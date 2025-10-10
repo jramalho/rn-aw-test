@@ -22,18 +22,17 @@ DerivedData
 *.xcuserstate
 **/.xcode.env.local
 
-# Android/IntelliJ
-#
-build/
-.idea
-.gradle
-local.properties
-*.iml
-*.hprof
-.cxx/
-*.keystore
-!debug.keystore
-.kotlin/
+# Android
+android/
+
+# iOS
+ios/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
 
 # node.js
 #

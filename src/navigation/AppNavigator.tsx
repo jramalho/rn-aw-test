@@ -1,12 +1,13 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
-// Import screens (to be created)
-import HomeScreen from '../screens/HomeScreen';
+// Import screens
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import PokemonListScreen from '../screens/PokemonListScreen';
+import PokemonDetailScreen from '../screens/PokemonDetailScreen';
 
 // Import types
 import type { RootStackParamList } from '../types';
@@ -35,44 +36,43 @@ const TabNavigator: React.FC = () => {
       }}
     >
       <Tab.Screen 
-        name="Home" 
-        component={HomeScreen}
-        options={{
-          tabBarIcon: ({ color }) => <TabIcon name="home" color={color} />,
-        }}
+        name="PokemonList" 
+        component={PokemonListScreen}
+          options={{
+            title: 'PokéDex',
+            tabBarIcon: ({ color }) => <PokemonIcon color={color} />,
+          }}
       />
       <Tab.Screen 
         name="Profile" 
         component={ProfileScreen}
-        options={{
-          tabBarIcon: ({ color }) => <TabIcon name="person" color={color} />,
-        }}
+          options={{
+            tabBarIcon: ({ color }) => <PersonIcon color={color} />,
+          }}
       />
       <Tab.Screen 
         name="Settings" 
         component={SettingsScreen}
-        options={{
-          tabBarIcon: ({ color }) => <TabIcon name="settings" color={color} />,
-        }}
+          options={{
+            tabBarIcon: ({ color }) => <SettingsIcon color={color} />,
+          }}
       />
     </Tab.Navigator>
   );
 };
 
-const TabIcon: React.FC<{ name: string; color: string }> = ({ name, color }) => {
-  // Simple text-based icons for now
-  const iconMap: { [key: string]: string } = {
-    home: '🏠',
-    person: '👤', 
-    settings: '⚙️',
-  };
+// Tab icon components
+const PokemonIcon = React.memo(({ color }: { color: string }) => (
+  <Text style={[navStyles.tabIcon, { color }]}>🎮</Text>
+));
 
-  return (
-    <Text style={{ fontSize: 20, color }}>
-      {iconMap[name] || '?'}
-    </Text>
-  );
-};
+const PersonIcon = React.memo(({ color }: { color: string }) => (
+  <Text style={[navStyles.tabIcon, { color }]}>👤</Text>
+));
+
+const SettingsIcon = React.memo(({ color }: { color: string }) => (
+  <Text style={[navStyles.tabIcon, { color }]}>⚙️</Text>
+));
 
 export const AppNavigator: React.FC = () => {
   return (
@@ -92,9 +92,23 @@ export const AppNavigator: React.FC = () => {
         component={TabNavigator}
         options={{ headerShown: false }}
       />
+      <Stack.Screen 
+        name="PokemonDetail" 
+        component={PokemonDetailScreen}
+        options={{ 
+          headerShown: false,
+          presentation: 'card'
+        }}
+      />
     </Stack.Navigator>
   );
 };
 
 // Import Text from React Native
 import { Text } from 'react-native';
+
+const navStyles = StyleSheet.create({
+  tabIcon: {
+    fontSize: 20,
+  },
+});

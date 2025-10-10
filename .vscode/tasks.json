@@ -144,6 +144,46 @@
 			"type": "shell",
 			"command": "cat > INSTALLATION.md << 'EOF'\n# 🚀 Installation Guide - RN AW Test\n\nComplete setup guide for the React Native 0.82 New Architecture project.\n\n## 📱 Prerequisites\n\n### System Requirements\n\n- **Node.js** 20+ \n- **npm** or **yarn**\n- **React Native CLI**\n- **Git**\n\n### Platform-Specific Requirements\n\n#### iOS Development (macOS only)\n- **Xcode** 15+\n- **Xcode Command Line Tools**\n- **CocoaPods** (via Bundler)\n- **Ruby** (for CocoaPods)\n- **iOS Simulator** or physical device\n\n#### Android Development\n- **Android Studio**\n- **Android SDK** (API 34+)\n- **Java Development Kit** 17+\n- **Android Emulator** or physical device\n\n### Verification Commands\n\n```bash\n# Check Node.js version\nnode --version  # Should be 20+\n\n# Check React Native CLI\nnpx react-native --version\n\n# Check platform tools\nxcode-select --version    # macOS only\njava --version            # Should be 17+\n```\n\n## 💾 Installation Steps\n\n### 1. Clone the Repository\n\n```bash\ngit clone https://github.com/jramalhoinvillia/rn-aw-test.git\ncd rn-aw-test\n```\n\n### 2. Install JavaScript Dependencies\n\n```bash\n# Using npm\nnpm install\n\n# OR using yarn\nyarn install\n```\n\n### 3. Set Up Environment Variables\n\n```bash\n# Copy environment template\ncp .env.example .env\n\n# Edit .env file with your configuration\n# Most values can be left as defaults for development\n```\n\n### 4. Platform Setup\n\n#### iOS Setup (macOS only)\n\n```bash\n# Install Ruby dependencies\nbundle install\n\n# Install CocoaPods dependencies\ncd ios\nbundle exec pod install\ncd ..\n```\n\n**Note:** If you encounter issues with pod install:\n\n```bash\n# Clean and reinstall pods\ncd ios\nrm -rf Pods Podfile.lock\nbundle exec pod install --repo-update\ncd ..\n```\n\n#### Android Setup\n\n```bash\n# Clean Android build (if needed)\ncd android\n./gradlew clean\ncd ..\n```\n\n**Android Studio Setup:**\n1. Open Android Studio\n2. Configure SDK (API 34+)\n3. Create/start an Android emulator\n4. Enable USB debugging (for physical device)\n\n### 5. Initialize Git Hooks\n\n```bash\n# Set up Husky for code quality\nnpm run prepare\n```\n\n### 6. Verify Installation\n\n```bash\n# Type checking\nnpm run type-check\n\n# Linting\nnpm run lint\n\n# Run tests\nnpm test\n```\n\n## 🏃 Running the App\n\n### Start Metro Bundler\n\n```bash\n# Start the Metro bundler\nnpm start\n\n# OR with cache reset\nnpm run start:reset\n```\n\n### Run on iOS\n\n```bash\n# Debug mode\nnpm run ios\n\n# Specific simulator\nnpx react-native run-ios --simulator=\"iPhone 15 Pro\"\n\n# Release mode\nnpm run ios:release\n```\n\n### Run on Android\n\n```bash\n# Debug mode\nnpm run android\n\n# Release mode\nnpm run android:release\n```\n\n## 🔍 Troubleshooting\n\n### Common Issues\n\n#### Metro Bundler Issues\n\n```bash\n# Clear Metro cache\nnpm run start:reset\n\n# OR manually\nnpx react-native start --reset-cache\n```\n\n#### iOS Build Issues\n\n```bash\n# Clean iOS build\nnpm run clean:ios\n\n# Reinstall pods\ncd ios\nrm -rf Pods Podfile.lock\nbundle exec pod install\ncd ..\n```\n\n#### Android Build Issues\n\n```bash\n# Clean Android build\nnpm run clean:android\n\n# Clean all builds\nnpm run clean\n```\n\n#### Node Modules Issues\n\n```bash\n# Clean install\nrm -rf node_modules package-lock.json\nnpm install\n```\n\n### Environment Issues\n\n#### React Native Environment\n\n```bash\n# Check RN environment\nnpx @react-native-community/cli doctor\n\n# Fix common issues\nnpx @react-native-community/cli clean\n```\n\n#### TypeScript Issues\n\n```bash\n# Check TypeScript configuration\nnpm run type-check\n\n# Restart TypeScript server (VS Code)\n# Command Palette: \"TypeScript: Restart TS Server\"\n```\n\n### Platform-Specific Issues\n\n#### iOS\n\n**Xcode Issues:**\n```bash\n# Clean Xcode derived data\nrm -rf ~/Library/Developer/Xcode/DerivedData\n\n# Reset iOS simulator\nxcrun simctl erase all\n```\n\n**CocoaPods Issues:**\n```bash\n# Update CocoaPods\nsudo gem install cocoapods\npod repo update\n\n# Clear CocoaPods cache\npod cache clean --all\n```\n\n#### Android\n\n**Gradle Issues:**\n```bash\n# Clean Gradle cache\ncd android\n./gradlew clean\n./gradlew cleanBuildCache\ncd ..\n```\n\n**Android SDK Issues:**\n```bash\n# Check Android SDK\necho $ANDROID_HOME\necho $ANDROID_SDK_ROOT\n\n# Update SDK tools in Android Studio\n```\n\n## 📊 Performance Optimization\n\n### Development Performance\n\n```bash\n# Enable Flipper for debugging\n# Already configured in debug builds\n\n# Use Hermes engine (enabled by default)\n# Check android/app/build.gradle: enableHermes: true\n```\n\n### Build Performance\n\n```bash\n# Parallel builds (Android)\n# Add to android/gradle.properties:\n# org.gradle.parallel=true\n# org.gradle.configureondemand=true\n\n# Increase heap size\n# org.gradle.jvmargs=-Xmx8g -XX:MaxMetaspaceSize=512m\n```\n\n## 🛠️ Development Tools\n\n### Recommended VS Code Extensions\n\n```bash\n# Install recommended extensions\ncode --install-extension ms-vscode.vscode-typescript-next\ncode --install-extension esbenp.prettier-vscode\ncode --install-extension ms-vscode.vscode-eslint\ncode --install-extension bradlc.vscode-tailwindcss\n```\n\n### Debugging Tools\n\n- **Flipper** - React Native debugging (auto-configured)\n- **React DevTools** - Component inspection\n- **Reactotron** - State management debugging\n- **Chrome DevTools** - JavaScript debugging\n\n## 📝 Next Steps\n\nAfter successful installation:\n\n1. **Explore the app** - Run on iOS/Android to see features\n2. **Read the code** - Check `src/` directory structure\n3. **Run tests** - Execute `npm test` to see testing setup\n4. **Check documentation** - Review README.md and CONTRIBUTING.md\n5. **Start developing** - Add new features following the established patterns\n\n## 🌐 Deployment\n\n### Development Builds\n\n```bash\n# Android APK\nnpm run build:android\n\n# iOS Archive\nnpm run build:ios\n```\n\n### Production Setup\n\n- Configure signing certificates\n- Set up CI/CD pipeline (GitHub Actions included)\n- Configure app store metadata\n- Set up crash reporting and analytics\n\n---\n\n**Need Help?**\n\n- Check [React Native Documentation](https://reactnative.dev/docs/environment-setup)\n- Review [New Architecture Guide](https://reactnative.dev/docs/the-new-architecture/landing-page)\n- Open an issue on GitHub\n- Check CONTRIBUTING.md for development guidelines\n\n**Happy Coding! 🚀**\nEOF",
 			"group": "setup"
+		},
+		{
+			"label": "Create Pokemon API service",
+			"type": "shell",
+			"command": "touch src/utils/pokemonApi.ts"
+		},
+		{
+			"label": "Create Pokemon store",
+			"type": "shell",
+			"command": "touch src/store/pokemonStore.ts"
+		},
+		{
+			"label": "Create Pokemon Card component",
+			"type": "shell",
+			"command": "touch src/components/PokemonCard.tsx"
+		},
+		{
+			"label": "Create SearchBar component",
+			"type": "shell",
+			"command": "touch src/components/SearchBar.tsx"
+		},
+		{
+			"label": "Create TypeFilter component",
+			"type": "shell",
+			"command": "touch src/components/TypeFilter.tsx"
+		},
+		{
+			"label": "Create Pokemon List Screen",
+			"type": "shell",
+			"command": "touch src/screens/PokemonListScreen.tsx"
+		},
+		{
+			"label": "Create PokemonDetailScreen",
+			"type": "shell",
+			"command": "touch src/screens/PokemonDetailScreen.tsx"
+		},
+		{
+			"label": "Create Copilot instructions file",
+			"type": "shell",
+			"command": "touch .copilot-instructions.md"
 		}
 	]
 }

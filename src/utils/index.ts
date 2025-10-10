@@ -23,9 +23,56 @@ export const hexToRgba = (hex: string, alpha: number): string => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
+// Pokemon Type Colors
+export const getPokemonTypeColor = (type: string): string => {
+  const typeColors: Record<string, string> = {
+    normal: '#A8A878',
+    fire: '#F08030',
+    water: '#6890F0',
+    electric: '#F8D030',
+    grass: '#78C850',
+    ice: '#98D8D8',
+    fighting: '#C03028',
+    poison: '#A040A0',
+    ground: '#E0C068',
+    flying: '#A890F0',
+    psychic: '#F85888',
+    bug: '#A8B820',
+    rock: '#B8A038',
+    ghost: '#705898',
+    dragon: '#7038F8',
+    dark: '#705848',
+    steel: '#B8B8D0',
+    fairy: '#EE99AC',
+  };
+  
+  return typeColors[type.toLowerCase()] || '#68A090';
+};
+
+// Pokemon Stat Colors
+export const getStatColor = (statName: string): string => {
+  const statColors: Record<string, string> = {
+    hp: '#FF5959',
+    attack: '#F5AC78',
+    defense: '#FAE078',
+    'special-attack': '#9DB7F5',
+    'special-defense': '#A7DB8D',
+    speed: '#FA92B2',
+  };
+  
+  return statColors[statName.toLowerCase()] || '#A0A0A0';
+};
+
 // String utilities
 export const capitalize = (str: string): string => 
   str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+export const capitalizeWords = (str: string): string => 
+  str.split(' ').map(word => capitalize(word)).join(' ');
+
+export const formatPokemonName = (name: string): string => {
+  return name.split('-').map(word => capitalize(word)).join(' ');
+};
 
 export const truncate = (str: string, length: number): string => 
   str.length > length ? `${str.substring(0, length)}...` : str;
@@ -40,6 +87,24 @@ export const formatCurrency = (amount: number, currency = 'USD'): string => {
 
 export const clamp = (value: number, min: number, max: number): number => 
   Math.min(Math.max(value, min), max);
+
+export const formatHeight = (decimeters: number): string => {
+  const meters = decimeters / 10;
+  return `${meters.toFixed(1)} m`;
+};
+
+export const formatWeight = (hectograms: number): string => {
+  const kilograms = hectograms / 10;
+  return `${kilograms.toFixed(1)} kg`;
+};
+
+export const formatPokemonId = (id: number): string => {
+  return `#${id.toString().padStart(3, '0')}`;
+};
+
+export const getStatPercentage = (value: number, maxValue = 255): number => {
+  return Math.round((value / maxValue) * 100);
+};
 
 // Date utilities
 export const formatDate = (date: Date | string, format = 'short'): string => {
@@ -78,7 +143,7 @@ export const isValidEmail = (email: string): boolean => {
 };
 
 export const isValidPhone = (phone: string): boolean => {
-  const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+  const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
   return phoneRegex.test(phone.replace(/\s/g, ''));
 };
 
@@ -104,12 +169,50 @@ export const groupBy = <T>(array: T[], key: keyof T): Record<string, T[]> => {
   }, {} as Record<string, T[]>);
 };
 
+// Pokemon utilities
+export const getPokemonImageUrl = (id: number, variant: 'default' | 'shiny' | 'artwork' = 'default'): string => {
+  const baseUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+  
+  switch (variant) {
+    case 'shiny':
+      return `${baseUrl}/shiny/${id}.png`;
+    case 'artwork':
+      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+    default:
+      return `${baseUrl}/${id}.png`;
+  }
+};
+
+export const getPokemonIdFromUrl = (url: string): number => {
+  const matches = url.match(/\/(\d+)\/$/);
+  return matches ? parseInt(matches[1], 10) : 0;
+};
+
+export const filterPokemonsByType = <T extends { types: any[] }>(
+  pokemons: T[],
+  typeFilter: string
+): T[] => {
+  if (!typeFilter) return pokemons;
+  
+  return pokemons.filter(pokemon =>
+    pokemon.types.some(type => type.type.name.toLowerCase() === typeFilter.toLowerCase())
+  );
+};
+
+export const sortPokemonsByName = <T extends { name: string }>(pokemons: T[]): T[] => {
+  return [...pokemons].sort((a, b) => a.name.localeCompare(b.name));
+};
+
+export const sortPokemonsByNumber = <T extends { id: number }>(pokemons: T[]): T[] => {
+  return [...pokemons].sort((a, b) => a.id - b.id);
+};
+
 // Performance utilities
 export const debounce = <T extends (...args: any[]) => any>(
   func: T,
   delay: number
 ): (...args: Parameters<T>) => void => {
-  let timeoutId: NodeJS.Timeout;
+  let timeoutId: ReturnType<typeof setTimeout>;
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
@@ -128,6 +231,27 @@ export const throttle = <T extends (...args: any[]) => any>(
       setTimeout(() => { isThrottled = false; }, delay);
     }
   };
+};
+
+// API utilities
+export const buildPokemonApiUrl = (endpoint: string, params?: Record<string, string | number>): string => {
+  const baseUrl = 'https://pokeapi.co/api/v2';
+  let url = `${baseUrl}/${endpoint}`;
+  
+  if (params) {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      searchParams.append(key, value.toString());
+    });
+    url += `?${searchParams.toString()}`;
+  }
+  
+  return url;
+};
+
+// Cache utilities
+export const createCacheKey = (...parts: (string | number)[]): string => {
+  return parts.join(':');
 };
 
 // Import necessary React Native modules

@@ -1,20 +1,37 @@
 import { renderHook, act, waitFor } from '@testing-library/react-native';
 import {
   useKeyboard,
+  useAppState,
   useDebounce,
   usePrevious,
   useAsyncOperation,
   useCountdown,
+  useAsyncStorage,
 } from '../index';
-import { Keyboard } from 'react-native';
+import { Keyboard, AppState } from 'react-native';
 
-// Mock Keyboard
+// Mock AsyncStorage
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  default: {
+    setItem: jest.fn(() => Promise.resolve()),
+    getItem: jest.fn(() => Promise.resolve(null)),
+    removeItem: jest.fn(() => Promise.resolve()),
+  },
+}));
+
+// Mock Keyboard and AppState
 jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
   return {
     ...RN,
     Keyboard: {
       addListener: jest.fn((event, callback) => ({
+        remove: jest.fn(),
+      })),
+    },
+    AppState: {
+      currentState: 'active',
+      addEventListener: jest.fn((event, callback) => ({
         remove: jest.fn(),
       })),
     },
@@ -308,6 +325,222 @@ describe('Custom Hooks', () => {
       
       expect(result.current.time).toBe(0);
       expect(result.current.isActive).toBe(false);
+    });
+  });
+
+  describe('useAppState', () => {
+    it('initializes with current app state', () => {
+      const { result } = renderHook(() => useAppState());
+      
+      expect(result.current).toBe('active');
+    });
+
+    it('updates when app state changes', () => {
+      let stateChangeCallback: ((state: string) => void) | null = null;
+      
+      (AppState.addEventListener as jest.Mock).mockImplementation((event, callback) => {
+        stateChangeCallback = callback;
+        return { remove: jest.fn() };
+      });
+      
+      const { result } = renderHook(() => useAppState());
+      
+      expect(result.current).toBe('active');
+      
+      // Simulate app going to background
+      act(() => {
+        if (stateChangeCallback) {
+          stateChangeCallback('background');
+        }
+      });
+      
+      expect(result.current).toBe('background');
+      
+      // Simulate app going inactive
+      act(() => {
+        if (stateChangeCallback) {
+          stateChangeCallback('inactive');
+        }
+      });
+      
+      expect(result.current).toBe('inactive');
+    });
+
+    it('cleans up listener on unmount', () => {
+      const mockRemove = jest.fn();
+      (AppState.addEventListener as jest.Mock).mockReturnValue({ remove: mockRemove });
+      
+      const { unmount } = renderHook(() => useAppState());
+      
+      unmount();
+      
+      expect(mockRemove).toHaveBeenCalled();
+    });
+  });
+
+  describe('useAsyncStorage', () => {
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+
+    beforeEach(() => {
+      AsyncStorage.setItem.mockClear();
+      AsyncStorage.getItem.mockClear();
+      AsyncStorage.removeItem.mockClear();
+    });
+
+    it('initializes with initial value when storage is empty', async () => {
+      AsyncStorage.getItem.mockResolvedValue(null);
+      
+      const { result } = renderHook(() => useAsyncStorage('test-key', 'initial'));
+      
+      expect(result.current.loading).toBe(true);
+      
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+      
+      expect(result.current.value).toBe('initial');
+      expect(AsyncStorage.getItem).toHaveBeenCalledWith('test-key');
+    });
+
+    it('loads stored value from AsyncStorage', async () => {
+      const storedValue = { data: 'stored' };
+      AsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedValue));
+      
+      const { result } = renderHook(() => useAsyncStorage('test-key', { data: 'initial' }));
+      
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+      
+      expect(result.current.value).toEqual(storedValue);
+    });
+
+    it('sets value and persists to AsyncStorage', async () => {
+      AsyncStorage.getItem.mockResolvedValue(null);
+      
+      const { result } = renderHook(() => useAsyncStorage('test-key', 'initial'));
+      
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+      
+      await act(async () => {
+        await result.current.setValue('updated');
+      });
+      
+      expect(result.current.value).toBe('updated');
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith('test-key', JSON.stringify('updated'));
+    });
+
+    it('sets value using function updater', async () => {
+      AsyncStorage.getItem.mockResolvedValue(null);
+      
+      const { result } = renderHook(() => useAsyncStorage('test-key', 10));
+      
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+      
+      await act(async () => {
+        await result.current.setValue((prev) => prev + 5);
+      });
+      
+      expect(result.current.value).toBe(15);
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith('test-key', JSON.stringify(15));
+    });
+
+    it('removes value from AsyncStorage', async () => {
+      AsyncStorage.getItem.mockResolvedValue(JSON.stringify('stored'));
+      
+      const { result } = renderHook(() => useAsyncStorage('test-key', 'initial'));
+      
+      await waitFor(() => {
+        expect(result.current.value).toBe('stored');
+      });
+      
+      await act(async () => {
+        await result.current.removeValue();
+      });
+      
+      expect(result.current.value).toBe('initial');
+      expect(AsyncStorage.removeItem).toHaveBeenCalledWith('test-key');
+    });
+
+    it('handles AsyncStorage errors gracefully when getting', async () => {
+      const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+      AsyncStorage.getItem.mockRejectedValue(new Error('Storage error'));
+      
+      const { result } = renderHook(() => useAsyncStorage('test-key', 'initial'));
+      
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+      
+      expect(result.current.value).toBe('initial');
+      expect(consoleError).toHaveBeenCalled();
+      
+      consoleError.mockRestore();
+    });
+
+    it('handles AsyncStorage errors gracefully when setting', async () => {
+      const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+      AsyncStorage.getItem.mockResolvedValue(null);
+      AsyncStorage.setItem.mockRejectedValue(new Error('Storage error'));
+      
+      const { result } = renderHook(() => useAsyncStorage('test-key', 'initial'));
+      
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+      
+      await act(async () => {
+        await result.current.setValue('updated');
+      });
+      
+      expect(consoleError).toHaveBeenCalled();
+      
+      consoleError.mockRestore();
+    });
+
+    it('handles AsyncStorage errors gracefully when removing', async () => {
+      const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+      AsyncStorage.getItem.mockResolvedValue(null);
+      AsyncStorage.removeItem.mockRejectedValue(new Error('Storage error'));
+      
+      const { result } = renderHook(() => useAsyncStorage('test-key', 'initial'));
+      
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+      
+      await act(async () => {
+        await result.current.removeValue();
+      });
+      
+      expect(consoleError).toHaveBeenCalled();
+      
+      consoleError.mockRestore();
+    });
+
+    it('works with complex object types', async () => {
+      type ComplexType = { id: number; name: string; tags: string[] };
+      const initialValue: ComplexType = { id: 1, name: 'Test', tags: ['a', 'b'] };
+      const updatedValue: ComplexType = { id: 2, name: 'Updated', tags: ['c', 'd', 'e'] };
+      
+      AsyncStorage.getItem.mockResolvedValue(null);
+      
+      const { result } = renderHook(() => useAsyncStorage<ComplexType>('complex-key', initialValue));
+      
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+      
+      await act(async () => {
+        await result.current.setValue(updatedValue);
+      });
+      
+      expect(result.current.value).toEqual(updatedValue);
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith('complex-key', JSON.stringify(updatedValue));
     });
   });
 });

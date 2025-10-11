@@ -2344,7 +2344,7 @@ jobs:
           GITHUB_AW_AGENT_OUTPUT: ${{ needs.agent.outputs.output }}
           GITHUB_AW_WORKFLOW_NAME: "Daily Roadmap Progress"
           GITHUB_AW_DISCUSSION_TITLE_PREFIX: "${{ github.workflow }}"
-          GITHUB_AW_DISCUSSION_CATEGORY_ID: "ideas"
+          GITHUB_AW_DISCUSSION_CATEGORY_ID: "DIC_kwDOP_5pk84CwfYn"
         with:
           script: |
             async function main() {

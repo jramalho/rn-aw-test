@@ -5,7 +5,7 @@
 #
 # Source: githubnext/agentics/workflows/daily-progress.md@e2770974a7eaccb58ddafd5606c38a05ba52c631
 #
-# Effective stop-time: 2025-10-12 20:37:16
+# Effective stop-time: 2025-10-13 18:17:23
 
 name: "Daily Roadmap Progress"
 on:
@@ -144,7 +144,7 @@ jobs:
           WORKFLOW_NAME="Daily Roadmap Progress"
           
           # Check stop-time limit
-          STOP_TIME="2025-10-12 20:37:16"
+          STOP_TIME="2025-10-13 18:17:23"
           echo "Checking stop-time limit: $STOP_TIME"
           
           # Convert stop time to epoch seconds

@@ -7,20 +7,23 @@ import {
   Switch,
   Pressable,
   useColorScheme,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeStore } from '../store/themeStore';
 import { Button } from '../components';
+import { pokemonApi } from '../utils/pokemonApi';
 
 const SettingsScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const systemColorScheme = useColorScheme();
   const { isDarkMode, systemTheme, toggleTheme, setTheme } = useThemeStore();
-  
+
   // Local state for other settings
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const [analyticsEnabled, setAnalyticsEnabled] = React.useState(false);
-  const [performanceMonitoring, setPerformanceMonitoring] = React.useState(true);
+  const [performanceMonitoring, setPerformanceMonitoring] =
+    React.useState(true);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff',
@@ -38,9 +41,21 @@ const SettingsScreen: React.FC = () => {
     setTheme(systemColorScheme === 'dark');
   };
 
+  const handleClearCache = async () => {
+    try {
+      await pokemonApi.clearCache();
+      Alert.alert('Success', 'Cache cleared successfully!');
+    } catch (error) {
+      console.error('Error clearing cache:', error);
+      Alert.alert('Error', 'Failed to clear cache');
+    }
+  };
+
   return (
-    <View style={[styles.container, backgroundStyle, { paddingTop: insets.top }]}>
-      <ScrollView 
+    <View
+      style={[styles.container, backgroundStyle, { paddingTop: insets.top }]}
+    >
+      <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}
         contentContainerStyle={styles.scrollContent}
@@ -48,14 +63,21 @@ const SettingsScreen: React.FC = () => {
         {/* Header */}
         <View style={styles.header}>
           <Text style={[styles.title, textStyle]}>Settings</Text>
-          <Text style={[styles.subtitle, textStyle]}>Customize your app experience</Text>
+          <Text style={[styles.subtitle, textStyle]}>
+            Customize your app experience
+          </Text>
         </View>
 
         {/* Appearance Section */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, textStyle]}>Appearance</Text>
-          
-          <View style={[styles.settingCard, { backgroundColor: isDarkMode ? '#2a2a2a' : '#f8f9fa' }]}>
+
+          <View
+            style={[
+              styles.settingCard,
+              { backgroundColor: isDarkMode ? '#2a2a2a' : '#f8f9fa' },
+            ]}
+          >
             <SettingItem
               title="Dark Mode"
               description={`Currently: ${isDarkMode ? 'Dark' : 'Light'}`}
@@ -63,17 +85,26 @@ const SettingsScreen: React.FC = () => {
               onValueChange={handleThemeChange}
               isDarkMode={isDarkMode}
             />
-            
+
             <View style={styles.separator} />
-            
-            <Pressable style={styles.settingPressable} onPress={resetToSystemTheme}>
+
+            <Pressable
+              style={styles.settingPressable}
+              onPress={resetToSystemTheme}
+            >
               <View>
-                <Text style={[styles.settingTitle, textStyle]}>Use System Theme</Text>
+                <Text style={[styles.settingTitle, textStyle]}>
+                  Use System Theme
+                </Text>
                 <Text style={[styles.settingDescription, textStyle]}>
-                  {systemTheme ? 'Following system settings' : 'Manual override active'}
+                  {systemTheme
+                    ? 'Following system settings'
+                    : 'Manual override active'}
                 </Text>
               </View>
-              <Text style={[styles.actionText, { color: '#007AFF' }]}>Reset</Text>
+              <Text style={[styles.actionText, { color: '#007AFF' }]}>
+                Reset
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -81,8 +112,13 @@ const SettingsScreen: React.FC = () => {
         {/* App Settings Section */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, textStyle]}>App Settings</Text>
-          
-          <View style={[styles.settingCard, { backgroundColor: isDarkMode ? '#2a2a2a' : '#f8f9fa' }]}>
+
+          <View
+            style={[
+              styles.settingCard,
+              { backgroundColor: isDarkMode ? '#2a2a2a' : '#f8f9fa' },
+            ]}
+          >
             <SettingItem
               title="Push Notifications"
               description="Receive app updates and alerts"
@@ -90,9 +126,9 @@ const SettingsScreen: React.FC = () => {
               onValueChange={setNotificationsEnabled}
               isDarkMode={isDarkMode}
             />
-            
+
             <View style={styles.separator} />
-            
+
             <SettingItem
               title="Analytics"
               description="Help improve the app with usage data"
@@ -100,9 +136,9 @@ const SettingsScreen: React.FC = () => {
               onValueChange={setAnalyticsEnabled}
               isDarkMode={isDarkMode}
             />
-            
+
             <View style={styles.separator} />
-            
+
             <SettingItem
               title="Performance Monitoring"
               description="Track app performance metrics"
@@ -115,27 +151,42 @@ const SettingsScreen: React.FC = () => {
 
         {/* New Architecture Info */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, textStyle]}>New Architecture Status</Text>
-          
-          <View style={[styles.infoCard, { backgroundColor: isDarkMode ? '#2a2a2a' : '#f0f8ff' }]}>
+          <Text style={[styles.sectionTitle, textStyle]}>
+            New Architecture Status
+          </Text>
+
+          <View
+            style={[
+              styles.infoCard,
+              { backgroundColor: isDarkMode ? '#2a2a2a' : '#f0f8ff' },
+            ]}
+          >
             <View style={styles.statusItem}>
               <Text style={styles.statusIcon}>✓</Text>
-              <Text style={[styles.statusText, textStyle]}>Fabric Renderer Active</Text>
+              <Text style={[styles.statusText, textStyle]}>
+                Fabric Renderer Active
+              </Text>
             </View>
-            
+
             <View style={styles.statusItem}>
               <Text style={styles.statusIcon}>✓</Text>
-              <Text style={[styles.statusText, textStyle]}>TurboModules Enabled</Text>
+              <Text style={[styles.statusText, textStyle]}>
+                TurboModules Enabled
+              </Text>
             </View>
-            
+
             <View style={styles.statusItem}>
               <Text style={styles.statusIcon}>✓</Text>
-              <Text style={[styles.statusText, textStyle]}>JSI Bridge Active</Text>
+              <Text style={[styles.statusText, textStyle]}>
+                JSI Bridge Active
+              </Text>
             </View>
-            
+
             <View style={styles.statusItem}>
               <Text style={styles.statusIcon}>✓</Text>
-              <Text style={[styles.statusText, textStyle]}>Hermes Engine Running</Text>
+              <Text style={[styles.statusText, textStyle]}>
+                Hermes Engine Running
+              </Text>
             </View>
           </View>
         </View>
@@ -143,28 +194,27 @@ const SettingsScreen: React.FC = () => {
         {/* Actions Section */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, textStyle]}>Actions</Text>
-          
+
           <View style={styles.actionsContainer}>
-            <Button 
+            <Button
               title="Clear Cache"
-              onPress={() => console.log('Clear Cache pressed')}
+              onPress={handleClearCache}
               variant="outline"
             />
-            
-            <Button 
+
+            <Button
               title="Reset Settings"
               onPress={() => console.log('Reset Settings pressed')}
               variant="outline"
             />
-            
-            <Button 
+
+            <Button
               title="About App"
               onPress={() => console.log('About App pressed')}
               variant="primary"
             />
           </View>
         </View>
-
       </ScrollView>
     </View>
   );
@@ -179,20 +229,22 @@ interface SettingItemProps {
   isDarkMode: boolean;
 }
 
-const SettingItem: React.FC<SettingItemProps> = ({ 
-  title, 
-  description, 
-  value, 
+const SettingItem: React.FC<SettingItemProps> = ({
+  title,
+  description,
+  value,
   onValueChange,
-  isDarkMode 
+  isDarkMode,
 }) => {
   const textColor = { color: isDarkMode ? '#ffffff' : '#000000' };
-  
+
   return (
     <View style={styles.settingItem}>
       <View style={styles.settingContent}>
         <Text style={[styles.settingTitle, textColor]}>{title}</Text>
-        <Text style={[styles.settingDescription, textColor]}>{description}</Text>
+        <Text style={[styles.settingDescription, textColor]}>
+          {description}
+        </Text>
       </View>
       <Switch
         value={value}

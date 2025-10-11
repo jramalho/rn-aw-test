@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { usePokemonStore } from '../store/pokemonStore';
 import { Button } from '../components';
-import { RootStackParamList, PokemonSpecies, EvolutionChain } from '../types';
+import { RootStackParamList, Pokemon } from '../types';
 import { pokemonApi } from '../utils/pokemonApi';
 
 type PokemonDetailRouteProp = RouteProp<RootStackParamList, 'PokemonDetail'>;
@@ -28,14 +28,27 @@ const PokemonDetailScreen: React.FC = () => {
   const route = useRoute<PokemonDetailRouteProp>();
   const { pokemon } = route.params;
 
-  const { favorites, toggleFavorite } = usePokemonStore();
-  
-  const [species, setSpecies] = useState<PokemonSpecies | null>(null);
-  const [_evolution, setEvolution] = useState<EvolutionChain | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    favorites,
+    toggleFavorite,
+    loadPokemonDetail,
+    currentSpecies,
+    isLoadingDetail,
+    detailError,
+    clearDetailError,
+  } = usePokemonStore();
 
+  const [fullPokemon, setFullPokemon] = useState<Pokemon | null>(null);
+  const [loadingFullData, setLoadingFullData] = useState(false);
+
+  // Use full Pokemon data if available, otherwise use the passed pokemon
+  const displayPokemon = fullPokemon || pokemon;
   const isFavorite = favorites.includes(pokemon.id);
+
+  // Use store data for species and loading states
+  const species = currentSpecies;
+  const loading = isLoadingDetail || loadingFullData;
+  const error = detailError;
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff',
@@ -45,36 +58,36 @@ const PokemonDetailScreen: React.FC = () => {
     color: isDarkMode ? '#ffffff' : '#000000',
   };
 
-  const loadPokemonDetails = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // Load species data
-      const speciesData = await pokemonApi.getPokemonSpecies(pokemon.id);
-      setSpecies(speciesData);
+  const loadFullPokemonData = useCallback(async () => {
+    // Check if we need to load full Pokemon data (abilities, moves, etc.)
+    const needsFullData =
+      !pokemon.abilities ||
+      !pokemon.moves ||
+      !pokemon.stats ||
+      !Array.isArray(pokemon.abilities) ||
+      !Array.isArray(pokemon.moves) ||
+      !Array.isArray(pokemon.stats);
 
-      // Load evolution chain
-      if (speciesData.evolution_chain?.url) {
-        // Extract ID from URL for the evolution chain
-        const urlParts = speciesData.evolution_chain.url.split('/');
-        const evolutionId = parseInt(urlParts[urlParts.length - 2], 10);
-        if (evolutionId) {
-          const evolutionData = await pokemonApi.getEvolutionChain(evolutionId);
-          setEvolution(evolutionData);
-        }
+    if (needsFullData) {
+      setLoadingFullData(true);
+      try {
+        const fullData = await pokemonApi.getPokemon(pokemon.id);
+        setFullPokemon(fullData);
+      } catch (err) {
+        console.error('Failed to load full Pokemon data:', err);
+      } finally {
+        setLoadingFullData(false);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load Pokemon details');
-    } finally {
-      setLoading(false);
     }
-  }, [pokemon.id]);
+
+    // Load species and evolution data through the store
+    await loadPokemonDetail(pokemon);
+  }, [pokemon, loadPokemonDetail]);
 
   // Load additional Pokemon data
   useEffect(() => {
-    loadPokemonDetails();
-  }, [loadPokemonDetails]);
+    loadFullPokemonData();
+  }, [loadFullPokemonData]);
 
   const getTypeColor = (type: string): string => {
     const typeColors: { [key: string]: string } = {
@@ -110,47 +123,85 @@ const PokemonDetailScreen: React.FC = () => {
     return `${kg.toFixed(1)}kg`;
   };
 
-  const renderStats = () => (
-    <View style={styles.section}>
-      <Text style={[styles.sectionTitle, textStyle]}>Base Stats</Text>
-      {pokemon.stats.map((stat, index) => {
-        const statPercentage = Math.min(stat.base_stat / 2, 100);
-        const statColor = stat.base_stat > 100 ? '#4CAF50' : 
-          stat.base_stat > 70 ? '#FF9800' : '#F44336';
-        
-        return (
-          <View key={index} style={styles.statRow}>
-            <Text style={[styles.statName, textStyle]}>
-              {stat.stat.name.replace('-', ' ').toUpperCase()}
-            </Text>
-            <Text style={[styles.statValue, textStyle]}>
-              {stat.base_stat}
-            </Text>
-            <View style={styles.statBar}>
-              <View
-                style={[
-                  styles.statFill,
-                  {
-                    width: `${statPercentage}%`,
-                    backgroundColor: statColor,
-                  },
-                ]}
-              />
+  const renderStats = () => {
+    // Check if stats exist and is an array
+    if (
+      !displayPokemon.stats ||
+      !Array.isArray(displayPokemon.stats) ||
+      displayPokemon.stats.length === 0
+    ) {
+      return (
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, textStyle]}>Base Stats</Text>
+          <Text style={[styles.noDataText, textStyle]}>Loading stats...</Text>
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, textStyle]}>Base Stats</Text>
+        {displayPokemon.stats.map((stat, index) => {
+          const statPercentage = Math.min(stat.base_stat / 2, 100);
+          const statColor =
+            stat.base_stat > 100
+              ? '#4CAF50'
+              : stat.base_stat > 70
+              ? '#FF9800'
+              : '#F44336';
+
+          return (
+            <View key={index} style={styles.statRow}>
+              <Text style={[styles.statName, textStyle]}>
+                {stat.stat.name.replace('-', ' ').toUpperCase()}
+              </Text>
+              <Text style={[styles.statValue, textStyle]}>
+                {stat.base_stat}
+              </Text>
+              <View style={styles.statBar}>
+                <View
+                  style={[
+                    styles.statFill,
+                    {
+                      width: `${statPercentage}%`,
+                      backgroundColor: statColor,
+                    },
+                  ]}
+                />
+              </View>
             </View>
-          </View>
-        );
-      })}
-    </View>
-  );
+          );
+        })}
+      </View>
+    );
+  };
 
   const renderAbilities = () => {
     const abilityChipColor = isDarkMode ? '#333333' : '#f0f0f0';
-    
+
+    // Check if abilities exist and is an array
+    if (
+      !displayPokemon.abilities ||
+      !Array.isArray(displayPokemon.abilities) ||
+      displayPokemon.abilities.length === 0
+    ) {
+      return (
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, textStyle]}>Abilities</Text>
+          <View style={styles.abilitiesContainer}>
+            <Text style={[styles.noDataText, textStyle]}>
+              Loading abilities...
+            </Text>
+          </View>
+        </View>
+      );
+    }
+
     return (
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, textStyle]}>Abilities</Text>
         <View style={styles.abilitiesContainer}>
-          {pokemon.abilities.map((ability, index) => (
+          {displayPokemon.abilities.map((ability, index) => (
             <View
               key={index}
               style={[
@@ -172,30 +223,41 @@ const PokemonDetailScreen: React.FC = () => {
   };
 
   const renderMoves = () => {
-    const firstMoves = pokemon.moves.slice(0, 8);
+    // Check if moves exist and is an array
+    if (
+      !displayPokemon.moves ||
+      !Array.isArray(displayPokemon.moves) ||
+      displayPokemon.moves.length === 0
+    ) {
+      return (
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, textStyle]}>Moves</Text>
+          <Text style={[styles.noDataText, textStyle]}>Loading moves...</Text>
+        </View>
+      );
+    }
+
+    const firstMoves = displayPokemon.moves.slice(0, 8);
     const moveChipColor = isDarkMode ? '#2a2a2a' : '#f8f9fa';
     const moreMovesChipColor = isDarkMode ? '#333333' : '#e0e0e0';
-    
+
     return (
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, textStyle]}>
-          Moves ({pokemon.moves.length} total)
+          Moves ({displayPokemon.moves.length} total)
         </Text>
         <View style={styles.movesGrid}>
           {firstMoves.map((move, index) => (
             <View
               key={index}
-              style={[
-                styles.moveChip,
-                { backgroundColor: moveChipColor },
-              ]}
+              style={[styles.moveChip, { backgroundColor: moveChipColor }]}
             >
               <Text style={[styles.moveText, textStyle]}>
                 {move.move.name.replace('-', ' ')}
               </Text>
             </View>
           ))}
-          {pokemon.moves.length > 8 && (
+          {displayPokemon.moves.length > 8 && (
             <View
               style={[
                 styles.moveChip,
@@ -204,7 +266,7 @@ const PokemonDetailScreen: React.FC = () => {
               ]}
             >
               <Text style={[styles.moveText, textStyle]}>
-                +{pokemon.moves.length - 8} more
+                +{displayPokemon.moves.length - 8} more
               </Text>
             </View>
           )}
@@ -217,14 +279,15 @@ const PokemonDetailScreen: React.FC = () => {
     if (!species) return null;
 
     const englishEntry = species.flavor_text_entries.find(
-      entry => entry.language.name === 'en'
+      entry => entry.language.name === 'en',
     );
 
     return (
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, textStyle]}>Description</Text>
         <Text style={[styles.descriptionText, textStyle]}>
-          {englishEntry?.flavor_text.replace(/\f/g, ' ') || 'No description available.'}
+          {englishEntry?.flavor_text.replace(/\f/g, ' ') ||
+            'No description available.'}
         </Text>
       </View>
     );
@@ -234,21 +297,22 @@ const PokemonDetailScreen: React.FC = () => {
     <View style={[styles.container, backgroundStyle]}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
-        <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Pressable
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
           <Text style={styles.backButtonText}>←</Text>
         </Pressable>
-        
+
         <Pressable
           style={styles.favoriteButton}
-          onPress={() => toggleFavorite(pokemon.id)}
+          onPress={() => toggleFavorite(displayPokemon.id)}
         >
-          <Text style={styles.favoriteIcon}>
-            {isFavorite ? '❤️' : '🤍'}
-          </Text>
+          <Text style={styles.favoriteIcon}>{isFavorite ? '❤️' : '🤍'}</Text>
         </Pressable>
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={backgroundStyle}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -258,65 +322,72 @@ const PokemonDetailScreen: React.FC = () => {
           <View style={styles.imageContainer}>
             <Image
               source={{
-                uri: pokemon.sprites.other?.['official-artwork']?.front_default ||
-                     pokemon.sprites.front_default ||
-                     'https://via.placeholder.com/200x200?text=No+Image',
+                uri:
+                  displayPokemon.sprites.other?.['official-artwork']
+                    ?.front_default ||
+                  displayPokemon.sprites.front_default ||
+                  'https://via.placeholder.com/200x200?text=No+Image',
               }}
               style={styles.pokemonImage}
               resizeMode="contain"
             />
           </View>
-          
+
           <Text style={[styles.pokemonName, textStyle]}>
-            {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
+            {displayPokemon.name.charAt(0).toUpperCase() +
+              displayPokemon.name.slice(1)}
           </Text>
-          
+
           <Text style={[styles.pokemonId, textStyle]}>
-            #{pokemon.id.toString().padStart(3, '0')}
+            #{displayPokemon.id.toString().padStart(3, '0')}
           </Text>
 
           {/* Types */}
           <View style={styles.typesContainer}>
-            {pokemon.types.map((type, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.typeChip,
-                  { backgroundColor: getTypeColor(type.type.name) },
-                ]}
-              >
-                <Text style={styles.typeText}>
-                  {type.type.name.toUpperCase()}
-                </Text>
-              </View>
-            ))}
+            {displayPokemon.types &&
+              Array.isArray(displayPokemon.types) &&
+              displayPokemon.types.map((type, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.typeChip,
+                    { backgroundColor: getTypeColor(type.type.name) },
+                  ]}
+                >
+                  <Text style={styles.typeText}>
+                    {type.type.name.toUpperCase()}
+                  </Text>
+                </View>
+              ))}
           </View>
 
           {/* Physical Stats */}
           <View style={styles.physicalStats}>
             <View style={styles.physicalStatItem}>
               <Text style={[styles.physicalStatValue, textStyle]}>
-                {formatHeight(pokemon.height)}
+                {formatHeight(displayPokemon.height)}
               </Text>
               <Text style={[styles.physicalStatLabel, textStyle]}>Height</Text>
             </View>
-            
+
             <View style={styles.physicalStatDivider} />
-            
+
             <View style={styles.physicalStatItem}>
               <Text style={[styles.physicalStatValue, textStyle]}>
-                {formatWeight(pokemon.weight)}
+                {formatWeight(displayPokemon.weight)}
               </Text>
               <Text style={[styles.physicalStatLabel, textStyle]}>Weight</Text>
             </View>
-            
+
             <View style={styles.physicalStatDivider} />
-            
+
             <View style={styles.physicalStatItem}>
               <Text style={[styles.physicalStatValue, textStyle]}>
-                {pokemon.base_experience || 'N/A'}
+                {displayPokemon.base_experience || 'N/A'}
               </Text>
-              <Text style={[styles.physicalStatLabel, textStyle]}>Base Exp</Text>
+              <Text style={[styles.physicalStatLabel, textStyle]}>
+                Base Exp
+              </Text>
             </View>
           </View>
         </View>
@@ -325,7 +396,9 @@ const PokemonDetailScreen: React.FC = () => {
         {loading && (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="small" color="#007AFF" />
-            <Text style={[styles.loadingText, textStyle]}>Loading details...</Text>
+            <Text style={[styles.loadingText, textStyle]}>
+              Loading details...
+            </Text>
           </View>
         )}
 
@@ -335,7 +408,10 @@ const PokemonDetailScreen: React.FC = () => {
             <Text style={styles.errorText}>⚠️ {error}</Text>
             <Button
               title="Retry"
-              onPress={loadPokemonDetails}
+              onPress={() => {
+                clearDetailError();
+                loadFullPokemonData();
+              }}
               size="small"
               variant="outline"
             />
@@ -569,6 +645,12 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 20,
+  },
+  noDataText: {
+    fontSize: 14,
+    opacity: 0.7,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
 

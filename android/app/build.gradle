@@ -84,6 +84,11 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        
+        // Speed up builds: only build for device architecture during development
+        ndk {
+            abiFilters project.findProperty("reactNativeArchitectures")?.split(",") ?: ["arm64-v8a", "armeabi-v7a"]
+        }
     }
     signingConfigs {
         debug {
@@ -93,6 +98,17 @@ android {
             keyPassword 'android'
         }
     }
+    
+    // Splits configuration for faster builds
+    splits {
+        abi {
+            reset()
+            enable project.findProperty("enableSeparateBuildPerCPUArchitecture")?.toBoolean() ?: false
+            universalApk false
+            include "arm64-v8a", "x86_64"
+        }
+    }
+    
     buildTypes {
         debug {
             signingConfig signingConfigs.debug

@@ -1,8 +1,6 @@
 module.exports = {
   presets: ['module:@react-native/babel-preset'],
   plugins: [
-    // Reanimated plugin must be last
-    'react-native-reanimated/plugin',
     [
       'module-resolver',
       {
@@ -10,7 +8,7 @@ module.exports = {
         alias: {
           '@': './src',
           '@components': './src/components',
-          '@screens': './src/screens', 
+          '@screens': './src/screens',
           '@navigation': './src/navigation',
           '@hooks': './src/hooks',
           '@utils': './src/utils',
@@ -20,13 +18,12 @@ module.exports = {
         },
       },
     ],
+    // Worklets plugin must be last
+    'react-native-worklets/plugin',
   ],
   env: {
     production: {
-      plugins: [
-        'react-native-paper/babel',
-        'transform-remove-console',
-      ],
+      plugins: ['react-native-paper/babel', 'transform-remove-console'],
     },
   },
 };

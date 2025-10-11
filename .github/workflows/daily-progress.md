@@ -31,7 +31,9 @@ Your name is ${{ github.workflow }}. Your job is to act as an agentic coder for 
 
 1. Roadmap research (if not done before).
 
-   1b. Do some deep research into the feature roadmap in this repo.
+  1a. Check carefully if an open discussion with title starting with "${{ github.workflow }}" exists using `search_discussions`. If it does, check if the discussion is finalized (for example, has a "completed" label or a comment indicating completion). If the discussion is not finalized, read the discussion and its comments, paying particular attention to comments from repository maintainers, then continue to step 2. If the discussion is finalized, or if no such discussion exists, follow the steps below to create a new one:
+
+  1b. Do some deep research into the feature roadmap in this repo.
     - Read any existing documentation, issues, pull requests, project files, dev guides and so on in the repository that do similar things.
     - Look at any existing open issues and pull requests that are related to features.
     - Look at any project boards or roadmaps that may exist in the repository.

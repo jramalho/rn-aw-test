@@ -10,7 +10,7 @@ safe-outputs:
     max: 3
     target: "*"
   create-discussion:
-    category-id: DIC_kwDOP_5pk84CwfYn
+    category: DIC_kwDOP_5pk84CwfYn
     max: 3
     title-prefix: ${{ github.workflow }}
   create-pull-request:

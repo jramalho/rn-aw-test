@@ -143,6 +143,9 @@ describe('pokemonStore', () => {
         isLoadingDetail: false,
         detailError: null,
         favorites: [],
+        team: [],
+        savedTeams: [],
+        currentTeamId: null,
         selectedType: null,
         availableTypes: [],
       });
@@ -904,6 +907,297 @@ describe('pokemonStore', () => {
       expect(result.current.searchResults.length).toBeGreaterThanOrEqual(0);
       expect(result.current.isSearching).toBe(false);
       expect(result.current.isLoading).toBe(false);
+    });
+  });
+
+  describe('Team Management', () => {
+    describe('addToTeam', () => {
+      it('should add Pokemon to team', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        act(() => {
+          const success = result.current.addToTeam(mockPokemon1);
+          expect(success).toBe(true);
+        });
+
+        expect(result.current.team).toHaveLength(1);
+        expect(result.current.team[0]).toEqual(mockPokemon1);
+      });
+
+      it('should not add duplicate Pokemon', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        act(() => {
+          result.current.addToTeam(mockPokemon1);
+          const success = result.current.addToTeam(mockPokemon1);
+          expect(success).toBe(false);
+        });
+
+        expect(result.current.team).toHaveLength(1);
+      });
+
+      it('should not add more than 6 Pokemon', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        const pokemon3 = { ...mockPokemon1, id: 3, name: 'venusaur' };
+        const pokemon4 = { ...mockPokemon1, id: 4, name: 'charmander' };
+        const pokemon5 = { ...mockPokemon1, id: 5, name: 'charmeleon' };
+        const pokemon6 = { ...mockPokemon1, id: 6, name: 'charizard' };
+        const pokemon7 = { ...mockPokemon1, id: 7, name: 'squirtle' };
+
+        act(() => {
+          result.current.addToTeam(mockPokemon1);
+          result.current.addToTeam(mockPokemon2);
+          result.current.addToTeam(pokemon3);
+          result.current.addToTeam(pokemon4);
+          result.current.addToTeam(pokemon5);
+          result.current.addToTeam(pokemon6);
+          const success = result.current.addToTeam(pokemon7);
+          expect(success).toBe(false);
+        });
+
+        expect(result.current.team).toHaveLength(6);
+      });
+    });
+
+    describe('removeFromTeam', () => {
+      it('should remove Pokemon from team', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        act(() => {
+          result.current.addToTeam(mockPokemon1);
+          result.current.addToTeam(mockPokemon2);
+        });
+
+        expect(result.current.team).toHaveLength(2);
+
+        act(() => {
+          result.current.removeFromTeam(mockPokemon1.id);
+        });
+
+        expect(result.current.team).toHaveLength(1);
+        expect(result.current.team[0].id).toBe(mockPokemon2.id);
+      });
+    });
+
+    describe('clearTeam', () => {
+      it('should clear entire team', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        act(() => {
+          result.current.addToTeam(mockPokemon1);
+          result.current.addToTeam(mockPokemon2);
+        });
+
+        expect(result.current.team).toHaveLength(2);
+
+        act(() => {
+          result.current.clearTeam();
+        });
+
+        expect(result.current.team).toHaveLength(0);
+      });
+    });
+
+    describe('isInTeam', () => {
+      it('should check if Pokemon is in team', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        act(() => {
+          result.current.addToTeam(mockPokemon1);
+        });
+
+        expect(result.current.isInTeam(mockPokemon1.id)).toBe(true);
+        expect(result.current.isInTeam(mockPokemon2.id)).toBe(false);
+      });
+    });
+
+    describe('saveCurrentTeam', () => {
+      it('should save current team', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        act(() => {
+          result.current.addToTeam(mockPokemon1);
+          result.current.addToTeam(mockPokemon2);
+        });
+
+        let savedTeam;
+        act(() => {
+          savedTeam = result.current.saveCurrentTeam('My Team', 'Test description');
+        });
+
+        expect(result.current.savedTeams).toHaveLength(1);
+        expect(result.current.savedTeams[0].name).toBe('My Team');
+        expect(result.current.savedTeams[0].description).toBe('Test description');
+        expect(result.current.savedTeams[0].pokemon).toHaveLength(2);
+        expect(result.current.currentTeamId).toBe(savedTeam.id);
+      });
+
+      it('should not save empty team', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        expect(() => {
+          act(() => {
+            result.current.saveCurrentTeam('Empty Team');
+          });
+        }).toThrow('Cannot save an empty team');
+      });
+
+      it('should update existing team when currentTeamId is set', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        let teamId;
+        act(() => {
+          result.current.addToTeam(mockPokemon1);
+          const saved = result.current.saveCurrentTeam('Original Name');
+          teamId = saved.id;
+        });
+
+        act(() => {
+          result.current.addToTeam(mockPokemon2);
+          result.current.saveCurrentTeam('Updated Name', 'New description');
+        });
+
+        expect(result.current.savedTeams).toHaveLength(1);
+        expect(result.current.savedTeams[0].name).toBe('Updated Name');
+        expect(result.current.savedTeams[0].description).toBe('New description');
+        expect(result.current.savedTeams[0].pokemon).toHaveLength(2);
+      });
+    });
+
+    describe('loadTeam', () => {
+      it('should load saved team', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        let teamId;
+        act(() => {
+          result.current.addToTeam(mockPokemon1);
+          result.current.addToTeam(mockPokemon2);
+          const saved = result.current.saveCurrentTeam('Team 1');
+          teamId = saved.id;
+          result.current.clearTeam();
+        });
+
+        expect(result.current.team).toHaveLength(0);
+
+        act(() => {
+          result.current.loadTeam(teamId);
+        });
+
+        expect(result.current.team).toHaveLength(2);
+        expect(result.current.currentTeamId).toBe(teamId);
+      });
+
+      it('should throw error for non-existent team', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        expect(() => {
+          act(() => {
+            result.current.loadTeam('non-existent-id');
+          });
+        }).toThrow('Team not found');
+      });
+    });
+
+    describe('deleteTeam', () => {
+      it('should delete saved team', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        let teamId;
+        act(() => {
+          result.current.addToTeam(mockPokemon1);
+          const saved = result.current.saveCurrentTeam('Team to Delete');
+          teamId = saved.id;
+        });
+
+        expect(result.current.savedTeams).toHaveLength(1);
+
+        act(() => {
+          result.current.deleteTeam(teamId);
+        });
+
+        expect(result.current.savedTeams).toHaveLength(0);
+      });
+
+      it('should clear currentTeamId when deleting active team', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        let teamId;
+        act(() => {
+          result.current.addToTeam(mockPokemon1);
+          const saved = result.current.saveCurrentTeam('Active Team');
+          teamId = saved.id;
+        });
+
+        expect(result.current.currentTeamId).toBe(teamId);
+
+        act(() => {
+          result.current.deleteTeam(teamId);
+        });
+
+        expect(result.current.currentTeamId).toBeNull();
+      });
+    });
+
+    describe('updateTeam', () => {
+      it('should update team name and description', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        let teamId;
+        act(() => {
+          result.current.addToTeam(mockPokemon1);
+          const saved = result.current.saveCurrentTeam('Original Name', 'Original description');
+          teamId = saved.id;
+        });
+
+        act(() => {
+          result.current.updateTeam(teamId, {
+            name: 'Updated Name',
+            description: 'Updated description',
+          });
+        });
+
+        const updatedTeam = result.current.savedTeams.find(t => t.id === teamId);
+        expect(updatedTeam?.name).toBe('Updated Name');
+        expect(updatedTeam?.description).toBe('Updated description');
+      });
+    });
+
+    describe('getTeamAnalysis', () => {
+      it('should return null for empty team', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        const analysis = result.current.getTeamAnalysis();
+        expect(analysis).toBeNull();
+      });
+
+      it('should calculate type coverage', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        act(() => {
+          result.current.addToTeam(mockPokemon1); // grass/poison
+          result.current.addToTeam(mockPokemon2); // grass/poison
+        });
+
+        const analysis = result.current.getTeamAnalysis();
+        expect(analysis).not.toBeNull();
+        expect(analysis?.typeCoverage.grass).toBe(2);
+        expect(analysis?.typeCoverage.poison).toBe(2);
+      });
+
+      it('should calculate average stats', () => {
+        const { result } = renderHook(() => usePokemonStore());
+
+        act(() => {
+          result.current.addToTeam(mockPokemon1); // HP: 45, Attack: 49
+          result.current.addToTeam(mockPokemon2); // HP: 60, Attack: 62
+        });
+
+        const analysis = result.current.getTeamAnalysis();
+        expect(analysis).not.toBeNull();
+        expect(analysis?.averageStats.hp).toBe(53); // (45 + 60) / 2 = 52.5 rounded to 53
+        expect(analysis?.averageStats.attack).toBe(56); // (49 + 62) / 2 = 55.5 rounded to 56
+      });
     });
   });
 });

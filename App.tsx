@@ -26,9 +26,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { useThemeStore } from './src/store/themeStore';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { OfflineIndicator } from './src/components/OfflineIndicator';
 import { linkingConfig } from './src/config/linkingConfig';
 import { useNotifications } from './src/hooks/useNotifications';
 import { useDeepLink } from './src/hooks/useDeepLink';
+import { useNetwork } from './src/hooks/useNetwork';
 
 import { seedDemoUsers } from './src/utils/authApi';
 
@@ -45,6 +47,9 @@ const App: React.FC = () => {
   // Initialize deep linking
   const { url: deepLinkUrl } = useDeepLink();
 
+  // Initialize network monitoring
+  const { isOnline } = useNetwork();
+
   React.useEffect(() => {
     setSystemTheme(systemColorScheme === 'dark');
   }, [systemColorScheme, setSystemTheme]);
@@ -60,6 +65,10 @@ const App: React.FC = () => {
       console.log('Deep link received:', deepLinkUrl);
     }
   }, [deepLinkUrl]);
+
+  React.useEffect(() => {
+    console.log('Network status:', isOnline ? 'Online' : 'Offline');
+  }, [isOnline]);
 
   // Create custom navigation themes
   const lightTheme = {
@@ -96,6 +105,7 @@ const App: React.FC = () => {
             barStyle={isDarkMode ? 'light-content' : 'dark-content'}
             backgroundColor={navigationTheme.colors.card}
           />
+          <OfflineIndicator />
           <AppNavigator />
         </NavigationContainer>
       </SafeAreaProvider>

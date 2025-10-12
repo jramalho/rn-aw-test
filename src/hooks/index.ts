@@ -216,3 +216,6 @@ export { useNotificationNavigation } from './useNotificationNavigation';
 
 // Export deep link hook
 export { useDeepLink } from './useDeepLink';
+
+// Export network hook
+export { useNetwork } from './useNetwork';

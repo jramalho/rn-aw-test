@@ -27,6 +27,11 @@ import { AppNavigator } from './src/navigation/AppNavigator';
 import { useThemeStore } from './src/store/themeStore';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 
+import { seedDemoUsers } from './src/utils/authApi';
+
+// Seed demo users for testing
+seedDemoUsers();
+
 const App: React.FC = () => {
   const systemColorScheme = useColorScheme();
   const { isDarkMode, setSystemTheme } = useThemeStore();

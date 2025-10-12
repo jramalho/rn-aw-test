@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeStore } from '../store/themeStore';
+import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components';
 import { pokemonApi } from '../utils/pokemonApi';
 
@@ -18,6 +19,7 @@ const SettingsScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const systemColorScheme = useColorScheme();
   const { isDarkMode, systemTheme, toggleTheme, setTheme } = useThemeStore();
+  const { user, logout } = useAuth();
 
   // Local state for other settings
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
@@ -49,6 +51,31 @@ const SettingsScreen: React.FC = () => {
       console.error('Error clearing cache:', error);
       Alert.alert('Error', 'Failed to clear cache');
     }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+            } catch (error) {
+              console.error('Error signing out:', error);
+              Alert.alert('Error', 'Failed to sign out');
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -215,6 +242,39 @@ const SettingsScreen: React.FC = () => {
             />
           </View>
         </View>
+
+        {/* Account Section */}
+        {user && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, textStyle]}>Account</Text>
+
+            <View
+              style={[
+                styles.settingCard,
+                { backgroundColor: isDarkMode ? '#2a2a2a' : '#f8f9fa' },
+              ]}
+            >
+              <View style={styles.settingItem}>
+                <View style={styles.settingContent}>
+                  <Text style={[styles.settingTitle, textStyle]}>
+                    Signed in as
+                  </Text>
+                  <Text style={[styles.settingDescription, textStyle]}>
+                    {user.email}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={[styles.actionsContainer, { marginTop: 16 }]}>
+              <Button
+                title="Sign Out"
+                onPress={handleLogout}
+                variant="outline"
+              />
+            </View>
+          </View>
+        )}
       </ScrollView>
     </View>
   );

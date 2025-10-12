@@ -108,8 +108,8 @@ const TeamBuilderScreen: React.FC = () => {
       return;
     }
 
-    // Navigate to battle screen
-    (navigation as any).navigate('Battle', { teamId: currentTeamId });
+    // Navigate to opponent selection screen
+    (navigation as any).navigate('OpponentSelection', { teamId: currentTeamId });
   };
 
   const handleSaveTeam = () => {

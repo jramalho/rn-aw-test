@@ -10,6 +10,7 @@ import PokemonListScreen from '../screens/PokemonListScreen';
 import PokemonDetailScreen from '../screens/PokemonDetailScreen';
 import PerformanceDashboardScreen from '../screens/PerformanceDashboardScreen';
 import TeamBuilderScreen from '../screens/TeamBuilderScreen';
+import OpponentSelectionScreen from '../screens/OpponentSelectionScreen';
 import BattleScreen from '../screens/BattleScreen';
 import BattleHistoryScreen from '../screens/BattleHistoryScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -163,6 +164,14 @@ export const AppNavigator: React.FC = () => {
             options={{ 
               headerShown: false,
               presentation: 'card'
+            }}
+          />
+          <Stack.Screen 
+            name="OpponentSelection" 
+            component={OpponentSelectionScreen}
+            options={{ 
+              title: 'Choose Opponent',
+              headerShown: true,
             }}
           />
           <Stack.Screen 

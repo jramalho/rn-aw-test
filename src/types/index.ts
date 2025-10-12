@@ -7,7 +7,8 @@ export type RootStackParamList = {
   PokemonList: undefined;
   PokemonDetail: { pokemon: Pokemon };
   TeamBuilder: undefined;
-  Battle: { teamId: string };
+  OpponentSelection: { teamId: string };
+  Battle: { teamId: string; opponentTrainer?: OpponentTrainer };
   BattleHistory: undefined;
   PerformanceDashboard: undefined;
   Search: undefined;
@@ -496,6 +497,18 @@ export interface BattleHistory {
   wins: number;
   losses: number;
   totalBattles: number;
+}
+
+// Opponent Trainer Types
+export type TeamStrategy = 'random' | 'type-focused' | 'balanced' | 'offensive' | 'defensive' | 'legendary';
+export type DifficultyLevel = 'easy' | 'medium' | 'hard' | 'expert';
+
+export interface OpponentTrainer {
+  name: string;
+  title: string;
+  strategy: TeamStrategy;
+  difficulty: DifficultyLevel;
+  teamSize: number;
 }
 
 // Import TextStyle from React Native

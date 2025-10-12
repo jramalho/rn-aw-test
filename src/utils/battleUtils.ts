@@ -144,12 +144,213 @@ export function calculateDamage(
 }
 
 /**
- * Generate an AI opponent team
+ * Team generation strategies
  */
-export function generateOpponentTeam(allPokemon: Pokemon[], teamSize: number = 6): Pokemon[] {
-  // Get a random selection of Pokemon
-  const shuffled = [...allPokemon].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, Math.min(teamSize, shuffled.length));
+export type TeamStrategy = 'random' | 'type-focused' | 'balanced' | 'offensive' | 'defensive' | 'legendary';
+export type DifficultyLevel = 'easy' | 'medium' | 'hard' | 'expert';
+
+export interface OpponentTrainer {
+  name: string;
+  title: string;
+  strategy: TeamStrategy;
+  difficulty: DifficultyLevel;
+  teamSize: number;
+}
+
+/**
+ * Predefined opponent trainers
+ */
+export const OPPONENT_TRAINERS: OpponentTrainer[] = [
+  { name: 'Joey', title: 'Youngster', strategy: 'random', difficulty: 'easy', teamSize: 3 },
+  { name: 'Misty', title: 'Gym Leader', strategy: 'type-focused', difficulty: 'medium', teamSize: 4 },
+  { name: 'Brock', title: 'Gym Leader', strategy: 'type-focused', difficulty: 'medium', teamSize: 4 },
+  { name: 'Lt. Surge', title: 'Gym Leader', strategy: 'type-focused', difficulty: 'medium', teamSize: 5 },
+  { name: 'Sabrina', title: 'Gym Leader', strategy: 'type-focused', difficulty: 'hard', teamSize: 5 },
+  { name: 'Blue', title: 'Rival', strategy: 'balanced', difficulty: 'hard', teamSize: 6 },
+  { name: 'Lance', title: 'Champion', strategy: 'legendary', difficulty: 'expert', teamSize: 6 },
+  { name: 'Red', title: 'Master Trainer', strategy: 'balanced', difficulty: 'expert', teamSize: 6 },
+];
+
+/**
+ * Get Pokemon types for filtering
+ */
+function getPokemonTypes(pokemon: Pokemon): string[] {
+  return pokemon.types.map(t => t.type.name);
+}
+
+/**
+ * Calculate Pokemon power level based on base stats
+ */
+function getPokemonPowerLevel(pokemon: Pokemon): number {
+  return pokemon.stats.reduce((sum, stat) => sum + stat.base_stat, 0);
+}
+
+/**
+ * Generate a type-focused team
+ */
+function generateTypeFocusedTeam(allPokemon: Pokemon[], teamSize: number, difficulty: DifficultyLevel): Pokemon[] {
+  // Pick a random type to focus on
+  const availableTypes = ['fire', 'water', 'grass', 'electric', 'psychic', 'fighting', 'dragon', 'ghost'];
+  const focusType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+  
+  // Filter Pokemon of that type
+  const typedPokemon = allPokemon.filter(p => 
+    getPokemonTypes(p).includes(focusType)
+  );
+  
+  // Sort by power level based on difficulty
+  const sortedByPower = [...typedPokemon].sort((a, b) => {
+    const powerA = getPokemonPowerLevel(a);
+    const powerB = getPokemonPowerLevel(b);
+    return difficulty === 'easy' ? powerA - powerB : powerB - powerA;
+  });
+  
+  // Take appropriate number based on difficulty
+  const startIndex = difficulty === 'easy' ? 0 : difficulty === 'medium' ? Math.floor(sortedByPower.length * 0.3) : Math.floor(sortedByPower.length * 0.5);
+  return sortedByPower.slice(startIndex, startIndex + teamSize);
+}
+
+/**
+ * Generate a balanced team with diverse types
+ */
+function generateBalancedTeam(allPokemon: Pokemon[], teamSize: number, difficulty: DifficultyLevel): Pokemon[] {
+  const team: Pokemon[] = [];
+  const usedTypes: string[] = [];
+  
+  // Sort by power level
+  const sortedByPower = [...allPokemon].sort((a, b) => {
+    const powerA = getPokemonPowerLevel(a);
+    const powerB = getPokemonPowerLevel(b);
+    return difficulty === 'easy' ? powerA - powerB : powerB - powerA;
+  });
+  
+  // Select Pokemon with diverse types
+  for (const pokemon of sortedByPower) {
+    const types = getPokemonTypes(pokemon);
+    const hasNewType = types.some(type => !usedTypes.includes(type));
+    
+    if (hasNewType || team.length === 0) {
+      team.push(pokemon);
+      types.forEach(type => {
+        if (!usedTypes.includes(type)) {
+          usedTypes.push(type);
+        }
+      });
+      
+      if (team.length >= teamSize) break;
+    }
+  }
+  
+  // Fill remaining slots if needed
+  while (team.length < teamSize && team.length < sortedByPower.length) {
+    const remaining = sortedByPower.filter(p => !team.includes(p));
+    if (remaining.length > 0) {
+      team.push(remaining[0]);
+    } else {
+      break;
+    }
+  }
+  
+  return team;
+}
+
+/**
+ * Generate an offensive team (high attack stats)
+ */
+function generateOffensiveTeam(allPokemon: Pokemon[], teamSize: number, difficulty: DifficultyLevel): Pokemon[] {
+  const sortedByOffense = [...allPokemon].sort((a, b) => {
+    const attackA = a.stats.find(s => s.stat.name === 'attack')?.base_stat || 0;
+    const spAttackA = a.stats.find(s => s.stat.name === 'special-attack')?.base_stat || 0;
+    const totalOffenseA = attackA + spAttackA;
+    
+    const attackB = b.stats.find(s => s.stat.name === 'attack')?.base_stat || 0;
+    const spAttackB = b.stats.find(s => s.stat.name === 'special-attack')?.base_stat || 0;
+    const totalOffenseB = attackB + spAttackB;
+    
+    return totalOffenseB - totalOffenseA;
+  });
+  
+  const startIndex = difficulty === 'easy' ? Math.floor(sortedByOffense.length * 0.7) : difficulty === 'medium' ? Math.floor(sortedByOffense.length * 0.4) : 0;
+  return sortedByOffense.slice(startIndex, startIndex + teamSize);
+}
+
+/**
+ * Generate a defensive team (high defense/HP stats)
+ */
+function generateDefensiveTeam(allPokemon: Pokemon[], teamSize: number, difficulty: DifficultyLevel): Pokemon[] {
+  const sortedByDefense = [...allPokemon].sort((a, b) => {
+    const hpA = a.stats.find(s => s.stat.name === 'hp')?.base_stat || 0;
+    const defenseA = a.stats.find(s => s.stat.name === 'defense')?.base_stat || 0;
+    const spDefenseA = a.stats.find(s => s.stat.name === 'special-defense')?.base_stat || 0;
+    const totalDefenseA = hpA + defenseA + spDefenseA;
+    
+    const hpB = b.stats.find(s => s.stat.name === 'hp')?.base_stat || 0;
+    const defenseB = b.stats.find(s => s.stat.name === 'defense')?.base_stat || 0;
+    const spDefenseB = b.stats.find(s => s.stat.name === 'special-defense')?.base_stat || 0;
+    const totalDefenseB = hpB + defenseB + spDefenseB;
+    
+    return totalDefenseB - totalDefenseA;
+  });
+  
+  const startIndex = difficulty === 'easy' ? Math.floor(sortedByDefense.length * 0.7) : difficulty === 'medium' ? Math.floor(sortedByDefense.length * 0.4) : 0;
+  return sortedByDefense.slice(startIndex, startIndex + teamSize);
+}
+
+/**
+ * Generate a legendary/powerful team
+ */
+function generateLegendaryTeam(allPokemon: Pokemon[], teamSize: number, difficulty: DifficultyLevel): Pokemon[] {
+  // Sort by total base stats (power level)
+  const sortedByPower = [...allPokemon].sort((a, b) => {
+    return getPokemonPowerLevel(b) - getPokemonPowerLevel(a);
+  });
+  
+  // Take the most powerful Pokemon
+  const powerThreshold = difficulty === 'expert' ? 0 : difficulty === 'hard' ? Math.floor(sortedByPower.length * 0.1) : Math.floor(sortedByPower.length * 0.2);
+  return sortedByPower.slice(powerThreshold, powerThreshold + teamSize);
+}
+
+/**
+ * Generate an AI opponent team with strategy
+ */
+export function generateOpponentTeam(
+  allPokemon: Pokemon[], 
+  teamSize: number = 6,
+  strategy: TeamStrategy = 'random',
+  difficulty: DifficultyLevel = 'medium'
+): Pokemon[] {
+  if (allPokemon.length === 0) return [];
+  
+  // Ensure teamSize doesn't exceed available Pokemon
+  const actualTeamSize = Math.min(teamSize, allPokemon.length);
+  
+  switch (strategy) {
+    case 'type-focused':
+      return generateTypeFocusedTeam(allPokemon, actualTeamSize, difficulty);
+    case 'balanced':
+      return generateBalancedTeam(allPokemon, actualTeamSize, difficulty);
+    case 'offensive':
+      return generateOffensiveTeam(allPokemon, actualTeamSize, difficulty);
+    case 'defensive':
+      return generateDefensiveTeam(allPokemon, actualTeamSize, difficulty);
+    case 'legendary':
+      return generateLegendaryTeam(allPokemon, actualTeamSize, difficulty);
+    case 'random':
+    default:
+      // Simple random selection for 'random' strategy
+      const shuffled = [...allPokemon].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, actualTeamSize);
+  }
+}
+
+/**
+ * Generate opponent team from a trainer profile
+ */
+export function generateTrainerTeam(
+  allPokemon: Pokemon[],
+  trainer: OpponentTrainer
+): Pokemon[] {
+  return generateOpponentTeam(allPokemon, trainer.teamSize, trainer.strategy, trainer.difficulty);
 }
 
 /**

@@ -13,6 +13,7 @@ import TeamBuilderScreen from '../screens/TeamBuilderScreen';
 import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import { NotificationSettingsScreen } from '../screens/NotificationSettingsScreen';
+import { NotificationDemoScreen } from '../screens/NotificationDemoScreen';
 
 // Import types
 import type { RootStackParamList } from '../types';
@@ -167,6 +168,14 @@ export const AppNavigator: React.FC = () => {
             component={NotificationSettingsScreen}
             options={{ 
               title: 'Notifications',
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen 
+            name="NotificationDemo" 
+            component={NotificationDemoScreen}
+            options={{ 
+              title: 'Notification Navigation Demo',
               headerShown: true,
             }}
           />

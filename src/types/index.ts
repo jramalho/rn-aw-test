@@ -12,6 +12,7 @@ export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
   NotificationSettings: undefined;
+  NotificationDemo: undefined;
 };
 
 // Pokemon API Types

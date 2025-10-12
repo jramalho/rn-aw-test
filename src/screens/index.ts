@@ -7,3 +7,4 @@ export { default as PokemonDetailScreen } from './PokemonDetailScreen';
 export { default as PerformanceDashboardScreen } from './PerformanceDashboardScreen';
 export { default as TeamBuilderScreen } from './TeamBuilderScreen';
 export { NotificationSettingsScreen } from './NotificationSettingsScreen';
+export { NotificationDemoScreen } from './NotificationDemoScreen';

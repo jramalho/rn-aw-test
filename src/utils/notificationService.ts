@@ -9,7 +9,7 @@ import notifee, {
   EventType,
   Notification,
 } from '@notifee/react-native';
-import { Platform } from 'react-native';
+import { Platform, Linking } from 'react-native';
 import {
   NotificationChannel,
   NotificationData,
@@ -17,8 +17,15 @@ import {
   NotificationPriority,
 } from '../types/notifications';
 
+// Type for notification action handlers
+type NotificationActionHandler = (
+  actionId: string,
+  notification?: Notification,
+) => void | Promise<void>;
+
 class NotificationService {
   private initialized = false;
+  private actionHandlers: Map<string, NotificationActionHandler> = new Map();
 
   /**
    * Initialize notification channels and event listeners
@@ -299,16 +306,100 @@ class NotificationService {
    * Handle notification press
    */
   private handleNotificationPress(notification?: Notification): void {
-    // TODO: Implement navigation based on notification data
     console.log('Handling notification press:', notification);
+    
+    // If notification has a deep link in its data, open it
+    if (notification?.data?.deepLink) {
+      const deepLink = notification.data.deepLink as string;
+      console.log('Opening deep link from notification:', deepLink);
+      
+      Linking.openURL(deepLink).catch(error => {
+        console.error('Failed to open deep link:', error);
+      });
+    }
+    
+    // If notification has a screen to navigate to
+    if (notification?.data?.screen) {
+      const screen = notification.data.screen as string;
+      console.log('Navigation to screen:', screen, notification.data.params);
+      // Note: Direct navigation would require a navigation ref
+      // For now, we'll use deep linking which is already set up
+      const params = notification.data.params as Record<string, any>;
+      const deepLink = this.buildDeepLink(screen, params);
+      
+      if (deepLink) {
+        Linking.openURL(deepLink).catch(error => {
+          console.error('Failed to navigate:', error);
+        });
+      }
+    }
   }
 
   /**
    * Handle notification action press
    */
   private handleActionPress(actionId?: string, notification?: Notification): void {
-    // TODO: Implement action handling
     console.log('Handling action press:', actionId, notification);
+    
+    // Check if there's a registered handler for this action
+    if (actionId && this.actionHandlers.has(actionId)) {
+      const handler = this.actionHandlers.get(actionId);
+      handler?.(actionId, notification);
+      return;
+    }
+    
+    // Default action handling
+    if (actionId === 'accept' || actionId === 'confirm') {
+      console.log('User accepted the notification');
+    } else if (actionId === 'decline' || actionId === 'dismiss') {
+      console.log('User declined the notification');
+    }
+  }
+
+  /**
+   * Register an action handler
+   */
+  registerActionHandler(actionId: string, handler: NotificationActionHandler): void {
+    this.actionHandlers.set(actionId, handler);
+  }
+
+  /**
+   * Unregister an action handler
+   */
+  unregisterActionHandler(actionId: string): void {
+    this.actionHandlers.delete(actionId);
+  }
+
+  /**
+   * Build a deep link URL from screen name and parameters
+   */
+  private buildDeepLink(screen: string, params?: Record<string, any>): string | null {
+    const URL_SCHEME = 'rnawtest';
+    
+    const screenMap: Record<string, string> = {
+      PokemonList: 'pokemon',
+      PokemonDetail: 'pokemon',
+      TeamBuilder: 'team',
+      Profile: 'profile',
+      Settings: 'settings',
+      NotificationSettings: 'notifications',
+      PerformanceDashboard: 'performance',
+      Login: 'login',
+      SignUp: 'signup',
+    };
+    
+    const path = screenMap[screen];
+    if (!path) {
+      console.warn('Unknown screen for deep link:', screen);
+      return null;
+    }
+    
+    // Handle special cases with parameters
+    if (screen === 'PokemonDetail' && params?.id) {
+      return `${URL_SCHEME}://${path}/${params.id}`;
+    }
+    
+    return `${URL_SCHEME}://${path}`;
   }
 
   /**

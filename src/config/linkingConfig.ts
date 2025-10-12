@@ -52,6 +52,7 @@ export const linkingConfig: LinkingOptions<RootStackParamList> = {
       
       // Settings Screens
       NotificationSettings: 'notifications',
+      NotificationDemo: 'notifications/demo',
     },
   },
 };

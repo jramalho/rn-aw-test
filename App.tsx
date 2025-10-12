@@ -27,6 +27,8 @@ import { AppNavigator } from './src/navigation/AppNavigator';
 import { useThemeStore } from './src/store/themeStore';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { linkingConfig } from './src/config/linkingConfig';
+import { useNotifications } from './src/hooks/useNotifications';
+import { useDeepLink } from './src/hooks/useDeepLink';
 
 import { seedDemoUsers } from './src/utils/authApi';
 
@@ -36,10 +38,28 @@ seedDemoUsers();
 const App: React.FC = () => {
   const systemColorScheme = useColorScheme();
   const { isDarkMode, setSystemTheme } = useThemeStore();
+  
+  // Initialize notifications
+  const { isInitialized: notificationsReady } = useNotifications();
+  
+  // Initialize deep linking
+  const { url: deepLinkUrl } = useDeepLink();
 
   React.useEffect(() => {
     setSystemTheme(systemColorScheme === 'dark');
   }, [systemColorScheme, setSystemTheme]);
+
+  React.useEffect(() => {
+    if (notificationsReady) {
+      console.log('Notification service initialized successfully');
+    }
+  }, [notificationsReady]);
+
+  React.useEffect(() => {
+    if (deepLinkUrl) {
+      console.log('Deep link received:', deepLinkUrl);
+    }
+  }, [deepLinkUrl]);
 
   // Create custom navigation themes
   const lightTheme = {

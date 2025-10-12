@@ -23,7 +23,13 @@ module.exports = {
   ],
   env: {
     production: {
-      plugins: ['react-native-paper/babel', 'transform-remove-console'],
+      plugins: [
+        'react-native-paper/babel',
+        'transform-remove-console',
+        // Additional production optimizations
+        ['@babel/plugin-transform-react-inline-elements'],
+        ['@babel/plugin-transform-react-constant-elements'],
+      ],
     },
   },
 };

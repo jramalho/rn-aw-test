@@ -9,6 +9,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import PokemonListScreen from '../screens/PokemonListScreen';
 import PokemonDetailScreen from '../screens/PokemonDetailScreen';
 import PerformanceDashboardScreen from '../screens/PerformanceDashboardScreen';
+import TeamBuilderScreen from '../screens/TeamBuilderScreen';
 
 // Import types
 import type { RootStackParamList } from '../types';
@@ -45,6 +46,14 @@ const TabNavigator: React.FC = () => {
           }}
       />
       <Tab.Screen 
+        name="TeamBuilder" 
+        component={TeamBuilderScreen}
+          options={{
+            title: 'Team',
+            tabBarIcon: ({ color }) => <TeamIcon color={color} />,
+          }}
+      />
+      <Tab.Screen 
         name="PerformanceDashboard" 
         component={PerformanceDashboardScreen}
           options={{
@@ -73,6 +82,10 @@ const TabNavigator: React.FC = () => {
 // Tab icon components
 const PokemonIcon = React.memo(({ color }: { color: string }) => (
   <Text style={[navStyles.tabIcon, { color }]}>🎮</Text>
+));
+
+const TeamIcon = React.memo(({ color }: { color: string }) => (
+  <Text style={[navStyles.tabIcon, { color }]}>⚔️</Text>
 ));
 
 const PerformanceIcon = React.memo(({ color }: { color: string }) => (

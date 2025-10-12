@@ -31,6 +31,9 @@ interface PokemonState {
   // Favorites
   favorites: number[];
 
+  // Team state
+  team: Pokemon[];
+
   // Filter state
   selectedType: string | null;
   availableTypes: Type[];
@@ -41,6 +44,10 @@ interface PokemonState {
   searchPokemon: (query: string) => Promise<void>;
   loadPokemonDetail: (pokemon: Pokemon) => Promise<void>;
   toggleFavorite: (pokemonId: number) => void;
+  addToTeam: (pokemon: Pokemon) => boolean;
+  removeFromTeam: (pokemonId: number) => void;
+  clearTeam: () => void;
+  isInTeam: (pokemonId: number) => boolean;
   setSelectedType: (type: string | null) => void;
   loadTypes: () => Promise<void>;
   getSuggestions: (query: string) => Promise<void>;
@@ -74,6 +81,8 @@ export const usePokemonStore = create<PokemonState>()(
       detailError: null,
 
       favorites: [],
+
+      team: [],
 
       selectedType: null,
       availableTypes: [],
@@ -214,6 +223,37 @@ export const usePokemonStore = create<PokemonState>()(
         });
       },
 
+      addToTeam: (pokemon: Pokemon) => {
+        const { team } = get();
+        
+        // Check if team is full (max 6 Pokemon)
+        if (team.length >= 6) {
+          return false;
+        }
+        
+        // Check if Pokemon is already in team
+        if (team.some(p => p.id === pokemon.id)) {
+          return false;
+        }
+        
+        set({ team: [...team, pokemon] });
+        return true;
+      },
+
+      removeFromTeam: (pokemonId: number) => {
+        const { team } = get();
+        set({ team: team.filter(p => p.id !== pokemonId) });
+      },
+
+      clearTeam: () => {
+        set({ team: [] });
+      },
+
+      isInTeam: (pokemonId: number) => {
+        const { team } = get();
+        return team.some(p => p.id === pokemonId);
+      },
+
       setSelectedType: (type: string | null) => {
         set({ 
           selectedType: type,
@@ -277,6 +317,7 @@ export const usePokemonStore = create<PokemonState>()(
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         favorites: state.favorites,
+        team: state.team,
         selectedType: state.selectedType,
       }),
     }

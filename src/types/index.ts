@@ -6,6 +6,7 @@ export type RootStackParamList = {
   Settings: undefined;
   PokemonList: undefined;
   PokemonDetail: { pokemon: Pokemon };
+  TeamBuilder: undefined;
   PerformanceDashboard: undefined;
   Search: undefined;
 };

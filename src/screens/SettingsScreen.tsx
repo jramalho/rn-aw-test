@@ -14,8 +14,14 @@ import { useThemeStore } from '../store/themeStore';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components';
 import { pokemonApi } from '../utils/pokemonApi';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types';
+
+type NavigationProp = StackNavigationProp<RootStackParamList, 'Settings'>;
 
 const SettingsScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp>();
   const insets = useSafeAreaInsets();
   const systemColorScheme = useColorScheme();
   const { isDarkMode, systemTheme, toggleTheme, setTheme } = useThemeStore();
@@ -146,13 +152,22 @@ const SettingsScreen: React.FC = () => {
               { backgroundColor: isDarkMode ? '#2a2a2a' : '#f8f9fa' },
             ]}
           >
-            <SettingItem
-              title="Push Notifications"
-              description="Receive app updates and alerts"
-              value={notificationsEnabled}
-              onValueChange={setNotificationsEnabled}
-              isDarkMode={isDarkMode}
-            />
+            <Pressable
+              style={styles.settingPressable}
+              onPress={() => navigation.navigate('NotificationSettings')}
+            >
+              <View style={styles.settingContent}>
+                <Text style={[styles.settingTitle, textStyle]}>
+                  Push Notifications
+                </Text>
+                <Text style={[styles.settingDescription, textStyle]}>
+                  Manage notification preferences
+                </Text>
+              </View>
+              <Text style={[styles.actionText, { color: '#007AFF' }]}>
+                Configure
+              </Text>
+            </Pressable>
 
             <View style={styles.separator} />
 

@@ -30,7 +30,7 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 | 🔔 **Push Notifications** | ✅ Complete | Notifee with navigation integration |
 | 🔗 **Deep Linking** | ✅ Complete | Custom URL scheme + universal/app links |
 | ♿ **Accessibility** | ✅ Enhanced | WCAG 2.1 AA compliance with screen reader support |
-| 🧪 **Testing Setup** | ✅ Complete | Unit tests, mocks, coverage reporting |
+| 🧪 **Testing Setup** | ✅ Complete | Unit tests, E2E tests with Detox, coverage reporting |
 | 🚀 **CI/CD Pipeline** | ✅ Complete | GitHub Actions for builds and tests |
 | 📚 **Documentation** | ✅ Complete | Comprehensive guides and API docs |
 
@@ -200,10 +200,22 @@ npm run test:coverage
 # or
 yarn test:coverage
 
+# Run E2E tests (iOS)
+npm run test:e2e:build:ios
+npm run test:e2e:test:ios
+# or
+yarn test:e2e:build:ios
+yarn test:e2e:test:ios
+
 # Run E2E tests (Android)
 npm run test:e2e:build:android
 npm run test:e2e:test:android
+# or
+yarn test:e2e:build:android
+yarn test:e2e:test:android
 ```
+
+For more details on E2E testing, see [e2e/README.md](./e2e/README.md).
 
 ## 🛠️ Development Tools
 
@@ -275,11 +287,12 @@ npm run build:ios      # Build iOS archive
 - [x] Notification-Navigation integration ✅
 - [x] Offline support ✅
 
-### Phase 3: Optimization 🚧
+### Phase 3: Optimization ✅
 - [x] Performance monitoring ✅
 - [x] Bundle size optimization ✅
 - [x] CI/CD pipeline ✅
 - [x] Automated testing ✅
+- [x] E2E testing with Detox ✅
 - [ ] App Store deployment 📋
 
 ## 🤝 Contributing

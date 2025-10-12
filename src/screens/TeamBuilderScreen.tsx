@@ -313,11 +313,11 @@ const TeamBuilderScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.emptyStateButton}
               onPress={handleAddPokemon}
-              accessibilityLabel="Go to Pokedex"
+              accessibilityLabel="Go to Pokédex"
               accessibilityRole="button"
             >
               <Text style={styles.emptyStateButtonText}>
-                Browse Pokedex
+                Browse Pokédex
               </Text>
             </TouchableOpacity>
           </View>

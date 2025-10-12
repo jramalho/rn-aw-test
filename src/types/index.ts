@@ -414,3 +414,6 @@ export interface SearchBarProps {
 
 // Import TextStyle from React Native
 import { TextStyle } from 'react-native';
+
+// Re-export auth types
+export * from './auth';

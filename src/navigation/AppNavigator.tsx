@@ -12,6 +12,7 @@ import PerformanceDashboardScreen from '../screens/PerformanceDashboardScreen';
 import TeamBuilderScreen from '../screens/TeamBuilderScreen';
 import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
+import { NotificationSettingsScreen } from '../screens/NotificationSettingsScreen';
 
 // Import types
 import type { RootStackParamList } from '../types';
@@ -159,6 +160,14 @@ export const AppNavigator: React.FC = () => {
             options={{ 
               headerShown: false,
               presentation: 'card'
+            }}
+          />
+          <Stack.Screen 
+            name="NotificationSettings" 
+            component={NotificationSettingsScreen}
+            options={{ 
+              title: 'Notifications',
+              headerShown: true,
             }}
           />
         </>

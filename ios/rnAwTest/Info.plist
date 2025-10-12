@@ -51,5 +51,18 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.rnawtest</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>rnawtest</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

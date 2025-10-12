@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Pokemon, PokemonSpecies, EvolutionChain, Type } from '../types';
+import { Pokemon, PokemonSpecies, EvolutionChain, Type, SavedTeam, TeamAnalysis } from '../types';
 import pokemonApi from '../utils/pokemonApi';
 
 interface PokemonState {
@@ -33,6 +33,8 @@ interface PokemonState {
 
   // Team state
   team: Pokemon[];
+  savedTeams: SavedTeam[];
+  currentTeamId: string | null;
 
   // Filter state
   selectedType: string | null;
@@ -48,6 +50,11 @@ interface PokemonState {
   removeFromTeam: (pokemonId: number) => void;
   clearTeam: () => void;
   isInTeam: (pokemonId: number) => boolean;
+  saveCurrentTeam: (name: string, description?: string) => SavedTeam;
+  loadTeam: (teamId: string) => void;
+  deleteTeam: (teamId: string) => void;
+  updateTeam: (teamId: string, updates: Partial<Pick<SavedTeam, 'name' | 'description'>>) => void;
+  getTeamAnalysis: () => TeamAnalysis | null;
   setSelectedType: (type: string | null) => void;
   loadTypes: () => Promise<void>;
   getSuggestions: (query: string) => Promise<void>;
@@ -83,6 +90,8 @@ export const usePokemonStore = create<PokemonState>()(
       favorites: [],
 
       team: [],
+      savedTeams: [],
+      currentTeamId: null,
 
       selectedType: null,
       availableTypes: [],
@@ -254,6 +263,146 @@ export const usePokemonStore = create<PokemonState>()(
         return team.some(p => p.id === pokemonId);
       },
 
+      saveCurrentTeam: (name: string, description?: string) => {
+        const { team, savedTeams, currentTeamId } = get();
+        
+        if (team.length === 0) {
+          throw new Error('Cannot save an empty team');
+        }
+
+        const now = Date.now();
+        
+        // If editing existing team, update it
+        if (currentTeamId) {
+          const updatedTeams = savedTeams.map(t => 
+            t.id === currentTeamId 
+              ? { ...t, name, description, pokemon: team, updatedAt: now }
+              : t
+          );
+          set({ savedTeams: updatedTeams });
+          return updatedTeams.find(t => t.id === currentTeamId)!;
+        }
+        
+        // Otherwise create new team
+        const newTeam: SavedTeam = {
+          id: `team_${now}_${Math.random().toString(36).substr(2, 9)}`,
+          name,
+          description,
+          pokemon: [...team],
+          createdAt: now,
+          updatedAt: now,
+        };
+        
+        set({ 
+          savedTeams: [...savedTeams, newTeam],
+          currentTeamId: newTeam.id,
+        });
+        
+        return newTeam;
+      },
+
+      loadTeam: (teamId: string) => {
+        const { savedTeams } = get();
+        const teamToLoad = savedTeams.find(t => t.id === teamId);
+        
+        if (!teamToLoad) {
+          throw new Error('Team not found');
+        }
+        
+        set({ 
+          team: [...teamToLoad.pokemon],
+          currentTeamId: teamId,
+        });
+      },
+
+      deleteTeam: (teamId: string) => {
+        const { savedTeams, currentTeamId } = get();
+        const updatedTeams = savedTeams.filter(t => t.id !== teamId);
+        
+        set({ 
+          savedTeams: updatedTeams,
+          currentTeamId: currentTeamId === teamId ? null : currentTeamId,
+        });
+      },
+
+      updateTeam: (teamId: string, updates: Partial<Pick<SavedTeam, 'name' | 'description'>>) => {
+        const { savedTeams } = get();
+        const updatedTeams = savedTeams.map(t => 
+          t.id === teamId 
+            ? { ...t, ...updates, updatedAt: Date.now() }
+            : t
+        );
+        
+        set({ savedTeams: updatedTeams });
+      },
+
+      getTeamAnalysis: (): TeamAnalysis | null => {
+        const { team, availableTypes } = get();
+        
+        if (team.length === 0) return null;
+
+        // Calculate type coverage
+        const typeCoverage: Record<string, number> = {};
+        team.forEach(pokemon => {
+          pokemon.types.forEach(typeInfo => {
+            const typeName = typeInfo.type.name;
+            typeCoverage[typeName] = (typeCoverage[typeName] || 0) + 1;
+          });
+        });
+
+        // Calculate average stats
+        const totalStats = team.reduce((acc, pokemon) => {
+          pokemon.stats.forEach(stat => {
+            const statName = stat.stat.name;
+            acc[statName] = (acc[statName] || 0) + stat.base_stat;
+          });
+          return acc;
+        }, {} as Record<string, number>);
+
+        const averageStats = Object.entries(totalStats).reduce((acc, [name, value]) => {
+          acc[name] = Math.round(value / team.length);
+          return acc;
+        }, {} as Record<string, number>);
+
+        // Calculate weaknesses, resistances, and immunities
+        const weaknessCount: Record<string, number> = {};
+        const resistanceCount: Record<string, number> = {};
+        const immunityCount: Record<string, number> = {};
+
+        team.forEach(pokemon => {
+          const pokemonTypes = pokemon.types.map(t => t.type.name);
+          
+          // For each type this Pokemon has
+          pokemonTypes.forEach(typeName => {
+            const typeData = availableTypes.find(t => t.name === typeName);
+            if (!typeData) return;
+
+            // Track weaknesses (types that deal double damage to this Pokemon)
+            typeData.damage_relations.double_damage_from.forEach(weakType => {
+              weaknessCount[weakType.name] = (weaknessCount[weakType.name] || 0) + 1;
+            });
+
+            // Track resistances (types that deal half damage to this Pokemon)
+            typeData.damage_relations.half_damage_from.forEach(resistType => {
+              resistanceCount[resistType.name] = (resistanceCount[resistType.name] || 0) + 1;
+            });
+
+            // Track immunities (types that deal no damage to this Pokemon)
+            typeData.damage_relations.no_damage_from.forEach(immuneType => {
+              immunityCount[immuneType.name] = (immunityCount[immuneType.name] || 0) + 1;
+            });
+          });
+        });
+
+        return {
+          typeCoverage,
+          averageStats,
+          weaknesses: Object.keys(weaknessCount).sort((a, b) => weaknessCount[b] - weaknessCount[a]),
+          resistances: Object.keys(resistanceCount).sort((a, b) => resistanceCount[b] - resistanceCount[a]),
+          immunities: Object.keys(immunityCount).sort((a, b) => immunityCount[b] - immunityCount[a]),
+        };
+      },
+
       setSelectedType: (type: string | null) => {
         set({ 
           selectedType: type,
@@ -318,6 +467,8 @@ export const usePokemonStore = create<PokemonState>()(
       partialize: (state) => ({
         favorites: state.favorites,
         team: state.team,
+        savedTeams: state.savedTeams,
+        currentTeamId: state.currentTeamId,
         selectedType: state.selectedType,
       }),
     }

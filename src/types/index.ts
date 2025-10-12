@@ -414,6 +414,24 @@ export interface SearchBarProps {
   loading?: boolean;
 }
 
+// Team Types
+export interface SavedTeam {
+  id: string;
+  name: string;
+  description?: string;
+  pokemon: Pokemon[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface TeamAnalysis {
+  typeCoverage: Record<string, number>;
+  averageStats: Record<string, number>;
+  weaknesses: string[];
+  resistances: string[];
+  immunities: string[];
+}
+
 // Import TextStyle from React Native
 import { TextStyle } from 'react-native';
 

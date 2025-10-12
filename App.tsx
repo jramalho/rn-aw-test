@@ -8,6 +8,7 @@
  * - Modern Navigation & State Management
  * - Material Design 3 Components
  * - Performance Optimizations
+ * - Comprehensive Error Handling
  * 
  * @format
  */
@@ -20,6 +21,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { useThemeStore } from './src/store/themeStore';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { globalErrorHandler } from './src/utils/errorHandler';
+
+// Initialize global error handler
+globalErrorHandler.initialize();
 
 const App: React.FC = () => {
   const systemColorScheme = useColorScheme();
@@ -57,15 +63,17 @@ const App: React.FC = () => {
   const navigationTheme = isDarkMode ? darkTheme : lightTheme;
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer theme={navigationTheme}>
-        <StatusBar 
-          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-          backgroundColor={navigationTheme.colors.card}
-        />
-        <AppNavigator />
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <NavigationContainer theme={navigationTheme}>
+          <StatusBar 
+            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+            backgroundColor={navigationTheme.colors.card}
+          />
+          <AppNavigator />
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 };
 

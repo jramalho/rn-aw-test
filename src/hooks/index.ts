@@ -201,3 +201,6 @@ export const useAsyncStorage = <T>(key: string, initialValue: T) => {
 
   return { value: storedValue, setValue, removeValue, loading };
 };
+
+// Export performance monitoring hook
+export { usePerformanceMonitor } from './usePerformanceMonitor';

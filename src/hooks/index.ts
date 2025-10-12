@@ -207,3 +207,12 @@ export { usePerformanceMonitor } from './usePerformanceMonitor';
 
 // Export authentication hook
 export { useAuth } from './useAuth';
+
+// Export notifications hook
+export { useNotifications } from './useNotifications';
+
+// Export notification navigation hook
+export { useNotificationNavigation } from './useNotificationNavigation';
+
+// Export deep link hook
+export { useDeepLink } from './useDeepLink';

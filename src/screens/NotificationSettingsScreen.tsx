@@ -20,14 +20,20 @@ import {
   List,
   useTheme,
 } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { useNotifications } from '../hooks/useNotifications';
 import {
   NotificationChannel,
   NotificationPriority,
 } from '../types/notifications';
+import { RootStackParamList } from '../types';
+
+type NavigationProp = StackNavigationProp<RootStackParamList, 'NotificationSettings'>;
 
 export const NotificationSettingsScreen: React.FC = () => {
   const theme = useTheme();
+  const navigation = useNavigation<NavigationProp>();
   const {
     permissionStatus,
     requestPermissions,
@@ -211,6 +217,14 @@ export const NotificationSettingsScreen: React.FC = () => {
             style={styles.button}>
             Clear All Notifications
           </Button>
+          <Divider style={styles.divider} />
+          <Button
+            mode="outlined"
+            onPress={() => navigation.navigate('NotificationDemo')}
+            style={styles.button}
+            icon="navigation">
+            Open Navigation Demo
+          </Button>
         </Card.Content>
       </Card>
 
@@ -341,6 +355,9 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 8,
+  },
+  divider: {
+    marginVertical: 12,
   },
   statusRow: {
     flexDirection: 'row',

@@ -38,6 +38,14 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, onPress }) => {
   const primaryType = pokemon.types[0]?.type.name || 'normal';
   const typeColor = getPokemonTypeColor(primaryType);
 
+  // Build accessibility label with comprehensive information
+  const hp = pokemon.stats.find(s => s.stat.name === 'hp')?.base_stat || 0;
+  const attack = pokemon.stats.find(s => s.stat.name === 'attack')?.base_stat || 0;
+  const defense = pokemon.stats.find(s => s.stat.name === 'defense')?.base_stat || 0;
+  const typesText = pokemon.types.map(t => t.type.name).join(' and ');
+  
+  const accessibilityLabel = `${formatPokemonName(pokemon.name)}, number ${formatPokemonId(pokemon.id)}, ${typesText} type. HP ${hp}, Attack ${attack}, Defense ${defense}`;
+
   return (
     <Pressable
       style={({ pressed }) => [
@@ -48,7 +56,8 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, onPress }) => {
       ]}
       onPress={() => onPress(pokemon)}
       accessibilityRole="button"
-      accessibilityLabel={`Pokemon ${pokemon.name}`}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint="Double tap to view detailed information about this Pokémon"
     >
       {/* Pokemon Image */}
       <View style={styles.imageContainer}>
@@ -56,6 +65,9 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, onPress }) => {
           source={{ uri: getPokemonImageUrl(pokemon.id) }}
           style={styles.pokemonImage}
           resizeMode="contain"
+          accessible={true}
+          accessibilityLabel={`${formatPokemonName(pokemon.name)} sprite image`}
+          accessibilityIgnoresInvertColors={true}
         />
       </View>
 

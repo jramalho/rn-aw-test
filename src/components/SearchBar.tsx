@@ -71,6 +71,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
           autoCapitalize="none"
           autoCorrect={false}
           clearButtonMode="never"
+          accessible={true}
+          accessibilityLabel="Search for Pokémon by name"
+          accessibilityHint="Enter a Pokémon name and press search"
+          accessibilityValue={{ text: value }}
         />
 
         {/* Loading Indicator */}
@@ -86,6 +90,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
             style={styles.clearButton}
             onPress={handleClear}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Clear search"
+            accessibilityHint="Double tap to clear the search field"
           >
             <Text style={[styles.clearIcon, { color: placeholderColor }]}>✕</Text>
           </Pressable>
@@ -97,6 +105,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
             style={styles.searchButton}
             onPress={handleSearch}
             disabled={loading}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Search"
+            accessibilityHint="Double tap to search for Pokémon"
+            accessibilityState={{ disabled: loading }}
           >
             <Text style={styles.searchButtonText}>Search</Text>
           </Pressable>
@@ -108,6 +121,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <Pressable
           style={[styles.quickActionButton, inputBackgroundColor]}
           onPress={() => onChangeText('pikachu')}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Quick search for Pikachu"
+          accessibilityHint="Double tap to search for Pikachu"
         >
           <Text style={[styles.quickActionText, textColor]}>⚡ Pikachu</Text>
         </Pressable>
@@ -115,6 +132,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <Pressable
           style={[styles.quickActionButton, inputBackgroundColor]}
           onPress={() => onChangeText('charizard')}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Quick search for Charizard"
+          accessibilityHint="Double tap to search for Charizard"
         >
           <Text style={[styles.quickActionText, textColor]}>🔥 Charizard</Text>
         </Pressable>
@@ -122,6 +143,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <Pressable
           style={[styles.quickActionButton, inputBackgroundColor]}
           onPress={() => onChangeText('blastoise')}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Quick search for Blastoise"
+          accessibilityHint="Double tap to search for Blastoise"
         >
           <Text style={[styles.quickActionText, textColor]}>💧 Blastoise</Text>
         </Pressable>
@@ -162,6 +187,10 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
             <Pressable
               style={[styles.suggestionItem, { borderBottomColor }]}
               onPress={() => onSelectSuggestion(item)}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={`Suggestion: ${item}`}
+              accessibilityHint="Double tap to search for this Pokémon"
             >
               <Text style={[styles.suggestionText, textColor]}>{item}</Text>
               <Text style={styles.suggestionArrow}>→</Text>
@@ -170,6 +199,8 @@ export const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
         }}
         style={styles.suggestionsList}
         scrollEnabled={false}
+        accessible={true}
+        accessibilityLabel="Search suggestions"
       />
     </View>
   );

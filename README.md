@@ -27,6 +27,7 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 | 📱 **Responsive Design** | ✅ Complete | iOS/Android with safe area handling |
 | ⚡ **State Management** | ✅ Complete | Zustand with persistence |
 | 🎮 **Pokemon App** | ✅ Complete | Full PokéAPI integration with search & details |
+| ♿ **Accessibility** | ✅ Enhanced | WCAG 2.1 AA compliance with screen reader support |
 | 🧪 **Testing Setup** | ✅ Complete | Unit tests, mocks, coverage reporting |
 | 🚀 **CI/CD Pipeline** | ✅ Complete | GitHub Actions for builds and tests |
 | 📚 **Documentation** | ✅ Complete | Comprehensive guides and API docs |
@@ -34,7 +35,8 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 ### 🛠️ Ready for Development
 
 - **Installation**: See [INSTALLATION.md](./INSTALLATION.md) for setup guide
-- **Contributing**: Check [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines  
+- **Contributing**: Check [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines
+- **Accessibility**: Read [docs/ACCESSIBILITY.md](./docs/ACCESSIBILITY.md) for accessibility features
 - **Examples**: Multiple demo screens and components included
 - **Testing**: Full test suite with 80%+ coverage
 - **CI/CD**: Automated builds and quality checks

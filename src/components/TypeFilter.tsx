@@ -47,6 +47,9 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ types, selectedType, onTypeSele
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        accessible={true}
+        accessibilityLabel="Pokémon type filter"
+        accessibilityHint="Scroll horizontally to view and select different Pokémon types"
       >
         {/* All Types Button */}
         <Pressable
@@ -56,6 +59,11 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ types, selectedType, onTypeSele
             { backgroundColor: allTypesStyle.backgroundColor },
           ]}
           onPress={() => onTypeSelect(null)}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="All Types filter"
+          accessibilityHint="Double tap to show all Pokémon types"
+          accessibilityState={{ selected: selectedType === null }}
         >
           <Text
             style={[
@@ -81,6 +89,11 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ types, selectedType, onTypeSele
                 { backgroundColor: typeStyle.backgroundColor },
               ]}
               onPress={() => onTypeSelect(type.name)}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={`${capitalizeWords(type.name)} type filter`}
+              accessibilityHint={`Double tap to show only ${type.name} type Pokémon`}
+              accessibilityState={{ selected: isSelected }}
             >
               <Text
                 style={[

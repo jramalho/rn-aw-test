@@ -154,6 +154,25 @@ const SettingsScreen: React.FC = () => {
           >
             <Pressable
               style={styles.settingPressable}
+              onPress={() => navigation.navigate('BattleHistory')}
+            >
+              <View style={styles.settingContent}>
+                <Text style={[styles.settingTitle, textStyle]}>
+                  Battle History
+                </Text>
+                <Text style={[styles.settingDescription, textStyle]}>
+                  View your Pokemon battle records
+                </Text>
+              </View>
+              <Text style={[styles.actionText, { color: '#007AFF' }]}>
+                View
+              </Text>
+            </Pressable>
+
+            <View style={styles.separator} />
+
+            <Pressable
+              style={styles.settingPressable}
               onPress={() => navigation.navigate('NotificationSettings')}
             >
               <View style={styles.settingContent}>

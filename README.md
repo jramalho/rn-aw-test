@@ -27,6 +27,8 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 | 📱 **Responsive Design** | ✅ Complete | iOS/Android with safe area handling |
 | ⚡ **State Management** | ✅ Complete | Zustand with persistence |
 | 🎮 **Pokemon App** | ✅ Complete | Full PokéAPI integration with search & details |
+| 🔔 **Push Notifications** | ✅ Complete | Notifee with navigation integration |
+| 🔗 **Deep Linking** | ✅ Complete | Custom URL scheme + universal/app links |
 | ♿ **Accessibility** | ✅ Enhanced | WCAG 2.1 AA compliance with screen reader support |
 | 🧪 **Testing Setup** | ✅ Complete | Unit tests, mocks, coverage reporting |
 | 🚀 **CI/CD Pipeline** | ✅ Complete | GitHub Actions for builds and tests |
@@ -38,6 +40,9 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 - **Contributing**: Check [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines
 - **Accessibility**: Read [docs/ACCESSIBILITY.md](./docs/ACCESSIBILITY.md) for accessibility features
 - **Bundle Optimization**: See [docs/BUNDLE_SIZE_OPTIMIZATION.md](./docs/BUNDLE_SIZE_OPTIMIZATION.md) for size reduction strategies
+- **Push Notifications**: See [docs/PUSH_NOTIFICATIONS.md](./docs/PUSH_NOTIFICATIONS.md) for notification features
+- **Deep Linking**: Read [docs/DEEP_LINKING.md](./docs/DEEP_LINKING.md) for deep link patterns
+- **Notification Navigation**: Check [docs/NOTIFICATION_NAVIGATION_INTEGRATION.md](./docs/NOTIFICATION_NAVIGATION_INTEGRATION.md) for integration details
 - **Examples**: Multiple demo screens and components included
 - **Testing**: Full test suite with 80%+ coverage
 - **CI/CD**: Automated builds and quality checks
@@ -261,19 +266,20 @@ npm run build:ios      # Build iOS archive
 - [x] State management integration
 - [x] UI component library
 
-### Phase 2: Advanced Features 🚧
-- [ ] Authentication system
-- [ ] API integration with caching
-- [ ] Push notifications
-- [ ] Deep linking
-- [ ] Offline support
+### Phase 2: Advanced Features ✅
+- [x] Authentication system ✅
+- [x] API integration with caching ✅
+- [x] Push notifications ✅
+- [x] Deep linking ✅
+- [x] Notification-Navigation integration ✅
+- [ ] Offline support 🚧
 
-### Phase 3: Optimization 📋
-- [ ] Performance monitoring
+### Phase 3: Optimization 🚧
+- [x] Performance monitoring ✅
 - [x] Bundle size optimization ✅
-- [x] CI/CD pipeline
-- [x] Automated testing
-- [ ] App Store deployment
+- [x] CI/CD pipeline ✅
+- [x] Automated testing ✅
+- [ ] App Store deployment 📋
 
 ## 🤝 Contributing
 

@@ -2,6 +2,13 @@
  * Utility functions for the React Native app
  */
 
+// Import necessary React Native modules
+import { Platform, Dimensions } from 'react-native';
+
+// Export error handler
+export { globalErrorHandler } from './errorHandler';
+export type { ErrorHandler } from './errorHandler';
+
 // Platform utilities
 export const isIOS = Platform.OS === 'ios';
 export const isAndroid = Platform.OS === 'android';

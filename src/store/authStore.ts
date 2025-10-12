@@ -15,6 +15,7 @@ import type {
   BiometricAuthOptions,
   AuthError,
 } from '../types';
+import { authApi } from '../utils/authApi';
 
 interface AuthStore extends AuthState {
   // Actions
@@ -41,9 +42,20 @@ export const useAuthStore = create<AuthStore>()(
       login: async (options: LoginOptions) => {
         set({ isLoading: true, error: null });
         try {
-          // TODO: Implement actual API call
-          // This is a placeholder for the authentication API integration
-          throw new Error('Login not implemented yet. API integration pending.');
+          const { credentials } = options;
+          if (!credentials) {
+            throw new Error('Email and password are required');
+          }
+
+          const { user, tokens } = await authApi.login(credentials);
+
+          set({
+            user,
+            tokens,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
         } catch (error) {
           const authError: AuthError = {
             code: 'LOGIN_FAILED',
@@ -58,9 +70,15 @@ export const useAuthStore = create<AuthStore>()(
       signUp: async (options: SignUpOptions) => {
         set({ isLoading: true, error: null });
         try {
-          // TODO: Implement actual API call
-          // This is a placeholder for the authentication API integration
-          throw new Error('Sign up not implemented yet. API integration pending.');
+          const { user, tokens } = await authApi.signUp(options);
+
+          set({
+            user,
+            tokens,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
         } catch (error) {
           const authError: AuthError = {
             code: 'SIGNUP_FAILED',
@@ -75,8 +93,10 @@ export const useAuthStore = create<AuthStore>()(
       logout: async () => {
         set({ isLoading: true });
         try {
+          await authApi.logout();
+          
           // Clear local storage
-          await AsyncStorage.multiRemove(['auth-tokens', 'user-data']);
+          await AsyncStorage.multiRemove(['auth-storage']);
           
           set({
             user: null,
@@ -102,9 +122,13 @@ export const useAuthStore = create<AuthStore>()(
 
         set({ isLoading: true, error: null });
         try {
-          // TODO: Implement actual token refresh API call
-          // This is a placeholder for the token refresh API integration
-          throw new Error('Token refresh not implemented yet. API integration pending.');
+          const newTokens = await authApi.refreshTokens(tokens.refreshToken);
+
+          set({
+            tokens: newTokens,
+            isLoading: false,
+            error: null,
+          });
         } catch (error) {
           const authError: AuthError = {
             code: 'TOKEN_REFRESH_FAILED',

@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, ActivityIndicator, View } from 'react-native';
 
 // Import screens
 import ProfileScreen from '../screens/ProfileScreen';
@@ -10,9 +10,13 @@ import PokemonListScreen from '../screens/PokemonListScreen';
 import PokemonDetailScreen from '../screens/PokemonDetailScreen';
 import PerformanceDashboardScreen from '../screens/PerformanceDashboardScreen';
 import TeamBuilderScreen from '../screens/TeamBuilderScreen';
+import LoginScreen from '../screens/LoginScreen';
+import SignUpScreen from '../screens/SignUpScreen';
 
 // Import types
 import type { RootStackParamList } from '../types';
+import { useAuth } from '../hooks/useAuth';
+import { Text } from 'react-native';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator();
@@ -101,6 +105,17 @@ const SettingsIcon = React.memo(({ color }: { color: string }) => (
 ));
 
 export const AppNavigator: React.FC = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Show loading spinner while checking auth state
+  if (isLoading) {
+    return (
+      <View style={navStyles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -113,19 +128,41 @@ export const AppNavigator: React.FC = () => {
         },
       }}
     >
-      <Stack.Screen 
-        name="Main" 
-        component={TabNavigator}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen 
-        name="PokemonDetail" 
-        component={PokemonDetailScreen}
-        options={{ 
-          headerShown: false,
-          presentation: 'card'
-        }}
-      />
+      {!isAuthenticated ? (
+        // Auth Stack - shown when user is not authenticated
+        <>
+          <Stack.Screen 
+            name="Login" 
+            component={LoginScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen 
+            name="SignUp" 
+            component={SignUpScreen}
+            options={{ 
+              headerShown: true,
+              title: 'Create Account',
+            }}
+          />
+        </>
+      ) : (
+        // App Stack - shown when user is authenticated
+        <>
+          <Stack.Screen 
+            name="Main" 
+            component={TabNavigator}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen 
+            name="PokemonDetail" 
+            component={PokemonDetailScreen}
+            options={{ 
+              headerShown: false,
+              presentation: 'card'
+            }}
+          />
+        </>
+      )}
     </Stack.Navigator>
   );
 };
@@ -136,5 +173,11 @@ import { Text } from 'react-native';
 const navStyles = StyleSheet.create({
   tabIcon: {
     fontSize: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
   },
 });

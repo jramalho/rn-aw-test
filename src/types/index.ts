@@ -9,6 +9,8 @@ export type RootStackParamList = {
   TeamBuilder: undefined;
   PerformanceDashboard: undefined;
   Search: undefined;
+  Login: undefined;
+  SignUp: undefined;
 };
 
 // Pokemon API Types

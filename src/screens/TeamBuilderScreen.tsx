@@ -112,6 +112,16 @@ const TeamBuilderScreen: React.FC = () => {
     (navigation as any).navigate('OpponentSelection', { teamId: currentTeamId });
   };
 
+  const handleStartTournament = () => {
+    if (team.length === 0) {
+      Alert.alert('Empty Team', 'Add at least one Pokemon before entering a tournament.');
+      return;
+    }
+
+    // Navigate to tournament lobby
+    (navigation as any).navigate('TournamentLobby');
+  };
+
   const handleSaveTeam = () => {
     if (team.length === 0) {
       Alert.alert('Empty Team', 'Add at least one Pokemon before saving.');
@@ -530,6 +540,16 @@ const TeamBuilderScreen: React.FC = () => {
               </TouchableOpacity>
               
               <TouchableOpacity
+                style={[styles.actionButton, styles.tournamentButton]}
+                onPress={handleStartTournament}
+                accessibilityLabel="Enter tournament with this team"
+                accessibilityHint="Opens the tournament lobby"
+                accessibilityRole="button"
+              >
+                <Text style={styles.tournamentButtonText}>🏆 Tournament</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
                 style={[styles.actionButton, styles.clearButton]}
                 onPress={handleClearTeam}
                 accessibilityLabel="Clear entire team"
@@ -927,6 +947,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#10b981',
   },
   battleButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  tournamentButton: {
+    backgroundColor: '#f59e0b',
+  },
+  tournamentButtonText: {
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',

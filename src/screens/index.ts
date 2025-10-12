@@ -9,3 +9,6 @@ export { default as TeamBuilderScreen } from './TeamBuilderScreen';
 export { default as OpponentSelectionScreen } from './OpponentSelectionScreen';
 export { NotificationSettingsScreen } from './NotificationSettingsScreen';
 export { NotificationDemoScreen } from './NotificationDemoScreen';
+export { default as TournamentLobbyScreen } from './TournamentLobbyScreen';
+export { default as TournamentBracketScreen } from './TournamentBracketScreen';
+export { default as TournamentBattleScreen } from './TournamentBattleScreen';

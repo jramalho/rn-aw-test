@@ -17,6 +17,9 @@ import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import { NotificationSettingsScreen } from '../screens/NotificationSettingsScreen';
 import { NotificationDemoScreen } from '../screens/NotificationDemoScreen';
+import TournamentLobbyScreen from '../screens/TournamentLobbyScreen';
+import TournamentBracketScreen from '../screens/TournamentBracketScreen';
+import TournamentBattleScreen from '../screens/TournamentBattleScreen';
 
 // Import types
 import type { RootStackParamList } from '../types';
@@ -203,6 +206,30 @@ export const AppNavigator: React.FC = () => {
             component={NotificationDemoScreen}
             options={{ 
               title: 'Notification Navigation Demo',
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen 
+            name="TournamentLobby" 
+            component={TournamentLobbyScreen}
+            options={{ 
+              title: 'Tournament Lobby',
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen 
+            name="TournamentBracket" 
+            component={TournamentBracketScreen}
+            options={{ 
+              title: 'Tournament Bracket',
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen 
+            name="TournamentBattle" 
+            component={TournamentBattleScreen}
+            options={{ 
+              title: 'Tournament Battle',
               headerShown: true,
             }}
           />

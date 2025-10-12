@@ -89,6 +89,29 @@ const TeamBuilderScreen: React.FC = () => {
     (navigation as any).navigate('PokemonList');
   };
 
+  const handleStartBattle = () => {
+    if (team.length === 0) {
+      Alert.alert('Empty Team', 'Add at least one Pokemon before battling.');
+      return;
+    }
+
+    // Must save team before battling
+    if (!currentTeamId) {
+      Alert.alert(
+        'Save Team First',
+        'You need to save your team before starting a battle.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Save Team', onPress: () => setShowSaveModal(true) }
+        ]
+      );
+      return;
+    }
+
+    // Navigate to battle screen
+    (navigation as any).navigate('Battle', { teamId: currentTeamId });
+  };
+
   const handleSaveTeam = () => {
     if (team.length === 0) {
       Alert.alert('Empty Team', 'Add at least one Pokemon before saving.');
@@ -494,16 +517,28 @@ const TeamBuilderScreen: React.FC = () => {
               </View>
             </View>
 
-            {/* Clear Team Button */}
-            <TouchableOpacity
-              style={styles.clearButton}
-              onPress={handleClearTeam}
-              accessibilityLabel="Clear entire team"
-              accessibilityHint="Removes all Pokemon from your team"
-              accessibilityRole="button"
-            >
-              <Text style={styles.clearButtonText}>Clear Team</Text>
-            </TouchableOpacity>
+            {/* Battle and Clear Buttons */}
+            <View style={styles.actionButtonsContainer}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.battleButton]}
+                onPress={handleStartBattle}
+                accessibilityLabel="Start battle with this team"
+                accessibilityHint="Opens the battle screen"
+                accessibilityRole="button"
+              >
+                <Text style={styles.battleButtonText}>⚔️ Start Battle</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.actionButton, styles.clearButton]}
+                onPress={handleClearTeam}
+                accessibilityLabel="Clear entire team"
+                accessibilityHint="Removes all Pokemon from your team"
+                accessibilityRole="button"
+              >
+                <Text style={styles.clearButtonText}>🗑️ Clear Team</Text>
+              </TouchableOpacity>
+            </View>
           </>
         )}
 
@@ -877,12 +912,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
-  clearButton: {
-    backgroundColor: '#ef4444',
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+  },
+  actionButton: {
+    flex: 1,
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
-    marginTop: 8,
+  },
+  battleButton: {
+    backgroundColor: '#10b981',
+  },
+  battleButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  clearButton: {
+    backgroundColor: '#ef4444',
   },
   clearButtonText: {
     color: '#ffffff',

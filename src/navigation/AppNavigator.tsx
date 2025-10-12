@@ -10,6 +10,8 @@ import PokemonListScreen from '../screens/PokemonListScreen';
 import PokemonDetailScreen from '../screens/PokemonDetailScreen';
 import PerformanceDashboardScreen from '../screens/PerformanceDashboardScreen';
 import TeamBuilderScreen from '../screens/TeamBuilderScreen';
+import BattleScreen from '../screens/BattleScreen';
+import BattleHistoryScreen from '../screens/BattleHistoryScreen';
 import LoginScreen from '../screens/LoginScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import { NotificationSettingsScreen } from '../screens/NotificationSettingsScreen';
@@ -161,6 +163,22 @@ export const AppNavigator: React.FC = () => {
             options={{ 
               headerShown: false,
               presentation: 'card'
+            }}
+          />
+          <Stack.Screen 
+            name="Battle" 
+            component={BattleScreen}
+            options={{ 
+              title: 'Battle',
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen 
+            name="BattleHistory" 
+            component={BattleHistoryScreen}
+            options={{ 
+              title: 'Battle History',
+              headerShown: true,
             }}
           />
           <Stack.Screen 

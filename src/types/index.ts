@@ -7,6 +7,8 @@ export type RootStackParamList = {
   PokemonList: undefined;
   PokemonDetail: { pokemon: Pokemon };
   TeamBuilder: undefined;
+  Battle: { teamId: string };
+  BattleHistory: undefined;
   PerformanceDashboard: undefined;
   Search: undefined;
   Login: undefined;
@@ -432,6 +434,68 @@ export interface TeamAnalysis {
   weaknesses: string[];
   resistances: string[];
   immunities: string[];
+}
+
+// Battle Types
+export interface BattlePokemon extends Pokemon {
+  currentHP: number;
+  maxHP: number;
+  status: 'normal' | 'fainted' | 'poisoned' | 'paralyzed' | 'burned' | 'frozen' | 'asleep';
+  statusTurns: number;
+}
+
+export interface BattleTeam {
+  pokemon: BattlePokemon[];
+  activePokemonIndex: number;
+}
+
+export interface BattleMove {
+  name: string;
+  type: string;
+  power: number;
+  accuracy: number;
+  pp: number;
+  maxPP: number;
+  category: 'physical' | 'special' | 'status';
+}
+
+export interface BattleAction {
+  type: 'attack' | 'switch' | 'forfeit';
+  moveIndex?: number;
+  targetPokemonIndex?: number;
+}
+
+export interface BattleTurn {
+  turnNumber: number;
+  playerAction: BattleAction;
+  opponentAction: BattleAction;
+  events: BattleEvent[];
+}
+
+export interface BattleEvent {
+  type: 'damage' | 'heal' | 'status' | 'switch' | 'faint' | 'message';
+  target: 'player' | 'opponent';
+  pokemonIndex?: number;
+  amount?: number;
+  status?: BattlePokemon['status'];
+  message: string;
+}
+
+export interface Battle {
+  id: string;
+  playerTeam: BattleTeam;
+  opponentTeam: BattleTeam;
+  turns: BattleTurn[];
+  status: 'ongoing' | 'won' | 'lost' | 'forfeit';
+  createdAt: number;
+  completedAt?: number;
+}
+
+export interface BattleHistory {
+  battles: Battle[];
+  wins: number;
+  losses: number;
+  totalBattles: number;
 }
 
 // Import TextStyle from React Native

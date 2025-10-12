@@ -204,3 +204,6 @@ export const useAsyncStorage = <T>(key: string, initialValue: T) => {
 
 // Export performance monitoring hook
 export { usePerformanceMonitor } from './usePerformanceMonitor';
+
+// Export authentication hook
+export { useAuth } from './useAuth';

@@ -23,7 +23,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, BattleAction, BattlePokemon } from '../types';
 import { useBattleStore } from '../store/battleStore';
 import { usePokemonStore } from '../store/pokemonStore';
-import { generateOpponentTeam, generateBattleMoves } from '../utils/battleUtils';
+import { generateTrainerTeam, OPPONENT_TRAINERS, OpponentTrainer } from '../utils/battleUtils';
+
+import { generateTrainerTeam, OPPONENT_TRAINERS, OpponentTrainer, generateBattleMoves } from '../utils/battleUtils';
 
 type BattleScreenRouteProp = RouteProp<RootStackParamList, 'Battle'>;
 type BattleScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Battle'>;
@@ -34,7 +36,7 @@ export default function BattleScreen() {
   const navigation = useNavigation<BattleScreenNavigationProp>();
   const route = useRoute<BattleScreenRouteProp>();
   const theme = useTheme();
-  const { teamId } = route.params;
+  const { teamId, opponentTrainer } = route.params;
 
   const {
     currentBattle,
@@ -50,6 +52,7 @@ export default function BattleScreen() {
   const [switchDialogVisible, setSwitchDialogVisible] = useState(false);
   const [selectedMove, setSelectedMove] = useState<number | null>(null);
   const [battleLog, setBattleLog] = useState<string[]>([]);
+  const [selectedTrainer, setSelectedTrainer] = useState<OpponentTrainer | null>(opponentTrainer || null);
 
   // Initialize battle
   useEffect(() => {
@@ -63,8 +66,12 @@ export default function BattleScreen() {
         return;
       }
 
-      // Generate opponent team
-      const opponentPokemon = generateOpponentTeam(pokemonList, team.pokemon.length);
+      // Use provided trainer or pick a random one
+      const trainer = selectedTrainer || OPPONENT_TRAINERS[Math.floor(Math.random() * OPPONENT_TRAINERS.length)];
+      setSelectedTrainer(trainer);
+
+      // Generate opponent team based on trainer
+      const opponentPokemon = generateTrainerTeam(pokemonList, trainer);
       
       if (opponentPokemon.length === 0) {
         Alert.alert('Error', 'Failed to generate opponent team', [
@@ -224,7 +231,9 @@ export default function BattleScreen() {
       <ScrollView style={styles.scrollView}>
         {/* Opponent Pokemon */}
         <View style={styles.battleSection}>
-          <Text variant="titleMedium" style={styles.sectionTitle}>Opponent</Text>
+          <Text variant="titleMedium" style={styles.sectionTitle}>
+            {selectedTrainer ? `${selectedTrainer.name} (${selectedTrainer.title})` : 'Opponent'}
+          </Text>
           {renderPokemonCard(opponentPokemon, true)}
         </View>
 

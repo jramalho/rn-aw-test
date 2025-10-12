@@ -26,6 +26,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { useThemeStore } from './src/store/themeStore';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { linkingConfig } from './src/config/linkingConfig';
 
 import { seedDemoUsers } from './src/utils/authApi';
 
@@ -70,7 +71,7 @@ const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <SafeAreaProvider>
-        <NavigationContainer theme={navigationTheme}>
+        <NavigationContainer theme={navigationTheme} linking={linkingConfig}>
           <StatusBar
             barStyle={isDarkMode ? 'light-content' : 'dark-content'}
             backgroundColor={navigationTheme.colors.card}

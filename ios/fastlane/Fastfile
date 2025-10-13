@@ -1,0 +1,129 @@
+# iOS Fastlane Configuration for RN AW Test
+# This file contains the fastlane.tools configuration
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Build IPA for local testing"
+  lane :build do
+    gym(
+      scheme: "rnAwTest",
+      workspace: "rnAwTest.xcworkspace",
+      configuration: "Release",
+      export_method: "development",
+      output_directory: "./build",
+      clean: true
+    )
+  end
+
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    # Ensure we're on the latest code
+    ensure_git_status_clean
+    
+    # Increment build number
+    increment_build_number(xcodeproj: "rnAwTest.xcodeproj")
+    
+    # Build the app
+    gym(
+      scheme: "rnAwTest",
+      workspace: "rnAwTest.xcworkspace",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "./build",
+      clean: true
+    )
+    
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      skip_submission: true
+    )
+    
+    # Commit version bump
+    commit_version_bump(
+      message: "Bump build number [skip ci]",
+      xcodeproj: "rnAwTest.xcodeproj"
+    )
+    
+    # Push to repository
+    push_to_git_remote
+  end
+
+  desc "Deploy a new version to the App Store"
+  lane :release do
+    # Ensure we're on the latest code
+    ensure_git_status_clean
+    
+    # Increment version number
+    increment_version_number(
+      xcodeproj: "rnAwTest.xcodeproj",
+      bump_type: "patch"
+    )
+    
+    # Increment build number
+    increment_build_number(xcodeproj: "rnAwTest.xcodeproj")
+    
+    # Build the app
+    gym(
+      scheme: "rnAwTest",
+      workspace: "rnAwTest.xcworkspace",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "./build",
+      clean: true
+    )
+    
+    # Upload to App Store
+    upload_to_app_store(
+      force: true,
+      skip_metadata: false,
+      skip_screenshots: false,
+      submit_for_review: false
+    )
+    
+    # Commit version bump
+    commit_version_bump(
+      message: "Release version #{lane_context[SharedValues::VERSION_NUMBER]} [skip ci]",
+      xcodeproj: "rnAwTest.xcodeproj"
+    )
+    
+    # Create git tag
+    add_git_tag(
+      tag: "v#{lane_context[SharedValues::VERSION_NUMBER]}"
+    )
+    
+    # Push to repository
+    push_to_git_remote(tags: true)
+  end
+
+  desc "Generate screenshots for App Store"
+  lane :screenshots do
+    snapshot
+  end
+
+  desc "Run tests"
+  lane :test do
+    run_tests(
+      workspace: "rnAwTest.xcworkspace",
+      scheme: "rnAwTest",
+      devices: ["iPhone 15 Pro"]
+    )
+  end
+
+  desc "Setup code signing with Match"
+  lane :setup_signing do
+    match(
+      type: "appstore",
+      readonly: false
+    )
+  end
+
+  # Error handling
+  error do |lane, exception|
+    notification(
+      subtitle: "Error in lane #{lane}",
+      message: exception.message
+    )
+  end
+end

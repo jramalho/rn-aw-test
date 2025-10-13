@@ -11,17 +11,8 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
-import {
-  Text,
-  Button,
-  Card,
-  Surface,
-  useTheme,
-  ActivityIndicator,
-  Chip,
-  IconButton,
-  Divider,
-} from 'react-native-paper';
+import { Text, Button, Card, Surface, Chip, IconButton, Divider,  } from '../components';
+import { useTheme } from '../hooks';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, TournamentMatch, TournamentStatus } from '../types';

@@ -13,16 +13,8 @@ import {
   RefreshControl,
   Alert,
 } from 'react-native';
-import {
-  Text,
-  Card,
-  List,
-  Divider,
-  ProgressBar,
-  useTheme,
-  IconButton,
-  Chip,
-} from 'react-native-paper';
+import { Text, Card, List, Divider, ProgressBar, IconButton, Chip,  } from '../components';
+import { useTheme } from '../hooks';
 import DeviceInfo from '../modules/DeviceInfo';
 import type { DeviceInfo as IDeviceInfo, BatteryInfo, StorageInfo } from '../modules/DeviceInfo';
 

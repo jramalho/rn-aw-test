@@ -6,18 +6,8 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
-import {
-  Text,
-  Button,
-  Card,
-  ProgressBar,
-  Portal,
-  Dialog,
-  List,
-  IconButton,
-  useTheme,
-  ActivityIndicator,
-} from 'react-native-paper';
+import { Text, Button, Card, ProgressBar, Portal, Dialog, List, IconButton,  } from '../components';
+import { useTheme } from '../hooks';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, BattleAction, BattlePokemon } from '../types';

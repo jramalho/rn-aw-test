@@ -11,15 +11,8 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import {
-  Text,
-  Button,
-  Card,
-  Switch,
-  Divider,
-  List,
-  useTheme,
-} from 'react-native-paper';
+import { Text, Button, Card, Switch, Divider, List,  } from '../components';
+import { useTheme } from '../hooks';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNotifications } from '../hooks/useNotifications';

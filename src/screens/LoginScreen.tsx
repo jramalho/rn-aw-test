@@ -39,14 +39,14 @@ const LoginScreen: React.FC<Props> = React.memo(({ navigation }) => {
 
   const handleLogin = React.useCallback(async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please enter both email and password');
+      Alert.alert('Error', 'Please enter both username and password');
       return;
     }
 
     try {
       await login({
         provider: AuthProvider.EMAIL,
-        credentials: { email, password },
+        credentials: { email, password }, // Using email field for username
         rememberMe,
       });
       // Navigation will be handled by auth state change
@@ -60,11 +60,10 @@ const LoginScreen: React.FC<Props> = React.memo(({ navigation }) => {
       const result = await authenticate(`Authenticate with ${biometryType}`);
 
       if (result.success) {
-        // In a real app, you would validate the biometric auth with your backend
-        // and then log the user in. For now, we'll use the demo login.
+        // Using DummyJSON test account for biometric demo
         await login({
           provider: AuthProvider.BIOMETRIC,
-          credentials: { email: 'demo@example.com', password: 'Demo123!' },
+          credentials: { email: 'emilys', password: 'emilyspass' },
           rememberMe: true,
         });
       } else {
@@ -109,19 +108,22 @@ const LoginScreen: React.FC<Props> = React.memo(({ navigation }) => {
           <Text style={styles.logo}>🎮</Text>
           <Text style={styles.title}>Welcome Back</Text>
           <Text style={styles.subtitle}>Sign in to continue to PokéDex</Text>
+          <Text style={styles.demoText}>
+            Demo: emilys / emilyspass
+          </Text>
         </View>
 
         <View style={styles.form}>
           <TextInput
-            label="Email"
+            label="Username"
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
-            keyboardType="email-address"
-            textContentType="emailAddress"
-            autoComplete="email"
+            textContentType="username"
+            autoComplete="username"
             editable={!isLoading}
             error={error}
+            placeholder="Try: emilys, michaelw, sophiab"
           />
 
           <TextInput
@@ -227,6 +229,12 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#666',
+  },
+  demoText: {
+    fontSize: 14,
+    color: '#007AFF',
+    marginTop: 8,
+    fontWeight: '500',
   },
   form: {
     width: '100%',

@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
+  Pressable,
   useColorScheme,
   Alert,
   Platform,
@@ -227,7 +227,7 @@ const TeamBuilderScreen: React.FC = () => {
   const TeamSlot = ({ pokemon, position }: { pokemon?: Pokemon; position: number }) => {
     if (!pokemon) {
       return (
-        <TouchableOpacity
+        <Pressable
           style={[styles.emptySlot, { backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff' }]}
           onPress={handleAddPokemon}
           accessibilityLabel={`Empty team slot ${position}`}
@@ -240,7 +240,7 @@ const TeamBuilderScreen: React.FC = () => {
           <Text style={[styles.emptySlotLabel, { color: isDarkMode ? '#6b7280' : '#9ca3af' }]}>
             Add Pokemon
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       );
     }
 
@@ -248,7 +248,7 @@ const TeamBuilderScreen: React.FC = () => {
     const typeColor = getTypeColor(primaryType);
 
     return (
-      <TouchableOpacity
+      <Pressable
         style={[styles.filledSlot, { backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff' }]}
         onPress={() => handlePokemonPress(pokemon)}
         onLongPress={() => handleRemovePokemon(pokemon.id)}
@@ -265,14 +265,14 @@ const TeamBuilderScreen: React.FC = () => {
               #{pokemon.id.toString().padStart(3, '0')}
             </Text>
           </View>
-          <TouchableOpacity
+          <Pressable
             style={styles.removeButton}
             onPress={() => handleRemovePokemon(pokemon.id)}
             accessibilityLabel="Remove from team"
             accessibilityRole="button"
           >
             <Text style={styles.removeButtonText}>×</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {pokemon.sprites.other?.['official-artwork']?.front_default && (
@@ -306,7 +306,7 @@ const TeamBuilderScreen: React.FC = () => {
             </View>
           ))}
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 
@@ -359,28 +359,28 @@ const TeamBuilderScreen: React.FC = () => {
             </Text>
           </View>
           <View style={styles.headerActions}>
-            <TouchableOpacity
+            <Pressable
               style={styles.headerButton}
               onPress={() => setShowLoadModal(true)}
               accessibilityLabel="Load saved team"
             >
               <Text style={styles.headerButtonText}>📂</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={styles.headerButton}
               onPress={handleSaveTeam}
               accessibilityLabel="Save current team"
             >
               <Text style={styles.headerButtonText}>💾</Text>
-            </TouchableOpacity>
+            </Pressable>
             {team.length > 0 && (
-              <TouchableOpacity
+              <Pressable
                 style={styles.headerButton}
                 onPress={() => setShowAnalysis(!showAnalysis)}
                 accessibilityLabel="Toggle team analysis"
               >
                 <Text style={styles.headerButtonText}>📊</Text>
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
         </View>
@@ -529,7 +529,7 @@ const TeamBuilderScreen: React.FC = () => {
 
             {/* Battle and Clear Buttons */}
             <View style={styles.actionButtonsContainer}>
-              <TouchableOpacity
+              <Pressable
                 style={[styles.actionButton, styles.battleButton]}
                 onPress={handleStartBattle}
                 accessibilityLabel="Start battle with this team"
@@ -537,9 +537,9 @@ const TeamBuilderScreen: React.FC = () => {
                 accessibilityRole="button"
               >
                 <Text style={styles.battleButtonText}>⚔️ Start Battle</Text>
-              </TouchableOpacity>
+              </Pressable>
               
-              <TouchableOpacity
+              <Pressable
                 style={[styles.actionButton, styles.tournamentButton]}
                 onPress={handleStartTournament}
                 accessibilityLabel="Enter tournament with this team"
@@ -547,9 +547,9 @@ const TeamBuilderScreen: React.FC = () => {
                 accessibilityRole="button"
               >
                 <Text style={styles.tournamentButtonText}>🏆 Tournament</Text>
-              </TouchableOpacity>
+              </Pressable>
               
-              <TouchableOpacity
+              <Pressable
                 style={[styles.actionButton, styles.clearButton]}
                 onPress={handleClearTeam}
                 accessibilityLabel="Clear entire team"
@@ -557,7 +557,7 @@ const TeamBuilderScreen: React.FC = () => {
                 accessibilityRole="button"
               >
                 <Text style={styles.clearButtonText}>🗑️ Clear Team</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </>
         )}
@@ -572,7 +572,7 @@ const TeamBuilderScreen: React.FC = () => {
             <Text style={[styles.emptyStateText, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>
               Add up to 6 Pokemon to create the ultimate team!
             </Text>
-            <TouchableOpacity
+            <Pressable
               style={styles.emptyStateButton}
               onPress={handleAddPokemon}
               accessibilityLabel="Go to Pokédex"
@@ -581,7 +581,7 @@ const TeamBuilderScreen: React.FC = () => {
               <Text style={styles.emptyStateButtonText}>
                 Browse Pokédex
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         )}
       </ScrollView>
@@ -626,7 +626,7 @@ const TeamBuilderScreen: React.FC = () => {
             />
             
             <View style={styles.modalButtons}>
-              <TouchableOpacity
+              <Pressable
                 style={[styles.modalButton, styles.modalButtonSecondary]}
                 onPress={() => {
                   setShowSaveModal(false);
@@ -635,16 +635,16 @@ const TeamBuilderScreen: React.FC = () => {
                 }}
               >
                 <Text style={styles.modalButtonSecondaryText}>Cancel</Text>
-              </TouchableOpacity>
+              </Pressable>
               
-              <TouchableOpacity
+              <Pressable
                 style={[styles.modalButton, styles.modalButtonPrimary]}
                 onPress={handleSaveConfirm}
               >
                 <Text style={styles.modalButtonPrimaryText}>
                   {currentTeamId ? 'Update' : 'Save'}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         </View>
@@ -678,7 +678,7 @@ const TeamBuilderScreen: React.FC = () => {
                       savedTeam.id === currentTeamId && styles.teamListItemActive,
                     ]}
                   >
-                    <TouchableOpacity
+                    <Pressable
                       style={styles.teamListItemMain}
                       onPress={() => handleLoadTeam(savedTeam.id)}
                     >
@@ -700,25 +700,25 @@ const TeamBuilderScreen: React.FC = () => {
                           </Text>
                         </View>
                       </View>
-                    </TouchableOpacity>
+                    </Pressable>
                     
-                    <TouchableOpacity
+                    <Pressable
                       style={styles.teamListItemDelete}
                       onPress={() => handleDeleteTeam(savedTeam)}
                     >
                       <Text style={styles.teamListItemDeleteText}>🗑️</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   </View>
                 ))}
               </ScrollView>
             )}
             
-            <TouchableOpacity
+            <Pressable
               style={[styles.modalButton, styles.modalButtonSecondary, { marginTop: 16 }]}
               onPress={() => setShowLoadModal(false)}
             >
               <Text style={styles.modalButtonSecondaryText}>Close</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </Modal>

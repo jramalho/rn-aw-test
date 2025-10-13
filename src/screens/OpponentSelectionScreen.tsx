@@ -3,7 +3,7 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
+  Pressable,
 } from 'react-native';
 import {
   Text,
@@ -76,7 +76,7 @@ export default function OpponentSelectionScreen() {
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         {OPPONENT_TRAINERS.map((trainer, index) => (
-          <TouchableOpacity
+          <Pressable
             key={index}
             onPress={() => handleTrainerSelect(trainer)}
             activeOpacity={0.7}
@@ -130,10 +130,10 @@ export default function OpponentSelectionScreen() {
                 </View>
               </Card.Content>
             </Card>
-          </TouchableOpacity>
+          </Pressable>
         ))}
 
-        <TouchableOpacity
+        <Pressable
           onPress={() => handleTrainerSelect({
             name: 'Random Trainer',
             title: 'Wild Trainer',
@@ -161,7 +161,7 @@ export default function OpponentSelectionScreen() {
               </Text>
             </Card.Content>
           </Card>
-        </TouchableOpacity>
+        </Pressable>
       </ScrollView>
     </View>
   );

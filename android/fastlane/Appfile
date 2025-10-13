@@ -1,0 +1,13 @@
+# Android Appfile Configuration
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile
+
+# Package name
+package_name("com.rnawtest") # Replace with your package name
+
+# Google Play Console service account JSON file path
+# Download from Google Play Console -> Setup -> API access
+json_key_file("path/to/your/service-account.json") # Replace with your JSON key path
+
+# Optional: Specify which Google account to use
+# issuer("service-account@project-id.iam.gserviceaccount.com")

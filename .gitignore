@@ -75,3 +75,17 @@ yarn-error.log
 
 # Bundle analysis outputs
 bundle-analysis/
+
+# Deployment and signing
+**/fastlane/README.md
+*.dSYM.zip
+*.cer
+*.p12
+*.mobileprovision
+*.keystore
+!debug.keystore
+android/app/*.keystore
+android/app/*.jks
+android/gradle.properties
+**/service-account.json
+*.jks

@@ -1,0 +1,23 @@
+# Match file for iOS code signing
+# For more information see: https://docs.fastlane.tools/actions/match/
+
+# Git repository URL for certificates
+git_url("https://github.com/YOUR_ORG/certificates") # Replace with your certificates repo
+
+# App identifier
+app_identifier(["com.rnawtest.app"]) # Replace with your bundle ID
+
+# Type of provisioning profile (appstore, adhoc, development)
+type("appstore")
+
+# Storage mode for certificates (git, google_cloud, s3)
+storage_mode("git")
+
+# Optional: Username for the git repository
+# username("git@github.com")
+
+# Optional: Branch to use for the git repository
+# git_branch("main")
+
+# Optional: Specify which team you want to use
+# team_id("YOUR_TEAM_ID")

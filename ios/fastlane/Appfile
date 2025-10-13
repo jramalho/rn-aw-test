@@ -1,0 +1,18 @@
+# iOS Appfile Configuration
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile
+
+# Apple Developer account email
+apple_id("your-apple-id@example.com") # Replace with your Apple ID
+
+# App bundle identifier
+app_identifier("com.rnawtest.app") # Replace with your bundle ID
+
+# Apple Developer Team ID (App Store Connect)
+itc_team_id("YOUR_ITC_TEAM_ID") # Replace with your team ID
+
+# Apple Developer Team ID (Developer Portal)
+team_id("YOUR_TEAM_ID") # Replace with your team ID
+
+# iTunes Connect Team Name (if needed)
+# itc_team_name("Your Team Name")

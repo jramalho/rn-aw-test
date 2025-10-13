@@ -48,6 +48,7 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 - **Deep Linking**: Read [docs/DEEP_LINKING.md](./docs/DEEP_LINKING.md) for deep link patterns
 - **Notification Navigation**: Check [docs/NOTIFICATION_NAVIGATION_INTEGRATION.md](./docs/NOTIFICATION_NAVIGATION_INTEGRATION.md) for integration details
 - **Offline Support**: See [docs/OFFLINE_SUPPORT.md](./docs/OFFLINE_SUPPORT.md) for offline-first architecture
+- **App Store Deployment**: See [docs/APP_STORE_DEPLOYMENT.md](./docs/APP_STORE_DEPLOYMENT.md) for deployment guide
 - **Tournament System**: See [docs/TOURNAMENT_SYSTEM.md](./docs/TOURNAMENT_SYSTEM.md) for bracket tournaments with AI opponents
 - **Custom TurboModule**: Read [docs/CUSTOM_TURBOMODULE.md](./docs/CUSTOM_TURBOMODULE.md) for native module development
 - **Biometric Authentication**: Read [docs/BIOMETRIC_AUTHENTICATION.md](./docs/BIOMETRIC_AUTHENTICATION.md) for Face ID, Touch ID, and Fingerprint auth
@@ -363,13 +364,13 @@ npm run build:ios      # Build iOS archive
 - [x] Custom TurboModule (DeviceInfo)
 - [x] Biometric Authentication (Face ID, Touch ID, Fingerprint)
 
-### Phase 3: Optimization 🚧 In Progress
+### Phase 3: Optimization ✅ Complete
 - [x] Performance monitoring
 - [x] Bundle size optimization
 - [x] CI/CD pipeline
 - [x] Automated testing (Unit + E2E)
 - [x] E2E testing with Detox (6 test suites)
-- [ ] App Store deployment setup 📋
+- [x] App Store deployment setup
 
 ## 🤝 Contributing
 

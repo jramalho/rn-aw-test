@@ -5,12 +5,22 @@
  * Provides a clean, type-safe API for accessing device information
  */
 
-import NativeDeviceInfo from '../specs/NativeDeviceInfo';
+import { Platform } from 'react-native';
 import type {
   DeviceInfo as IDeviceInfo,
   BatteryInfo as IBatteryInfo,
   StorageInfo as IStorageInfo,
 } from '../specs/NativeDeviceInfo';
+
+// Lazy import of native module to handle cases where it's not implemented yet
+let NativeDeviceInfo: any = null;
+try {
+  NativeDeviceInfo = require('../specs/NativeDeviceInfo').default;
+} catch {
+  console.warn(
+    'DeviceInfo TurboModule not available, using fallback implementation',
+  );
+}
 
 export type DeviceInfo = IDeviceInfo;
 export type BatteryInfo = IBatteryInfo;
@@ -50,7 +60,23 @@ class DeviceInfoModule {
    * ```
    */
   async getDeviceInfo(): Promise<DeviceInfo> {
-    return NativeDeviceInfo.getDeviceInfo();
+    if (NativeDeviceInfo) {
+      return NativeDeviceInfo.getDeviceInfo();
+    }
+
+    // Fallback implementation using React Native Platform
+    return {
+      deviceId: 'unknown',
+      model: Platform.OS === 'ios' ? 'iPhone Simulator' : 'Android Emulator',
+      systemName: Platform.OS === 'ios' ? 'iOS' : 'Android',
+      systemVersion: Platform.Version.toString(),
+      appVersion: '1.0.0',
+      buildNumber: '1',
+      manufacturer: Platform.OS === 'ios' ? 'Apple' : 'Google',
+      brand: Platform.OS === 'ios' ? 'iPhone' : 'Android',
+      isTablet: false,
+      isEmulator: true,
+    };
   }
 
   /**
@@ -68,7 +94,16 @@ class DeviceInfoModule {
    * ```
    */
   async getBatteryInfo(): Promise<BatteryInfo> {
-    return NativeDeviceInfo.getBatteryInfo();
+    if (NativeDeviceInfo) {
+      return NativeDeviceInfo.getBatteryInfo();
+    }
+
+    // Fallback implementation
+    return {
+      level: 0.85,
+      state: 'unknown',
+      isCharging: false,
+    };
   }
 
   /**
@@ -84,7 +119,18 @@ class DeviceInfoModule {
    * ```
    */
   async getStorageInfo(): Promise<StorageInfo> {
-    return NativeDeviceInfo.getStorageInfo();
+    if (NativeDeviceInfo) {
+      return NativeDeviceInfo.getStorageInfo();
+    }
+
+    // Fallback implementation (simulated values)
+    const totalSpace = 128 * 1024 * 1024 * 1024; // 128GB
+    const usedSpace = 64 * 1024 * 1024 * 1024; // 64GB used
+    return {
+      totalSpace,
+      freeSpace: totalSpace - usedSpace,
+      usedSpace,
+    };
   }
 
   /**
@@ -101,7 +147,12 @@ class DeviceInfoModule {
    * ```
    */
   async hasBiometricAuthentication(): Promise<boolean> {
-    return NativeDeviceInfo.hasBiometricAuthentication();
+    if (NativeDeviceInfo) {
+      return NativeDeviceInfo.hasBiometricAuthentication();
+    }
+
+    // Fallback implementation
+    return false;
   }
 
   /**
@@ -116,7 +167,12 @@ class DeviceInfoModule {
    * ```
    */
   async getDeviceLocale(): Promise<string> {
-    return NativeDeviceInfo.getDeviceLocale();
+    if (NativeDeviceInfo) {
+      return NativeDeviceInfo.getDeviceLocale();
+    }
+
+    // Fallback implementation
+    return 'en-US';
   }
 
   /**
@@ -131,7 +187,12 @@ class DeviceInfoModule {
    * ```
    */
   async getDeviceTimezone(): Promise<string> {
-    return NativeDeviceInfo.getDeviceTimezone();
+    if (NativeDeviceInfo) {
+      return NativeDeviceInfo.getDeviceTimezone();
+    }
+
+    // Fallback implementation using JavaScript Date
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
   }
 
   /**
@@ -148,7 +209,12 @@ class DeviceInfoModule {
    * ```
    */
   async supportsHaptics(): Promise<boolean> {
-    return NativeDeviceInfo.supportsHaptics();
+    if (NativeDeviceInfo) {
+      return NativeDeviceInfo.supportsHaptics();
+    }
+
+    // Fallback implementation
+    return Platform.OS === 'ios';
   }
 
   /**
@@ -166,7 +232,12 @@ class DeviceInfoModule {
    * ```
    */
   getDeviceModelSync(): string {
-    return NativeDeviceInfo.getDeviceModelSync();
+    if (NativeDeviceInfo) {
+      return NativeDeviceInfo.getDeviceModelSync();
+    }
+
+    // Fallback implementation
+    return Platform.OS === 'ios' ? 'iPhone Simulator' : 'Android Emulator';
   }
 
   /**

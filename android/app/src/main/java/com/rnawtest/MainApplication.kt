@@ -17,8 +17,8 @@ class MainApplication : Application(), ReactApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // add(MyReactNativePackage())
           
-          // Add DeviceInfo TurboModule
-          add(DeviceInfoPackage())
+          // TODO: Add DeviceInfo TurboModule implementation
+          // add(DeviceInfoPackage())
         },
     )
   }

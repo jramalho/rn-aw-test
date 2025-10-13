@@ -6,15 +6,13 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
-import { Text, Button, Card, ProgressBar, Portal, Dialog, List, IconButton,  } from '../components';
+import { Text, Button, Card, ProgressBar, Portal, Dialog, List, IconButton } from '../components';
 import { useTheme } from '../hooks';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, BattleAction, BattlePokemon } from '../types';
 import { useBattleStore } from '../store/battleStore';
 import { usePokemonStore } from '../store/pokemonStore';
-import { generateTrainerTeam, OPPONENT_TRAINERS, OpponentTrainer } from '../utils/battleUtils';
-
 import { generateTrainerTeam, OPPONENT_TRAINERS, OpponentTrainer, generateBattleMoves } from '../utils/battleUtils';
 
 type BattleScreenRouteProp = RouteProp<RootStackParamList, 'Battle'>;

@@ -16,6 +16,9 @@ export type RootStackParamList = {
   SignUp: undefined;
   NotificationSettings: undefined;
   NotificationDemo: undefined;
+  TournamentLobby: undefined;
+  TournamentBracket: { tournamentId: string };
+  TournamentBattle: { tournamentId: string; matchId: string };
 };
 
 // Pokemon API Types
@@ -516,3 +519,6 @@ import { TextStyle } from 'react-native';
 
 // Re-export auth types
 export * from './auth';
+
+// Re-export tournament types
+export * from './tournament';

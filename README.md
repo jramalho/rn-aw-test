@@ -44,6 +44,7 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 - **Deep Linking**: Read [docs/DEEP_LINKING.md](./docs/DEEP_LINKING.md) for deep link patterns
 - **Notification Navigation**: Check [docs/NOTIFICATION_NAVIGATION_INTEGRATION.md](./docs/NOTIFICATION_NAVIGATION_INTEGRATION.md) for integration details
 - **Offline Support**: See [docs/OFFLINE_SUPPORT.md](./docs/OFFLINE_SUPPORT.md) for offline-first architecture
+- **Tournament System**: See [docs/TOURNAMENT_SYSTEM.md](./docs/TOURNAMENT_SYSTEM.md) for group battle tournaments
 - **Examples**: Multiple demo screens and components included
 - **Testing**: Full test suite with 80%+ coverage
 - **CI/CD**: Automated builds and quality checks
@@ -75,6 +76,9 @@ A complete **Pokemon application** showcasing real-world usage patterns:
 - **🏷️ Type Filtering** - Filter Pokemon by types (Fire, Water, Grass, etc.)
 - **📱 Pokemon Details** - Complete Pokemon information with stats, abilities, and moves
 - **❤️ Favorites System** - Save favorite Pokemon with persistent storage
+- **👥 Team Builder** - Build and save teams of Pokemon for battles
+- **⚔️ Battle System** - Turn-based battles against AI opponents with moves and type effectiveness
+- **🏆 Tournament Mode** - Compete in bracket-style tournaments (4, 8, or 16 participants)
 - **🎨 Type-based Design** - Dynamic colors based on Pokemon types
 - **📊 Stats Visualization** - Interactive stat bars and charts
 - **🔄 Smart Caching** - Offline-first with intelligent API caching

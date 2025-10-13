@@ -219,3 +219,6 @@ export { useDeepLink } from './useDeepLink';
 
 // Export network hook
 export { useNetwork } from './useNetwork';
+
+// Export biometric hook
+export { useBiometric } from './useBiometric';

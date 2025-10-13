@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,8 +9,9 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { TextInput, Button, ActivityIndicator } from 'react-native-paper';
+import { TextInput, Button, ActivityIndicator, IconButton } from 'react-native-paper';
 import { useAuth } from '../hooks/useAuth';
+import { useBiometric } from '../hooks/useBiometric';
 import { AuthProvider } from '../types/auth';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types';
@@ -23,7 +24,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login, isLoading, error, clearError } = useAuth();
+  const { login, isLoading, error, clearError, user } = useAuth();
+  const { isAvailable, isEnabled, biometryType, authenticate } = useBiometric();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -40,6 +42,26 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       // Navigation will be handled by auth state change
     } catch (err) {
       Alert.alert('Login Failed', error || 'An error occurred during login');
+    }
+  };
+
+  const handleBiometricLogin = async () => {
+    try {
+      const result = await authenticate(`Authenticate with ${biometryType}`);
+      
+      if (result.success) {
+        // In a real app, you would validate the biometric auth with your backend
+        // and then log the user in. For now, we'll use the demo login.
+        await login({
+          provider: AuthProvider.BIOMETRIC,
+          credentials: { email: 'demo@example.com', password: 'Demo123!' },
+          rememberMe: true,
+        });
+      } else {
+        Alert.alert('Authentication Failed', result.error || 'Biometric authentication failed');
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Failed to authenticate with biometrics');
     }
   };
 
@@ -134,6 +156,26 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           >
             {isLoading ? 'Signing In...' : 'Sign In'}
           </Button>
+
+          {isAvailable && isEnabled && (
+            <View style={styles.biometricContainer}>
+              <View style={styles.divider}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>OR</Text>
+                <View style={styles.dividerLine} />
+              </View>
+              
+              <Button
+                mode="outlined"
+                onPress={handleBiometricLogin}
+                style={styles.biometricButton}
+                disabled={isLoading}
+                icon={biometryType === 'Face ID' ? 'face-recognition' : 'fingerprint'}
+              >
+                Sign in with {biometryType}
+              </Button>
+            </View>
+          )}
 
           <View style={styles.signUpContainer}>
             <Text style={styles.signUpText}>Don't have an account? </Text>
@@ -233,6 +275,29 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     marginBottom: 16,
+  },
+  biometricContainer: {
+    marginBottom: 16,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#ccc',
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    color: '#666',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  biometricButton: {
+    borderRadius: 8,
+    borderColor: '#007AFF',
   },
   signUpContainer: {
     flexDirection: 'row',

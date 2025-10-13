@@ -11,10 +11,12 @@ import { styles } from './styles';
 
 export interface TextInputProps extends RNTextInputProps {
   label?: string;
-  error?: string;
+  error?: string | boolean;
   helperText?: string;
   rightIcon?: React.ReactNode;
   onRightIconPress?: () => void;
+  disabled?: boolean;
+  mode?: 'outlined' | 'flat';
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -24,6 +26,8 @@ const TextInput: React.FC<TextInputProps> = ({
   rightIcon,
   onRightIconPress,
   style,
+  disabled,
+  mode = 'outlined',
   ...rest
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -33,9 +37,12 @@ const TextInput: React.FC<TextInputProps> = ({
   const placeholderColor = isDarkMode ? '#999999' : '#666666';
   const borderColor = isDarkMode ? '#444444' : '#cccccc';
   const backgroundColor = isDarkMode ? '#1c1c1e' : '#ffffff';
+  const disabledOpacity = disabled ? 0.5 : 1;
+
+  const hasError = typeof error === 'string' ? !!error : error;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { opacity: disabledOpacity }]}>
       {label && (
         <Text style={[styles.label, { color: inputColor }]}>
           {label}
@@ -46,7 +53,7 @@ const TextInput: React.FC<TextInputProps> = ({
           styles.inputContainer,
           { borderColor, backgroundColor },
           isFocused && styles.inputContainerFocused,
-          error && styles.inputContainerError,
+          hasError && styles.inputContainerError,
         ]}
       >
         <RNTextInput
@@ -54,12 +61,14 @@ const TextInput: React.FC<TextInputProps> = ({
           placeholderTextColor={placeholderColor}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          editable={!disabled}
           {...rest}
         />
         {rightIcon && (
           <Pressable
             style={styles.iconContainer}
             onPress={onRightIconPress}
+            disabled={disabled}
             accessibilityRole="button"
             accessibilityLabel="Toggle input visibility"
           >
@@ -67,10 +76,10 @@ const TextInput: React.FC<TextInputProps> = ({
           </Pressable>
         )}
       </View>
-      {error && (
+      {typeof error === 'string' && error && (
         <Text style={styles.errorText}>{error}</Text>
       )}
-      {helperText && !error && (
+      {helperText && !hasError && (
         <Text style={[styles.helperText, { color: inputColor }]}>
           {helperText}
         </Text>

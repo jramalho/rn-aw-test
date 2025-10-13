@@ -6,7 +6,7 @@
  */
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 
 interface Props {
   children: ReactNode;
@@ -76,14 +76,17 @@ export class ErrorBoundary extends Component<Props, State> {
                 <Text style={styles.debugText}>{this.state.error.stack}</Text>
               </View>
             )}
-            <TouchableOpacity
-              style={styles.button}
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                pressed && styles.buttonPressed,
+              ]}
               onPress={this.resetError}
               accessibilityRole="button"
               accessibilityLabel="Try again"
             >
               <Text style={styles.buttonText}>Try Again</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       );
@@ -151,6 +154,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+  },
+  buttonPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
   },
   buttonText: {
     color: '#ffffff',

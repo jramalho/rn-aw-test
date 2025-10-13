@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  Dimensions,
-} from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Dimensions } from 'react-native';
 import {
   Text,
   Button,
@@ -14,7 +8,6 @@ import {
   Portal,
   Dialog,
   List,
-  IconButton,
   useTheme,
   ActivityIndicator,
 } from 'react-native-paper';
@@ -23,12 +16,19 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, BattleAction, BattlePokemon } from '../types';
 import { useBattleStore } from '../store/battleStore';
 import { usePokemonStore } from '../store/pokemonStore';
-import { generateTrainerTeam, OPPONENT_TRAINERS, OpponentTrainer } from '../utils/battleUtils';
 
-import { generateTrainerTeam, OPPONENT_TRAINERS, OpponentTrainer, generateBattleMoves } from '../utils/battleUtils';
+import {
+  generateTrainerTeam,
+  OPPONENT_TRAINERS,
+  OpponentTrainer,
+  generateBattleMoves,
+} from '../utils/battleUtils';
 
 type BattleScreenRouteProp = RouteProp<RootStackParamList, 'Battle'>;
-type BattleScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Battle'>;
+type BattleScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Battle'
+>;
 
 const { width } = Dimensions.get('window');
 
@@ -50,15 +50,16 @@ export default function BattleScreen() {
   const { savedTeams, pokemonList } = usePokemonStore();
 
   const [switchDialogVisible, setSwitchDialogVisible] = useState(false);
-  const [selectedMove, setSelectedMove] = useState<number | null>(null);
+  const [_selectedMove, _setSelectedMove] = useState<number | null>(null);
   const [battleLog, setBattleLog] = useState<string[]>([]);
-  const [selectedTrainer, setSelectedTrainer] = useState<OpponentTrainer | null>(opponentTrainer || null);
+  const [selectedTrainer, setSelectedTrainer] =
+    useState<OpponentTrainer | null>(opponentTrainer || null);
 
   // Initialize battle
   useEffect(() => {
     if (!currentBattle) {
       const team = savedTeams.find(t => t.id === teamId);
-      
+
       if (!team || team.pokemon.length === 0) {
         Alert.alert('Error', 'Invalid team selected', [
           { text: 'OK', onPress: () => navigation.goBack() },
@@ -67,12 +68,14 @@ export default function BattleScreen() {
       }
 
       // Use provided trainer or pick a random one
-      const trainer = selectedTrainer || OPPONENT_TRAINERS[Math.floor(Math.random() * OPPONENT_TRAINERS.length)];
+      const trainer =
+        selectedTrainer ||
+        OPPONENT_TRAINERS[Math.floor(Math.random() * OPPONENT_TRAINERS.length)];
       setSelectedTrainer(trainer);
 
       // Generate opponent team based on trainer
       const opponentPokemon = generateTrainerTeam(pokemonList, trainer);
-      
+
       if (opponentPokemon.length === 0) {
         Alert.alert('Error', 'Failed to generate opponent team', [
           { text: 'OK', onPress: () => navigation.goBack() },
@@ -82,7 +85,15 @@ export default function BattleScreen() {
 
       startBattle(team.pokemon, opponentPokemon);
     }
-  }, []);
+  }, [
+    currentBattle,
+    navigation,
+    pokemonList,
+    savedTeams,
+    selectedTrainer,
+    startBattle,
+    teamId,
+  ]);
 
   // Update battle log when battle state changes
   useEffect(() => {
@@ -91,34 +102,31 @@ export default function BattleScreen() {
       const newMessages = lastTurn.events.map(event => event.message);
       setBattleLog(prev => [...prev, ...newMessages]);
     }
-  }, [currentBattle?.turns.length]);
+  }, [currentBattle]);
 
   // Check if battle ended
   useEffect(() => {
     if (currentBattle && currentBattle.status !== 'ongoing') {
-      const message = currentBattle.status === 'won' 
-        ? 'Congratulations! You won the battle!' 
-        : currentBattle.status === 'forfeit'
-        ? 'You forfeited the battle.'
-        : 'You lost the battle!';
+      const message =
+        currentBattle.status === 'won'
+          ? 'Congratulations! You won the battle!'
+          : currentBattle.status === 'forfeit'
+          ? 'You forfeited the battle.'
+          : 'You lost the battle!';
 
       setTimeout(() => {
-        Alert.alert(
-          'Battle Ended',
-          message,
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                clearCurrentBattle();
-                navigation.goBack();
-              },
+        Alert.alert('Battle Ended', message, [
+          {
+            text: 'OK',
+            onPress: () => {
+              clearCurrentBattle();
+              navigation.goBack();
             },
-          ]
-        );
+          },
+        ]);
       }, 500);
     }
-  }, [currentBattle?.status]);
+  }, [clearCurrentBattle, currentBattle, navigation]);
 
   if (!currentBattle) {
     return (
@@ -129,13 +137,19 @@ export default function BattleScreen() {
     );
   }
 
-  const playerPokemon = currentBattle.playerTeam.pokemon[currentBattle.playerTeam.activePokemonIndex];
-  const opponentPokemon = currentBattle.opponentTeam.pokemon[currentBattle.opponentTeam.activePokemonIndex];
+  const playerPokemon =
+    currentBattle.playerTeam.pokemon[
+      currentBattle.playerTeam.activePokemonIndex
+    ];
+  const opponentPokemon =
+    currentBattle.opponentTeam.pokemon[
+      currentBattle.opponentTeam.activePokemonIndex
+    ];
   const moves = generateBattleMoves(playerPokemon);
 
   const handleAttack = async (moveIndex: number) => {
     if (isProcessingTurn) return;
-    
+
     const action: BattleAction = {
       type: 'attack',
       moveIndex,
@@ -146,7 +160,7 @@ export default function BattleScreen() {
 
   const handleSwitch = (pokemonIndex: number) => {
     if (isProcessingTurn) return;
-    
+
     const action: BattleAction = {
       type: 'switch',
       targetPokemonIndex: pokemonIndex,
@@ -170,13 +184,18 @@ export default function BattleScreen() {
             navigation.goBack();
           },
         },
-      ]
+      ],
     );
   };
 
   const renderPokemonCard = (pokemon: BattlePokemon, isOpponent: boolean) => {
     const hpPercentage = pokemon.currentHP / pokemon.maxHP;
-    const hpColor = hpPercentage > 0.5 ? '#4caf50' : hpPercentage > 0.2 ? '#ff9800' : '#f44336';
+    const hpColor =
+      hpPercentage > 0.5
+        ? '#4caf50'
+        : hpPercentage > 0.2
+        ? '#ff9800'
+        : '#f44336';
 
     return (
       <Card style={[styles.pokemonCard, isOpponent && styles.opponentCard]}>
@@ -185,11 +204,9 @@ export default function BattleScreen() {
             <Text variant="titleLarge" style={styles.pokemonName}>
               {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
             </Text>
-            <Text variant="bodyMedium">
-              Lv. 50
-            </Text>
+            <Text variant="bodyMedium">Lv. 50</Text>
           </View>
-          
+
           <View style={styles.hpContainer}>
             <Text variant="bodySmall" style={styles.hpText}>
               HP: {pokemon.currentHP} / {pokemon.maxHP}
@@ -210,8 +227,16 @@ export default function BattleScreen() {
 
           <View style={styles.typesContainer}>
             {pokemon.types.map((typeInfo, index) => (
-              <View key={index} style={[styles.typeChip, { backgroundColor: getTypeColor(typeInfo.type.name) }]}>
-                <Text style={styles.typeText}>{typeInfo.type.name.toUpperCase()}</Text>
+              <View
+                key={index}
+                style={[
+                  styles.typeChip,
+                  { backgroundColor: getTypeColor(typeInfo.type.name) },
+                ]}
+              >
+                <Text style={styles.typeText}>
+                  {typeInfo.type.name.toUpperCase()}
+                </Text>
               </View>
             ))}
           </View>
@@ -232,7 +257,9 @@ export default function BattleScreen() {
         {/* Opponent Pokemon */}
         <View style={styles.battleSection}>
           <Text variant="titleMedium" style={styles.sectionTitle}>
-            {selectedTrainer ? `${selectedTrainer.name} (${selectedTrainer.title})` : 'Opponent'}
+            {selectedTrainer
+              ? `${selectedTrainer.name} (${selectedTrainer.title})`
+              : 'Opponent'}
           </Text>
           {renderPokemonCard(opponentPokemon, true)}
         </View>
@@ -258,7 +285,9 @@ export default function BattleScreen() {
 
         {/* Player Pokemon */}
         <View style={styles.battleSection}>
-          <Text variant="titleMedium" style={styles.sectionTitle}>Your Pokemon</Text>
+          <Text variant="titleMedium" style={styles.sectionTitle}>
+            Your Pokemon
+          </Text>
           {renderPokemonCard(playerPokemon, false)}
         </View>
       </ScrollView>
@@ -274,7 +303,10 @@ export default function BattleScreen() {
                 mode="contained"
                 onPress={() => handleAttack(index)}
                 disabled={isProcessingTurn}
-                style={[styles.moveButton, { backgroundColor: getTypeColor(move.type) }]}
+                style={[
+                  styles.moveButton,
+                  { backgroundColor: getTypeColor(move.type) },
+                ]}
                 labelStyle={styles.moveButtonLabel}
               >
                 {move.name}
@@ -307,18 +339,25 @@ export default function BattleScreen() {
 
       {/* Switch Pokemon Dialog */}
       <Portal>
-        <Dialog visible={switchDialogVisible} onDismiss={() => setSwitchDialogVisible(false)}>
+        <Dialog
+          visible={switchDialogVisible}
+          onDismiss={() => setSwitchDialogVisible(false)}
+        >
           <Dialog.Title>Switch Pokemon</Dialog.Title>
           <Dialog.ScrollArea>
             <ScrollView>
               {currentBattle.playerTeam.pokemon.map((pokemon, index) => {
-                const isActive = index === currentBattle.playerTeam.activePokemonIndex;
+                const isActive =
+                  index === currentBattle.playerTeam.activePokemonIndex;
                 const isFainted = pokemon.status === 'fainted';
-                
+
                 return (
                   <List.Item
                     key={pokemon.id}
-                    title={pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
+                    title={
+                      pokemon.name.charAt(0).toUpperCase() +
+                      pokemon.name.slice(1)
+                    }
                     description={`HP: ${pokemon.currentHP}/${pokemon.maxHP}`}
                     disabled={isActive || isFainted}
                     onPress={() => handleSwitch(index)}
@@ -334,7 +373,9 @@ export default function BattleScreen() {
             </ScrollView>
           </Dialog.ScrollArea>
           <Dialog.Actions>
-            <Button onPress={() => setSwitchDialogVisible(false)}>Cancel</Button>
+            <Button onPress={() => setSwitchDialogVisible(false)}>
+              Cancel
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

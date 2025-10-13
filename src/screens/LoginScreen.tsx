@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { TextInput, Button, ActivityIndicator } from 'react-native-paper';
+import { TextInput, Button } from 'react-native-paper';
 import { useAuth } from '../hooks/useAuth';
 import { AuthProvider } from '../types/auth';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -17,7 +17,7 @@ import type { RootStackParamList } from '../types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
-const LoginScreen: React.FC<Props> = ({ navigation }) => {
+const LoginScreen: React.FC<Props> = React.memo(({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -25,7 +25,17 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
   const { login, isLoading, error, clearError } = useAuth();
 
-  const handleLogin = async () => {
+  // Performance monitoring - only log when auth state changes
+  React.useEffect(() => {
+    if (isLoading || error) {
+      console.log('LoginScreen auth state changed:', {
+        isLoading,
+        hasError: !!error,
+      });
+    }
+  }, [isLoading, error]);
+
+  const handleLogin = React.useCallback(async () => {
     if (!email || !password) {
       Alert.alert('Error', 'Please enter both email and password');
       return;
@@ -38,19 +48,27 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         rememberMe,
       });
       // Navigation will be handled by auth state change
-    } catch (err) {
+    } catch {
       Alert.alert('Login Failed', error || 'An error occurred during login');
     }
-  };
+  }, [email, password, rememberMe, login, error]);
 
-  const handleSignUpNavigation = () => {
+  const handleSignUpNavigation = React.useCallback(() => {
     clearError();
     navigation.navigate('SignUp');
-  };
+  }, [clearError, navigation]);
 
-  const handleForgotPassword = () => {
+  const handleForgotPassword = React.useCallback(() => {
     Alert.alert('Forgot Password', 'Password reset functionality coming soon!');
-  };
+  }, []);
+
+  const toggleShowPassword = React.useCallback(() => {
+    setShowPassword(prev => !prev);
+  }, []);
+
+  const toggleRememberMe = React.useCallback(() => {
+    setRememberMe(prev => !prev);
+  }, []);
 
   return (
     <KeyboardAvoidingView
@@ -97,7 +115,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             right={
               <TextInput.Icon
                 icon={showPassword ? 'eye-off' : 'eye'}
-                onPress={() => setShowPassword(!showPassword)}
+                onPress={toggleShowPassword}
               />
             }
           />
@@ -105,16 +123,21 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           <View style={styles.optionsRow}>
             <TouchableOpacity
               style={styles.checkboxRow}
-              onPress={() => setRememberMe(!rememberMe)}
+              onPress={toggleRememberMe}
               disabled={isLoading}
             >
-              <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
+              <View
+                style={[styles.checkbox, rememberMe && styles.checkboxChecked]}
+              >
                 {rememberMe && <Text style={styles.checkmark}>✓</Text>}
               </View>
               <Text style={styles.checkboxLabel}>Remember me</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleForgotPassword} disabled={isLoading}>
+            <TouchableOpacity
+              onPress={handleForgotPassword}
+              disabled={isLoading}
+            >
               <Text style={styles.forgotPassword}>Forgot Password?</Text>
             </TouchableOpacity>
           </View>
@@ -137,7 +160,10 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
           <View style={styles.signUpContainer}>
             <Text style={styles.signUpText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={handleSignUpNavigation} disabled={isLoading}>
+            <TouchableOpacity
+              onPress={handleSignUpNavigation}
+              disabled={isLoading}
+            >
               <Text style={styles.signUpLink}>Sign Up</Text>
             </TouchableOpacity>
           </View>
@@ -145,7 +171,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       </ScrollView>
     </KeyboardAvoidingView>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

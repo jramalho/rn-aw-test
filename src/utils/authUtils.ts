@@ -59,11 +59,13 @@ export const storeTokens = async (tokens: AuthTokens): Promise<void> => {
   try {
     await AsyncStorage.setItem(
       STORAGE_KEYS.AUTH_TOKENS,
-      JSON.stringify(tokens)
+      JSON.stringify(tokens),
     );
-  } catch (error) {
+  } catch {
     throw new Error(
-      `Failed to store tokens: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to store tokens: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`,
     );
   }
 };
@@ -80,7 +82,7 @@ export const getStoredTokens = async (): Promise<AuthTokens | null> => {
 
     const tokens = JSON.parse(tokensJson) as AuthTokens;
     return validateTokens(tokens) ? tokens : null;
-  } catch (error) {
+  } catch {
     console.error('Failed to retrieve tokens:', error);
     return null;
   }
@@ -92,9 +94,11 @@ export const getStoredTokens = async (): Promise<AuthTokens | null> => {
 export const storeUser = async (user: User): Promise<void> => {
   try {
     await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
-  } catch (error) {
+  } catch {
     throw new Error(
-      `Failed to store user data: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to store user data: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`,
     );
   }
 };
@@ -106,7 +110,7 @@ export const getStoredUser = async (): Promise<User | null> => {
   try {
     const userJson = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
     return userJson ? (JSON.parse(userJson) as User) : null;
-  } catch (error) {
+  } catch {
     console.error('Failed to retrieve user data:', error);
     return null;
   }
@@ -121,9 +125,11 @@ export const clearAuthStorage = async (): Promise<void> => {
       STORAGE_KEYS.AUTH_TOKENS,
       STORAGE_KEYS.USER_DATA,
     ]);
-  } catch (error) {
+  } catch {
     throw new Error(
-      `Failed to clear auth storage: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to clear auth storage: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`,
     );
   }
 };
@@ -135,7 +141,7 @@ export const isBiometricEnabled = async (): Promise<boolean> => {
   try {
     const enabled = await AsyncStorage.getItem(STORAGE_KEYS.BIOMETRIC_ENABLED);
     return enabled === 'true';
-  } catch (error) {
+  } catch {
     console.error('Failed to check biometric status:', error);
     return false;
   }
@@ -148,11 +154,13 @@ export const setBiometricEnabled = async (enabled: boolean): Promise<void> => {
   try {
     await AsyncStorage.setItem(
       STORAGE_KEYS.BIOMETRIC_ENABLED,
-      enabled ? 'true' : 'false'
+      enabled ? 'true' : 'false',
     );
-  } catch (error) {
+  } catch {
     throw new Error(
-      `Failed to set biometric status: ${error instanceof Error ? error.message : 'Unknown error'}`
+      `Failed to set biometric status: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`,
     );
   }
 };
@@ -169,7 +177,9 @@ export const isValidEmail = (email: string): boolean => {
  * Validate password strength
  * Requirements: at least 8 characters, 1 uppercase, 1 lowercase, 1 number
  */
-export const isValidPassword = (password: string): {
+export const isValidPassword = (
+  password: string,
+): {
   valid: boolean;
   errors: string[];
 } => {
@@ -203,7 +213,7 @@ export const isValidPassword = (password: string): {
 export const createAuthError = (
   code: string,
   message: string,
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>,
 ): AuthError => ({
   code,
   message,

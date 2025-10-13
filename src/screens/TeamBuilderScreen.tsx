@@ -12,27 +12,25 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePokemonStore } from '../store/pokemonStore';
 import { Pokemon, SavedTeam } from '../types';
 import { useNavigation } from '@react-navigation/native';
 
 const TeamBuilderScreen: React.FC = () => {
-  const insets = useSafeAreaInsets();
   const isDarkMode = useColorScheme() === 'dark';
   const navigation = useNavigation();
-  
-  const { 
-    team, 
+
+  const {
+    team,
     savedTeams,
     currentTeamId,
-    removeFromTeam, 
+    removeFromTeam,
     clearTeam,
     saveCurrentTeam,
     loadTeam,
     deleteTeam,
-    updateTeam,
-    getTeamAnalysis,
+    // updateTeam: _updateTeam, // Unused
+    getTeamAnalysis: _getTeamAnalysis,
   } = usePokemonStore();
 
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -55,29 +53,29 @@ const TeamBuilderScreen: React.FC = () => {
       'Are you sure you want to remove this Pokemon from your team?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Remove', 
+        {
+          text: 'Remove',
           style: 'destructive',
-          onPress: () => removeFromTeam(pokemonId)
+          onPress: () => removeFromTeam(pokemonId),
         },
-      ]
+      ],
     );
   };
 
   const handleClearTeam = () => {
     if (team.length === 0) return;
-    
+
     Alert.alert(
       'Clear Team',
       'Are you sure you want to remove all Pokemon from your team?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Clear', 
+        {
+          text: 'Clear',
           style: 'destructive',
-          onPress: () => clearTeam()
+          onPress: () => clearTeam(),
         },
-      ]
+      ],
     );
   };
 
@@ -102,19 +100,24 @@ const TeamBuilderScreen: React.FC = () => {
         'You need to save your team before starting a battle.',
         [
           { text: 'Cancel', style: 'cancel' },
-          { text: 'Save Team', onPress: () => setShowSaveModal(true) }
-        ]
+          { text: 'Save Team', onPress: () => setShowSaveModal(true) },
+        ],
       );
       return;
     }
 
     // Navigate to opponent selection screen
-    (navigation as any).navigate('OpponentSelection', { teamId: currentTeamId });
+    (navigation as any).navigate('OpponentSelection', {
+      teamId: currentTeamId,
+    });
   };
 
   const handleStartTournament = () => {
     if (team.length === 0) {
-      Alert.alert('Empty Team', 'Add at least one Pokemon before entering a tournament.');
+      Alert.alert(
+        'Empty Team',
+        'Add at least one Pokemon before entering a tournament.',
+      );
       return;
     }
 
@@ -127,7 +130,7 @@ const TeamBuilderScreen: React.FC = () => {
       Alert.alert('Empty Team', 'Add at least one Pokemon before saving.');
       return;
     }
-    
+
     // Pre-fill name if editing existing team
     const currentTeam = savedTeams.find(t => t.id === currentTeamId);
     if (currentTeam) {
@@ -137,7 +140,7 @@ const TeamBuilderScreen: React.FC = () => {
       setTeamName('');
       setTeamDescription('');
     }
-    
+
     setShowSaveModal(true);
   };
 
@@ -153,8 +156,11 @@ const TeamBuilderScreen: React.FC = () => {
       setTeamName('');
       setTeamDescription('');
       Alert.alert('Success', 'Team saved successfully!');
-    } catch (error) {
-      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to save team');
+    } catch (saveError) {
+      Alert.alert(
+        'Error',
+        saveError instanceof Error ? saveError.message : 'Failed to save team',
+      );
     }
   };
 
@@ -163,8 +169,11 @@ const TeamBuilderScreen: React.FC = () => {
       loadTeam(teamId);
       setShowLoadModal(false);
       Alert.alert('Success', 'Team loaded successfully!');
-    } catch (error) {
-      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to load team');
+    } catch (loadError) {
+      Alert.alert(
+        'Error',
+        loadError instanceof Error ? loadError.message : 'Failed to load team',
+      );
     }
   };
 
@@ -182,23 +191,24 @@ const TeamBuilderScreen: React.FC = () => {
             Alert.alert('Success', 'Team deleted successfully!');
           },
         },
-      ]
+      ],
     );
   };
 
-  const handleNewTeam = () => {
-    if (team.length > 0) {
-      Alert.alert(
-        'New Team',
-        'Creating a new team will clear the current team. Do you want to save it first?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Discard', style: 'destructive', onPress: () => clearTeam() },
-          { text: 'Save First', onPress: handleSaveTeam },
-        ]
-      );
-    }
-  };
+  // Unused function - kept for future use
+  // const handleNewTeam = () => {
+  //   if (team.length > 0) {
+  //     Alert.alert(
+  //       'New Team',
+  //       'Creating a new team will clear the current team. Do you want to save it first?',
+  //       [
+  //         { text: 'Cancel', style: 'cancel' },
+  //         { text: 'Discard', style: 'destructive', onPress: () => clearTeam() },
+  //         { text: 'Save First', onPress: handleSaveTeam },
+  //       ]
+  //     );
+  //   }
+  // };
 
   const getTypeColor = (typeName: string): string => {
     const typeColors: Record<string, string> = {
@@ -224,32 +234,54 @@ const TeamBuilderScreen: React.FC = () => {
     return typeColors[typeName.toLowerCase()] || '#68A090';
   };
 
-  const TeamSlot = ({ pokemon, position }: { pokemon?: Pokemon; position: number }) => {
+  const TeamSlot = ({
+    pokemon,
+    position,
+  }: {
+    pokemon?: Pokemon;
+    position: number;
+  }) => {
     if (!pokemon) {
       return (
         <TouchableOpacity
-          style={[styles.emptySlot, { backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff' }]}
+          style={[
+            styles.emptySlot,
+            { backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff' },
+          ]}
           onPress={handleAddPokemon}
           accessibilityLabel={`Empty team slot ${position}`}
           accessibilityHint="Tap to add a Pokemon to your team"
           accessibilityRole="button"
         >
-          <Text style={[styles.emptySlotText, { color: isDarkMode ? '#6b7280' : '#9ca3af' }]}>
+          <Text
+            style={[
+              styles.emptySlotText,
+              { color: isDarkMode ? '#6b7280' : '#9ca3af' },
+            ]}
+          >
             +
           </Text>
-          <Text style={[styles.emptySlotLabel, { color: isDarkMode ? '#6b7280' : '#9ca3af' }]}>
+          <Text
+            style={[
+              styles.emptySlotLabel,
+              { color: isDarkMode ? '#6b7280' : '#9ca3af' },
+            ]}
+          >
             Add Pokemon
           </Text>
         </TouchableOpacity>
       );
     }
 
-    const primaryType = pokemon.types[0]?.type.name || 'normal';
-    const typeColor = getTypeColor(primaryType);
+    // const primaryType = pokemon.types[0]?.type.name || 'normal'; // Unused
+    // const typeColor = ...; // Unused
 
     return (
       <TouchableOpacity
-        style={[styles.filledSlot, { backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff' }]}
+        style={[
+          styles.filledSlot,
+          { backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff' },
+        ]}
         onPress={() => handlePokemonPress(pokemon)}
         onLongPress={() => handleRemovePokemon(pokemon.id)}
         accessibilityLabel={`${pokemon.name}, position ${position}`}
@@ -261,7 +293,12 @@ const TeamBuilderScreen: React.FC = () => {
             <Text style={[styles.pokemonName, textStyle]}>
               {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
             </Text>
-            <Text style={[styles.pokemonNumber, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>
+            <Text
+              style={[
+                styles.pokemonNumber,
+                { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+              ]}
+            >
               #{pokemon.id.toString().padStart(3, '0')}
             </Text>
           </View>
@@ -285,7 +322,10 @@ const TeamBuilderScreen: React.FC = () => {
           {pokemon.types.map((typeInfo, index) => (
             <View
               key={index}
-              style={[styles.typeTag, { backgroundColor: getTypeColor(typeInfo.type.name) }]}
+              style={[
+                styles.typeTag,
+                { backgroundColor: getTypeColor(typeInfo.type.name) },
+              ]}
             >
               <Text style={styles.typeText}>
                 {typeInfo.type.name.toUpperCase()}
@@ -297,7 +337,12 @@ const TeamBuilderScreen: React.FC = () => {
         <View style={styles.statsContainer}>
           {pokemon.stats.slice(0, 3).map((stat, index) => (
             <View key={index} style={styles.statItem}>
-              <Text style={[styles.statLabel, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>
+              <Text
+                style={[
+                  styles.statLabel,
+                  { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                ]}
+              >
                 {stat.stat.name.substring(0, 3).toUpperCase()}
               </Text>
               <Text style={[styles.statValue, textStyle]}>
@@ -342,20 +387,23 @@ const TeamBuilderScreen: React.FC = () => {
 
   const teamStats = calculateTeamStats();
   const teamTypes = getTeamTypes();
-  const teamAnalysis = getTeamAnalysis();
+  const teamAnalysis = _getTeamAnalysis();
   const currentTeam = savedTeams.find(t => t.id === currentTeamId);
 
   return (
     <View style={[styles.container, backgroundStyle]}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      
+
       {/* Header */}
-      <View style={[styles.header, { paddingTop: Platform.OS === 'ios' ? 50 : 20 }]}>
+      <View
+        style={[styles.header, { paddingTop: Platform.OS === 'ios' ? 50 : 20 }]}
+      >
         <View style={styles.headerTop}>
           <View>
             <Text style={styles.headerTitle}>Team Builder</Text>
             <Text style={styles.headerSubtitle}>
-              {team.length}/6 Pokemon{currentTeam ? ` • ${currentTeam.name}` : ''}
+              {team.length}/6 Pokemon
+              {currentTeam ? ` • ${currentTeam.name}` : ''}
             </Text>
           </View>
           <View style={styles.headerActions}>
@@ -386,18 +434,14 @@ const TeamBuilderScreen: React.FC = () => {
         </View>
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
       >
         {/* Team Grid */}
         <View style={styles.teamGrid}>
           {[0, 1, 2, 3, 4, 5].map(index => (
-            <TeamSlot
-              key={index}
-              pokemon={team[index]}
-              position={index + 1}
-            />
+            <TeamSlot key={index} pokemon={team[index]} position={index + 1} />
           ))}
         </View>
 
@@ -406,13 +450,25 @@ const TeamBuilderScreen: React.FC = () => {
           <>
             {/* Team Analysis Section (Collapsible) */}
             {showAnalysis && teamAnalysis && (
-              <View style={[styles.statsSection, { backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff' }]}>
-                <Text style={[styles.sectionTitle, textStyle]}>Team Analysis</Text>
-                
+              <View
+                style={[
+                  styles.statsSection,
+                  { backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff' },
+                ]}
+              >
+                <Text style={[styles.sectionTitle, textStyle]}>
+                  Team Analysis
+                </Text>
+
                 {/* Weaknesses */}
                 {teamAnalysis.weaknesses.length > 0 && (
                   <View style={styles.analysisSubsection}>
-                    <Text style={[styles.analysisLabel, { color: isDarkMode ? '#ef4444' : '#dc2626' }]}>
+                    <Text
+                      style={[
+                        styles.analysisLabel,
+                        { color: isDarkMode ? '#ef4444' : '#dc2626' },
+                      ]}
+                    >
                       ⚠️ Weaknesses
                     </Text>
                     <View style={styles.typeCoverage}>
@@ -421,7 +477,10 @@ const TeamBuilderScreen: React.FC = () => {
                           key={typeName}
                           style={[
                             styles.typeCoverageTag,
-                            { backgroundColor: getTypeColor(typeName), opacity: 0.8 }
+                            {
+                              backgroundColor: getTypeColor(typeName),
+                              opacity: 0.8,
+                            },
                           ]}
                         >
                           <Text style={styles.typeCoverageText}>
@@ -436,7 +495,12 @@ const TeamBuilderScreen: React.FC = () => {
                 {/* Resistances */}
                 {teamAnalysis.resistances.length > 0 && (
                   <View style={styles.analysisSubsection}>
-                    <Text style={[styles.analysisLabel, { color: isDarkMode ? '#10b981' : '#059669' }]}>
+                    <Text
+                      style={[
+                        styles.analysisLabel,
+                        { color: isDarkMode ? '#10b981' : '#059669' },
+                      ]}
+                    >
                       🛡️ Resistances
                     </Text>
                     <View style={styles.typeCoverage}>
@@ -445,7 +509,10 @@ const TeamBuilderScreen: React.FC = () => {
                           key={typeName}
                           style={[
                             styles.typeCoverageTag,
-                            { backgroundColor: getTypeColor(typeName), opacity: 0.8 }
+                            {
+                              backgroundColor: getTypeColor(typeName),
+                              opacity: 0.8,
+                            },
                           ]}
                         >
                           <Text style={styles.typeCoverageText}>
@@ -460,7 +527,12 @@ const TeamBuilderScreen: React.FC = () => {
                 {/* Immunities */}
                 {teamAnalysis.immunities.length > 0 && (
                   <View style={styles.analysisSubsection}>
-                    <Text style={[styles.analysisLabel, { color: isDarkMode ? '#3b82f6' : '#2563eb' }]}>
+                    <Text
+                      style={[
+                        styles.analysisLabel,
+                        { color: isDarkMode ? '#3b82f6' : '#2563eb' },
+                      ]}
+                    >
                       🔰 Immunities
                     </Text>
                     <View style={styles.typeCoverage}>
@@ -469,7 +541,10 @@ const TeamBuilderScreen: React.FC = () => {
                           key={typeName}
                           style={[
                             styles.typeCoverageTag,
-                            { backgroundColor: getTypeColor(typeName), opacity: 0.8 }
+                            {
+                              backgroundColor: getTypeColor(typeName),
+                              opacity: 0.8,
+                            },
                           ]}
                         >
                           <Text style={styles.typeCoverageText}>
@@ -483,14 +558,26 @@ const TeamBuilderScreen: React.FC = () => {
               </View>
             )}
 
-            <View style={[styles.statsSection, { backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff' }]}>
-              <Text style={[styles.sectionTitle, textStyle]}>Team Statistics</Text>
-              
+            <View
+              style={[
+                styles.statsSection,
+                { backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff' },
+              ]}
+            >
+              <Text style={[styles.sectionTitle, textStyle]}>
+                Team Statistics
+              </Text>
+
               {teamStats && (
                 <View style={styles.statsGrid}>
                   {Object.entries(teamStats).map(([statName, value]) => (
                     <View key={statName} style={styles.avgStatItem}>
-                      <Text style={[styles.avgStatLabel, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>
+                      <Text
+                        style={[
+                          styles.avgStatLabel,
+                          { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                        ]}
+                      >
                         {statName.replace('-', ' ').toUpperCase()}
                       </Text>
                       <Text style={[styles.avgStatValue, textStyle]}>
@@ -503,16 +590,23 @@ const TeamBuilderScreen: React.FC = () => {
             </View>
 
             {/* Type Coverage */}
-            <View style={[styles.statsSection, { backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff' }]}>
-              <Text style={[styles.sectionTitle, textStyle]}>Type Coverage</Text>
-              
+            <View
+              style={[
+                styles.statsSection,
+                { backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff' },
+              ]}
+            >
+              <Text style={[styles.sectionTitle, textStyle]}>
+                Type Coverage
+              </Text>
+
               <View style={styles.typeCoverage}>
                 {Object.entries(teamTypes).map(([typeName, count]) => (
                   <View key={typeName} style={styles.typeCoverageItem}>
                     <View
                       style={[
                         styles.typeCoverageTag,
-                        { backgroundColor: getTypeColor(typeName) }
+                        { backgroundColor: getTypeColor(typeName) },
                       ]}
                     >
                       <Text style={styles.typeCoverageText}>
@@ -538,7 +632,7 @@ const TeamBuilderScreen: React.FC = () => {
               >
                 <Text style={styles.battleButtonText}>⚔️ Start Battle</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 style={[styles.actionButton, styles.tournamentButton]}
                 onPress={handleStartTournament}
@@ -548,7 +642,7 @@ const TeamBuilderScreen: React.FC = () => {
               >
                 <Text style={styles.tournamentButtonText}>🏆 Tournament</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 style={[styles.actionButton, styles.clearButton]}
                 onPress={handleClearTeam}
@@ -569,7 +663,12 @@ const TeamBuilderScreen: React.FC = () => {
             <Text style={[styles.emptyStateTitle, textStyle]}>
               Build Your Dream Team
             </Text>
-            <Text style={[styles.emptyStateText, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>
+            <Text
+              style={[
+                styles.emptyStateText,
+                { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+              ]}
+            >
               Add up to 6 Pokemon to create the ultimate team!
             </Text>
             <TouchableOpacity
@@ -578,9 +677,7 @@ const TeamBuilderScreen: React.FC = () => {
               accessibilityLabel="Go to Pokédex"
               accessibilityRole="button"
             >
-              <Text style={styles.emptyStateButtonText}>
-                Browse Pokédex
-              </Text>
+              <Text style={styles.emptyStateButtonText}>Browse Pokédex</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -594,28 +691,40 @@ const TeamBuilderScreen: React.FC = () => {
         onRequestClose={() => setShowSaveModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff' }]}>
+          <View
+            style={[
+              styles.modalContent,
+              { backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff' },
+            ]}
+          >
             <Text style={[styles.modalTitle, textStyle]}>
               {currentTeamId ? 'Update Team' : 'Save Team'}
             </Text>
-            
+
             <TextInput
-              style={[styles.modalInput, { 
-                backgroundColor: isDarkMode ? '#2a2a2a' : '#f5f5f5',
-                color: isDarkMode ? '#ffffff' : '#000000',
-              }]}
+              style={[
+                styles.modalInput,
+                {
+                  backgroundColor: isDarkMode ? '#2a2a2a' : '#f5f5f5',
+                  color: isDarkMode ? '#ffffff' : '#000000',
+                },
+              ]}
               placeholder="Team Name"
               placeholderTextColor={isDarkMode ? '#6b7280' : '#9ca3af'}
               value={teamName}
               onChangeText={setTeamName}
               maxLength={30}
             />
-            
+
             <TextInput
-              style={[styles.modalInput, styles.modalTextArea, { 
-                backgroundColor: isDarkMode ? '#2a2a2a' : '#f5f5f5',
-                color: isDarkMode ? '#ffffff' : '#000000',
-              }]}
+              style={[
+                styles.modalInput,
+                styles.modalTextArea,
+                {
+                  backgroundColor: isDarkMode ? '#2a2a2a' : '#f5f5f5',
+                  color: isDarkMode ? '#ffffff' : '#000000',
+                },
+              ]}
               placeholder="Description (optional)"
               placeholderTextColor={isDarkMode ? '#6b7280' : '#9ca3af'}
               value={teamDescription}
@@ -624,7 +733,7 @@ const TeamBuilderScreen: React.FC = () => {
               multiline
               numberOfLines={3}
             />
-            
+
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalButtonSecondary]}
@@ -636,7 +745,7 @@ const TeamBuilderScreen: React.FC = () => {
               >
                 <Text style={styles.modalButtonSecondaryText}>Cancel</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalButtonPrimary]}
                 onPress={handleSaveConfirm}
@@ -658,12 +767,23 @@ const TeamBuilderScreen: React.FC = () => {
         onRequestClose={() => setShowLoadModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, styles.modalContentLarge, { backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff' }]}>
+          <View
+            style={[
+              styles.modalContent,
+              styles.modalContentLarge,
+              { backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff' },
+            ]}
+          >
             <Text style={[styles.modalTitle, textStyle]}>Saved Teams</Text>
-            
+
             {savedTeams.length === 0 ? (
               <View style={styles.emptyTeamsContainer}>
-                <Text style={[styles.emptyTeamsText, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>
+                <Text
+                  style={[
+                    styles.emptyTeamsText,
+                    { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                  ]}
+                >
                   No saved teams yet. Build and save your first team!
                 </Text>
               </View>
@@ -675,7 +795,8 @@ const TeamBuilderScreen: React.FC = () => {
                     style={[
                       styles.teamListItem,
                       { backgroundColor: isDarkMode ? '#2a2a2a' : '#f5f5f5' },
-                      savedTeam.id === currentTeamId && styles.teamListItemActive,
+                      savedTeam.id === currentTeamId &&
+                        styles.teamListItemActive,
                     ]}
                   >
                     <TouchableOpacity
@@ -687,21 +808,36 @@ const TeamBuilderScreen: React.FC = () => {
                           {savedTeam.name}
                         </Text>
                         {savedTeam.description && (
-                          <Text style={[styles.teamListItemDescription, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>
+                          <Text
+                            style={[
+                              styles.teamListItemDescription,
+                              { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                            ]}
+                          >
                             {savedTeam.description}
                           </Text>
                         )}
                         <View style={styles.teamListItemMeta}>
-                          <Text style={[styles.teamListItemMetaText, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>
+                          <Text
+                            style={[
+                              styles.teamListItemMetaText,
+                              { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                            ]}
+                          >
                             {savedTeam.pokemon.length} Pokemon
                           </Text>
-                          <Text style={[styles.teamListItemMetaText, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>
+                          <Text
+                            style={[
+                              styles.teamListItemMetaText,
+                              { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                            ]}
+                          >
                             {new Date(savedTeam.updatedAt).toLocaleDateString()}
                           </Text>
                         </View>
                       </View>
                     </TouchableOpacity>
-                    
+
                     <TouchableOpacity
                       style={styles.teamListItemDelete}
                       onPress={() => handleDeleteTeam(savedTeam)}
@@ -712,9 +848,13 @@ const TeamBuilderScreen: React.FC = () => {
                 ))}
               </ScrollView>
             )}
-            
+
             <TouchableOpacity
-              style={[styles.modalButton, styles.modalButtonSecondary, { marginTop: 16 }]}
+              style={[
+                styles.modalButton,
+                styles.modalButtonSecondary,
+                { marginTop: 16 },
+              ]}
               onPress={() => setShowLoadModal(false)}
             >
               <Text style={styles.modalButtonSecondaryText}>Close</Text>

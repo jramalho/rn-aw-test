@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { InteractionManager, PerformanceObserver } from 'react-native';
+import { InteractionManager } from 'react-native';
 
 export interface PerformanceMetrics {
   jsHeapSize: number;
@@ -58,7 +58,7 @@ export const usePerformanceMonitor = () => {
   const measurePerformance = useCallback(() => {
     const now = Date.now();
     const deltaTime = now - lastFrameTimeRef.current;
-    
+
     // Calculate FPS
     frameCountRef.current++;
     const fps = deltaTime > 0 ? Math.min(60, 1000 / deltaTime) : 60;
@@ -90,11 +90,14 @@ export const usePerformanceMonitor = () => {
       const average: PerformanceMetrics = samplesRef.current.reduce(
         (acc, sample) => ({
           jsHeapSize: acc.jsHeapSize + sample.jsHeapSize / sampleCount,
-          nativeHeapSize: acc.nativeHeapSize + sample.nativeHeapSize / sampleCount,
+          nativeHeapSize:
+            acc.nativeHeapSize + sample.nativeHeapSize / sampleCount,
           fps: acc.fps + sample.fps / sampleCount,
           renderTime: acc.renderTime + sample.renderTime / sampleCount,
-          interactionTime: acc.interactionTime + sample.interactionTime / sampleCount,
-          memoryWarnings: acc.memoryWarnings + sample.memoryWarnings / sampleCount,
+          interactionTime:
+            acc.interactionTime + sample.interactionTime / sampleCount,
+          memoryWarnings:
+            acc.memoryWarnings + sample.memoryWarnings / sampleCount,
         }),
         {
           jsHeapSize: 0,
@@ -103,7 +106,7 @@ export const usePerformanceMonitor = () => {
           renderTime: 0,
           interactionTime: 0,
           memoryWarnings: 0,
-        }
+        },
       );
 
       // Calculate peaks
@@ -113,7 +116,10 @@ export const usePerformanceMonitor = () => {
           nativeHeapSize: Math.max(acc.nativeHeapSize, sample.nativeHeapSize),
           fps: Math.max(acc.fps, sample.fps),
           renderTime: Math.max(acc.renderTime, sample.renderTime),
-          interactionTime: Math.max(acc.interactionTime, sample.interactionTime),
+          interactionTime: Math.max(
+            acc.interactionTime,
+            sample.interactionTime,
+          ),
           memoryWarnings: Math.max(acc.memoryWarnings, sample.memoryWarnings),
         }),
         {
@@ -123,7 +129,7 @@ export const usePerformanceMonitor = () => {
           renderTime: 0,
           interactionTime: 0,
           memoryWarnings: 0,
-        }
+        },
       );
 
       setStats({

@@ -30,7 +30,7 @@ export const useNotifications = () => {
         // Check initial permission status
         const status = await notificationService.checkPermissions();
         setPermissionStatus(status);
-      } catch (error) {
+      } catch {
         console.error('Failed to initialize notifications:', error);
       }
     };
@@ -47,7 +47,7 @@ export const useNotifications = () => {
       const status = await notificationService.requestPermissions();
       setPermissionStatus(status);
       return status;
-    } catch (error) {
+    } catch {
       console.error('Failed to request permissions:', error);
       return permissionStatus;
     } finally {
@@ -63,7 +63,7 @@ export const useNotifications = () => {
       const status = await notificationService.checkPermissions();
       setPermissionStatus(status);
       return status;
-    } catch (error) {
+    } catch {
       console.error('Failed to check permissions:', error);
       return permissionStatus;
     }
@@ -80,9 +80,11 @@ export const useNotifications = () => {
       }
 
       try {
-        const notificationId = await notificationService.displayNotification(data);
+        const notificationId = await notificationService.displayNotification(
+          data,
+        );
         return notificationId;
-      } catch (error) {
+      } catch {
         console.error('Failed to display notification:', error);
         return null;
       }
@@ -96,7 +98,7 @@ export const useNotifications = () => {
   const cancelNotification = useCallback(async (notificationId: string) => {
     try {
       await notificationService.cancelNotification(notificationId);
-    } catch (error) {
+    } catch {
       console.error('Failed to cancel notification:', error);
     }
   }, []);
@@ -107,7 +109,7 @@ export const useNotifications = () => {
   const cancelAllNotifications = useCallback(async () => {
     try {
       await notificationService.cancelAllNotifications();
-    } catch (error) {
+    } catch {
       console.error('Failed to cancel all notifications:', error);
     }
   }, []);
@@ -118,7 +120,7 @@ export const useNotifications = () => {
   const setBadgeCount = useCallback(async (count: number) => {
     try {
       await notificationService.setBadgeCount(count);
-    } catch (error) {
+    } catch {
       console.error('Failed to set badge count:', error);
     }
   }, []);
@@ -129,7 +131,7 @@ export const useNotifications = () => {
   const openSettings = useCallback(async () => {
     try {
       await notificationService.openSettings();
-    } catch (error) {
+    } catch {
       console.error('Failed to open settings:', error);
     }
   }, []);

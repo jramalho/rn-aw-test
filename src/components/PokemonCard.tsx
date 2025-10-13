@@ -10,11 +10,11 @@ import {
   Alert,
 } from 'react-native';
 import { Pokemon } from '../types';
-import { 
-  getPokemonTypeColor, 
-  formatPokemonName, 
+import {
+  getPokemonTypeColor,
+  formatPokemonName,
   formatPokemonId,
-  getPokemonImageUrl 
+  getPokemonImageUrl,
 } from '../utils';
 import { usePokemonStore } from '../store/pokemonStore';
 
@@ -24,18 +24,22 @@ interface PokemonCardProps {
   showTeamButton?: boolean;
 }
 
-const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, onPress, showTeamButton = true }) => {
+const PokemonCard: React.FC<PokemonCardProps> = ({
+  pokemon,
+  onPress,
+  showTeamButton = true,
+}) => {
   const isDarkMode = useColorScheme() === 'dark';
-  const { addToTeam, isInTeam, team } = usePokemonStore();
-  
+  const { addToTeam, isInTeam } = usePokemonStore();
+
   const backgroundColor = {
     backgroundColor: isDarkMode ? '#2a2a2a' : '#ffffff',
   };
-  
+
   const textColor = {
     color: isDarkMode ? '#ffffff' : '#000000',
   };
-  
+
   const subtextColor = {
     color: isDarkMode ? '#cccccc' : '#666666',
   };
@@ -46,26 +50,38 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, onPress, showTeamBut
 
   // Build accessibility label with comprehensive information
   const hp = pokemon.stats.find(s => s.stat.name === 'hp')?.base_stat || 0;
-  const attack = pokemon.stats.find(s => s.stat.name === 'attack')?.base_stat || 0;
-  const defense = pokemon.stats.find(s => s.stat.name === 'defense')?.base_stat || 0;
+  const attack =
+    pokemon.stats.find(s => s.stat.name === 'attack')?.base_stat || 0;
+  const defense =
+    pokemon.stats.find(s => s.stat.name === 'defense')?.base_stat || 0;
   const typesText = pokemon.types.map(t => t.type.name).join(' and ');
-  
-  const accessibilityLabel = `${formatPokemonName(pokemon.name)}, number ${formatPokemonId(pokemon.id)}, ${typesText} type. HP ${hp}, Attack ${attack}, Defense ${defense}`;
+
+  const accessibilityLabel = `${formatPokemonName(
+    pokemon.name,
+  )}, number ${formatPokemonId(
+    pokemon.id,
+  )}, ${typesText} type. HP ${hp}, Attack ${attack}, Defense ${defense}`;
 
   const handleAddToTeam = (e: any) => {
     e.stopPropagation();
-    
+
     if (inTeam) {
       Alert.alert('Already in Team', 'This Pokemon is already in your team!');
       return;
     }
-    
+
     const success = addToTeam(pokemon);
-    
+
     if (!success) {
-      Alert.alert('Team Full', 'Your team can only have up to 6 Pokemon. Remove one to add more.');
+      Alert.alert(
+        'Team Full',
+        'Your team can only have up to 6 Pokemon. Remove one to add more.',
+      );
     } else {
-      Alert.alert('Added to Team', `${formatPokemonName(pokemon.name)} has been added to your team!`);
+      Alert.alert(
+        'Added to Team',
+        `${formatPokemonName(pokemon.name)} has been added to your team!`,
+      );
     }
   };
 
@@ -133,28 +149,32 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, onPress, showTeamBut
             <View style={styles.statItem}>
               <Text style={[styles.statLabel, subtextColor]}>ATK</Text>
               <Text style={[styles.statValue, textColor]}>
-                {pokemon.stats.find(s => s.stat.name === 'attack')?.base_stat || 0}
+                {pokemon.stats.find(s => s.stat.name === 'attack')?.base_stat ||
+                  0}
               </Text>
             </View>
             <View style={styles.statItem}>
               <Text style={[styles.statLabel, subtextColor]}>DEF</Text>
               <Text style={[styles.statValue, textColor]}>
-                {pokemon.stats.find(s => s.stat.name === 'defense')?.base_stat || 0}
+                {pokemon.stats.find(s => s.stat.name === 'defense')
+                  ?.base_stat || 0}
               </Text>
             </View>
           </View>
-          
+
           {showTeamButton && (
             <TouchableOpacity
               style={[styles.teamButton, inTeam && styles.teamButtonActive]}
               onPress={handleAddToTeam}
               accessibilityLabel={inTeam ? 'In team' : 'Add to team'}
-              accessibilityHint={inTeam ? 'This Pokemon is already in your team' : 'Add this Pokemon to your team'}
+              accessibilityHint={
+                inTeam
+                  ? 'This Pokemon is already in your team'
+                  : 'Add this Pokemon to your team'
+              }
               accessibilityRole="button"
             >
-              <Text style={styles.teamButtonText}>
-                {inTeam ? '✓' : '+'}
-              </Text>
+              <Text style={styles.teamButtonText}>{inTeam ? '✓' : '+'}</Text>
             </TouchableOpacity>
           )}
         </View>

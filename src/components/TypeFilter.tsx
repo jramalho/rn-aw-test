@@ -16,7 +16,11 @@ interface TypeFilterProps {
   onTypeSelect: (type: string | null) => void;
 }
 
-const TypeFilter: React.FC<TypeFilterProps> = ({ types, selectedType, onTypeSelect }) => {
+const TypeFilter: React.FC<TypeFilterProps> = ({
+  types,
+  selectedType,
+  onTypeSelect,
+}) => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const containerBackgroundColor = isDarkMode ? '#1a1a1a' : '#f8f9fa';
@@ -24,25 +28,35 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ types, selectedType, onTypeSele
   const getAllTypesStyle = () => {
     const isSelected = selectedType === null;
     return {
-      backgroundColor: isSelected ? '#007AFF' : (isDarkMode ? '#404040' : '#ffffff'),
-      color: isSelected ? '#ffffff' : (isDarkMode ? '#ffffff' : '#000000'),
+      backgroundColor: isSelected
+        ? '#007AFF'
+        : isDarkMode
+        ? '#404040'
+        : '#ffffff',
+      color: isSelected ? '#ffffff' : isDarkMode ? '#ffffff' : '#000000',
     };
   };
 
   const getTypeStyle = (type: Type) => {
     const isSelected = selectedType === type.name;
     const typeColor = getPokemonTypeColor(type.name);
-    
+
     return {
-      backgroundColor: isSelected ? typeColor : (isDarkMode ? '#404040' : '#ffffff'),
-      color: isSelected ? '#ffffff' : (isDarkMode ? '#ffffff' : '#000000'),
+      backgroundColor: isSelected
+        ? typeColor
+        : isDarkMode
+        ? '#404040'
+        : '#ffffff',
+      color: isSelected ? '#ffffff' : isDarkMode ? '#ffffff' : '#000000',
     };
   };
 
   const allTypesStyle = getAllTypesStyle();
 
   return (
-    <View style={[styles.container, { backgroundColor: containerBackgroundColor }]}>
+    <View
+      style={[styles.container, { backgroundColor: containerBackgroundColor }]}
+    >
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -65,18 +79,13 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ types, selectedType, onTypeSele
           accessibilityHint="Double tap to show all Pokémon types"
           accessibilityState={{ selected: selectedType === null }}
         >
-          <Text
-            style={[
-              styles.typeText,
-              { color: allTypesStyle.color },
-            ]}
-          >
+          <Text style={[styles.typeText, { color: allTypesStyle.color }]}>
             All Types
           </Text>
         </Pressable>
 
         {/* Type Chips */}
-        {types.map((type) => {
+        {types.map(type => {
           const isSelected = selectedType === type.name;
           const typeStyle = getTypeStyle(type);
 
@@ -95,12 +104,7 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ types, selectedType, onTypeSele
               accessibilityHint={`Double tap to show only ${type.name} type Pokémon`}
               accessibilityState={{ selected: isSelected }}
             >
-              <Text
-                style={[
-                  styles.typeText,
-                  { color: typeStyle.color },
-                ]}
-              >
+              <Text style={[styles.typeText, { color: typeStyle.color }]}>
                 {capitalizeWords(type.name)}
               </Text>
             </Pressable>

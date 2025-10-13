@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { StyleSheet, View, Text, Animated } from 'react-native';
+import { StyleSheet, Text, Animated } from 'react-native';
 import { useNetwork } from '../hooks/useNetwork';
 
 export interface OfflineIndicatorProps {

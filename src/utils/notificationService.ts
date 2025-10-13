@@ -42,7 +42,7 @@ class NotificationService {
       // Set up foreground event listener
       notifee.onForegroundEvent(({ type, detail }) => {
         console.log('Foreground notification event:', type, detail);
-        
+
         switch (type) {
           case EventType.DISMISSED:
             console.log('Notification dismissed');
@@ -74,7 +74,7 @@ class NotificationService {
 
       this.initialized = true;
       console.log('Notification service initialized');
-    } catch (error) {
+    } catch {
       console.error('Failed to initialize notification service:', error);
       throw error;
     }
@@ -126,14 +126,17 @@ class NotificationService {
       const settings = await notifee.requestPermission();
 
       const status: NotificationPermissionStatus = {
-        granted: settings.authorizationStatus === AuthorizationStatus.AUTHORIZED,
-        deniedForever: settings.authorizationStatus === AuthorizationStatus.DENIED,
-        canAskAgain: settings.authorizationStatus === AuthorizationStatus.NOT_DETERMINED,
+        granted:
+          settings.authorizationStatus === AuthorizationStatus.AUTHORIZED,
+        deniedForever:
+          settings.authorizationStatus === AuthorizationStatus.DENIED,
+        canAskAgain:
+          settings.authorizationStatus === AuthorizationStatus.NOT_DETERMINED,
       };
 
       console.log('Notification permission status:', status);
       return status;
-    } catch (error) {
+    } catch {
       console.error('Failed to request notification permissions:', error);
       return {
         granted: false,
@@ -151,11 +154,14 @@ class NotificationService {
       const settings = await notifee.getNotificationSettings();
 
       return {
-        granted: settings.authorizationStatus === AuthorizationStatus.AUTHORIZED,
-        deniedForever: settings.authorizationStatus === AuthorizationStatus.DENIED,
-        canAskAgain: settings.authorizationStatus === AuthorizationStatus.NOT_DETERMINED,
+        granted:
+          settings.authorizationStatus === AuthorizationStatus.AUTHORIZED,
+        deniedForever:
+          settings.authorizationStatus === AuthorizationStatus.DENIED,
+        canAskAgain:
+          settings.authorizationStatus === AuthorizationStatus.NOT_DETERMINED,
       };
-    } catch (error) {
+    } catch {
       console.error('Failed to check notification permissions:', error);
       return {
         granted: false,
@@ -206,7 +212,7 @@ class NotificationService {
       const notificationId = await notifee.displayNotification(notification);
       console.log('Notification displayed:', notificationId);
       return notificationId;
-    } catch (error) {
+    } catch {
       console.error('Failed to display notification:', error);
       throw error;
     }
@@ -219,7 +225,7 @@ class NotificationService {
     try {
       await notifee.cancelNotification(notificationId);
       console.log('Notification cancelled:', notificationId);
-    } catch (error) {
+    } catch {
       console.error('Failed to cancel notification:', error);
     }
   }
@@ -231,7 +237,7 @@ class NotificationService {
     try {
       await notifee.cancelAllNotifications();
       console.log('All notifications cancelled');
-    } catch (error) {
+    } catch {
       console.error('Failed to cancel all notifications:', error);
     }
   }
@@ -243,7 +249,7 @@ class NotificationService {
     try {
       const notifications = await notifee.getDisplayedNotifications();
       return notifications;
-    } catch (error) {
+    } catch {
       console.error('Failed to get displayed notifications:', error);
       return [];
     }
@@ -257,7 +263,7 @@ class NotificationService {
       try {
         await notifee.setBadgeCount(count);
         console.log('Badge count set:', count);
-      } catch (error) {
+      } catch {
         console.error('Failed to set badge count:', error);
       }
     }
@@ -271,7 +277,7 @@ class NotificationService {
       try {
         await notifee.incrementBadgeCount();
         console.log('Badge count incremented');
-      } catch (error) {
+      } catch {
         console.error('Failed to increment badge count:', error);
       }
     }
@@ -285,7 +291,7 @@ class NotificationService {
       try {
         await notifee.decrementBadgeCount();
         console.log('Badge count decremented');
-      } catch (error) {
+      } catch {
         console.error('Failed to decrement badge count:', error);
       }
     }
@@ -297,7 +303,7 @@ class NotificationService {
   async openSettings(): Promise<void> {
     try {
       await notifee.openNotificationSettings();
-    } catch (error) {
+    } catch {
       console.error('Failed to open notification settings:', error);
     }
   }
@@ -307,17 +313,17 @@ class NotificationService {
    */
   private handleNotificationPress(notification?: Notification): void {
     console.log('Handling notification press:', notification);
-    
+
     // If notification has a deep link in its data, open it
     if (notification?.data?.deepLink) {
       const deepLink = notification.data.deepLink as string;
       console.log('Opening deep link from notification:', deepLink);
-      
+
       Linking.openURL(deepLink).catch(error => {
         console.error('Failed to open deep link:', error);
       });
     }
-    
+
     // If notification has a screen to navigate to
     if (notification?.data?.screen) {
       const screen = notification.data.screen as string;
@@ -326,7 +332,7 @@ class NotificationService {
       // For now, we'll use deep linking which is already set up
       const params = notification.data.params as Record<string, any>;
       const deepLink = this.buildDeepLink(screen, params);
-      
+
       if (deepLink) {
         Linking.openURL(deepLink).catch(error => {
           console.error('Failed to navigate:', error);
@@ -338,16 +344,19 @@ class NotificationService {
   /**
    * Handle notification action press
    */
-  private handleActionPress(actionId?: string, notification?: Notification): void {
+  private handleActionPress(
+    actionId?: string,
+    notification?: Notification,
+  ): void {
     console.log('Handling action press:', actionId, notification);
-    
+
     // Check if there's a registered handler for this action
     if (actionId && this.actionHandlers.has(actionId)) {
       const handler = this.actionHandlers.get(actionId);
       handler?.(actionId, notification);
       return;
     }
-    
+
     // Default action handling
     if (actionId === 'accept' || actionId === 'confirm') {
       console.log('User accepted the notification');
@@ -359,7 +368,10 @@ class NotificationService {
   /**
    * Register an action handler
    */
-  registerActionHandler(actionId: string, handler: NotificationActionHandler): void {
+  registerActionHandler(
+    actionId: string,
+    handler: NotificationActionHandler,
+  ): void {
     this.actionHandlers.set(actionId, handler);
   }
 
@@ -373,9 +385,12 @@ class NotificationService {
   /**
    * Build a deep link URL from screen name and parameters
    */
-  private buildDeepLink(screen: string, params?: Record<string, any>): string | null {
+  private buildDeepLink(
+    screen: string,
+    params?: Record<string, any>,
+  ): string | null {
     const URL_SCHEME = 'rnawtest';
-    
+
     const screenMap: Record<string, string> = {
       PokemonList: 'pokemon',
       PokemonDetail: 'pokemon',
@@ -387,18 +402,18 @@ class NotificationService {
       Login: 'login',
       SignUp: 'signup',
     };
-    
+
     const path = screenMap[screen];
     if (!path) {
       console.warn('Unknown screen for deep link:', screen);
       return null;
     }
-    
+
     // Handle special cases with parameters
     if (screen === 'PokemonDetail' && params?.id) {
       return `${URL_SCHEME}://${path}/${params.id}`;
     }
-    
+
     return `${URL_SCHEME}://${path}`;
   }
 

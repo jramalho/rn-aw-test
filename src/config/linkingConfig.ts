@@ -20,17 +20,13 @@ const DOMAIN = 'rnawtest.app';
  * - App Links (Android): https://rnawtest.app/
  */
 export const linkingConfig: LinkingOptions<RootStackParamList> = {
-  prefixes: [
-    `${URL_SCHEME}://`,
-    `https://${DOMAIN}`,
-    `http://${DOMAIN}`,
-  ],
+  prefixes: [`${URL_SCHEME}://`, `https://${DOMAIN}`, `http://${DOMAIN}`],
   config: {
     screens: {
       // Auth Screens
       Login: 'login',
       SignUp: 'signup',
-      
+
       // Main Tab Navigator
       Main: {
         screens: {
@@ -41,7 +37,7 @@ export const linkingConfig: LinkingOptions<RootStackParamList> = {
           Settings: 'settings',
         },
       },
-      
+
       // Detail Screens
       PokemonDetail: {
         path: 'pokemon/:id',
@@ -49,7 +45,7 @@ export const linkingConfig: LinkingOptions<RootStackParamList> = {
           id: (id: string) => id,
         },
       },
-      
+
       // Settings Screens
       NotificationSettings: 'notifications',
       NotificationDemo: 'notifications/demo',
@@ -64,19 +60,19 @@ export const DeepLinkPatterns = {
   // Pokemon related
   POKEMON_LIST: `${URL_SCHEME}://pokemon`,
   POKEMON_DETAIL: (id: string | number) => `${URL_SCHEME}://pokemon/${id}`,
-  
+
   // Team related
   TEAM_BUILDER: `${URL_SCHEME}://team`,
-  
+
   // User related
   PROFILE: `${URL_SCHEME}://profile`,
   LOGIN: `${URL_SCHEME}://login`,
   SIGNUP: `${URL_SCHEME}://signup`,
-  
+
   // Settings
   SETTINGS: `${URL_SCHEME}://settings`,
   NOTIFICATIONS: `${URL_SCHEME}://notifications`,
-  
+
   // Performance
   PERFORMANCE: `${URL_SCHEME}://performance`,
 } as const;
@@ -88,19 +84,19 @@ export const WebLinkPatterns = {
   // Pokemon related
   POKEMON_LIST: `https://${DOMAIN}/pokemon`,
   POKEMON_DETAIL: (id: string | number) => `https://${DOMAIN}/pokemon/${id}`,
-  
+
   // Team related
   TEAM_BUILDER: `https://${DOMAIN}/team`,
-  
+
   // User related
   PROFILE: `https://${DOMAIN}/profile`,
   LOGIN: `https://${DOMAIN}/login`,
   SIGNUP: `https://${DOMAIN}/signup`,
-  
+
   // Settings
   SETTINGS: `https://${DOMAIN}/settings`,
   NOTIFICATIONS: `https://${DOMAIN}/notifications`,
-  
+
   // Performance
   PERFORMANCE: `https://${DOMAIN}/performance`,
 } as const;
@@ -116,7 +112,7 @@ export function parseDeepLink(url: string): {
     const urlObj = new URL(url);
     const pathname = urlObj.pathname.replace(/^\//, ''); // Remove leading slash
     const pathSegments = pathname.split('/');
-    
+
     // Handle different URL patterns
     switch (pathSegments[0]) {
       case 'pokemon':
@@ -127,32 +123,32 @@ export function parseDeepLink(url: string): {
           };
         }
         return { screen: 'PokemonList' };
-        
+
       case 'team':
         return { screen: 'TeamBuilder' };
-        
+
       case 'profile':
         return { screen: 'Profile' };
-        
+
       case 'settings':
         return { screen: 'Settings' };
-        
+
       case 'notifications':
         return { screen: 'NotificationSettings' };
-        
+
       case 'performance':
         return { screen: 'PerformanceDashboard' };
-        
+
       case 'login':
         return { screen: 'Login' };
-        
+
       case 'signup':
         return { screen: 'SignUp' };
-        
+
       default:
         return null;
     }
-  } catch (error) {
+  } catch {
     console.error('Error parsing deep link:', error);
     return null;
   }
@@ -163,15 +159,12 @@ export function parseDeepLink(url: string): {
  */
 export function isValidDeepLink(url: string): boolean {
   if (!url) return false;
-  
+
   try {
     const urlObj = new URL(url);
-    
+
     // Check if URL matches our scheme or domain
-    return (
-      urlObj.protocol === `${URL_SCHEME}:` ||
-      urlObj.hostname === DOMAIN
-    );
+    return urlObj.protocol === `${URL_SCHEME}:` || urlObj.hostname === DOMAIN;
   } catch {
     return false;
   }

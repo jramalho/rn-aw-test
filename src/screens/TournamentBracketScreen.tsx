@@ -9,7 +9,7 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  Dimensions,
+  // Dimensions, // Unused import
 } from 'react-native';
 import {
   Text,
@@ -24,13 +24,23 @@ import {
 } from 'react-native-paper';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList, TournamentMatch, TournamentStatus } from '../types';
+import {
+  RootStackParamList,
+  TournamentMatch,
+  TournamentStatus,
+} from '../types';
 import { useTournamentStore } from '../store/tournamentStore';
 
-type TournamentBracketRouteProp = RouteProp<RootStackParamList, 'TournamentBracket'>;
-type TournamentBracketNavigationProp = NativeStackNavigationProp<RootStackParamList, 'TournamentBracket'>;
+type TournamentBracketRouteProp = RouteProp<
+  RootStackParamList,
+  'TournamentBracket'
+>;
+type TournamentBracketNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'TournamentBracket'
+>;
 
-const { width } = Dimensions.get('window');
+// const { width } = useWindowDimensions(); // Currently unused
 
 export default function TournamentBracketScreen() {
   const navigation = useNavigation<TournamentBracketNavigationProp>();
@@ -48,11 +58,13 @@ export default function TournamentBracketScreen() {
 
   useEffect(() => {
     if (!currentTournament || currentTournament.id !== tournamentId) {
-      Alert.alert('Tournament Not Found', 'The tournament could not be loaded', [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ]);
+      Alert.alert(
+        'Tournament Not Found',
+        'The tournament could not be loaded',
+        [{ text: 'OK', onPress: () => navigation.goBack() }],
+      );
     }
-  }, [currentTournament, tournamentId]);
+  }, [navigation, currentTournament, tournamentId]);
 
   if (!currentTournament) {
     return (
@@ -83,7 +95,7 @@ export default function TournamentBracketScreen() {
             navigation.goBack();
           },
         },
-      ]
+      ],
     );
   };
 
@@ -99,8 +111,9 @@ export default function TournamentBracketScreen() {
     }
 
     // Check if player is in this match
-    const isPlayerMatch = match.participant1?.isPlayer || match.participant2?.isPlayer;
-    
+    const isPlayerMatch =
+      match.participant1?.isPlayer || match.participant2?.isPlayer;
+
     if (!isPlayerMatch) {
       Alert.alert('AI Match', 'This match will be simulated automatically');
       return;
@@ -131,7 +144,8 @@ export default function TournamentBracketScreen() {
   };
 
   const renderMatch = (match: TournamentMatch) => {
-    const isPlayerMatch = match.participant1?.isPlayer || match.participant2?.isPlayer;
+    const isPlayerMatch =
+      match.participant1?.isPlayer || match.participant2?.isPlayer;
     const canBattle = match.status === 'in_progress' && isPlayerMatch;
 
     return (
@@ -148,7 +162,9 @@ export default function TournamentBracketScreen() {
           <View style={styles.matchHeader}>
             <Text variant="labelSmall">Match {match.matchNumber}</Text>
             {match.status === 'completed' && (
-              <Chip compact icon="check">Complete</Chip>
+              <Chip compact icon="check">
+                Complete
+              </Chip>
             )}
             {canBattle && (
               <Chip compact icon="sword-cross" mode="flat">
@@ -158,48 +174,61 @@ export default function TournamentBracketScreen() {
           </View>
 
           <View style={styles.participants}>
-            <View style={[
-              styles.participant,
-              match.winner?.id === match.participant1?.id && styles.winner
-            ]}>
+            <View
+              style={[
+                styles.participant,
+                match.winner?.id === match.participant1?.id && styles.winner,
+              ]}
+            >
               <Text
                 variant="bodyMedium"
                 style={[
                   styles.participantName,
-                  match.participant1?.isPlayer && styles.playerName
+                  match.participant1?.isPlayer && styles.playerName,
                 ]}
               >
                 {match.participant1?.name || 'TBD'}
               </Text>
               {match.participant1?.isPlayer && (
-                <Chip compact icon="account">You</Chip>
+                <Chip compact icon="account">
+                  You
+                </Chip>
               )}
             </View>
 
-            <Text variant="titleMedium" style={styles.vs}>VS</Text>
+            <Text variant="titleMedium" style={styles.vs}>
+              VS
+            </Text>
 
-            <View style={[
-              styles.participant,
-              match.winner?.id === match.participant2?.id && styles.winner
-            ]}>
+            <View
+              style={[
+                styles.participant,
+                match.winner?.id === match.participant2?.id && styles.winner,
+              ]}
+            >
               <Text
                 variant="bodyMedium"
                 style={[
                   styles.participantName,
-                  match.participant2?.isPlayer && styles.playerName
+                  match.participant2?.isPlayer && styles.playerName,
                 ]}
               >
                 {match.participant2?.name || 'TBD'}
               </Text>
               {match.participant2?.isPlayer && (
-                <Chip compact icon="account">You</Chip>
+                <Chip compact icon="account">
+                  You
+                </Chip>
               )}
             </View>
           </View>
 
           {match.winner && (
             <View style={styles.winnerBanner}>
-              <Text variant="labelSmall" style={{ color: theme.colors.onPrimary }}>
+              <Text
+                variant="labelSmall"
+                style={{ color: theme.colors.onPrimary }}
+              >
                 Winner: {match.winner.name}
               </Text>
             </View>
@@ -209,26 +238,44 @@ export default function TournamentBracketScreen() {
     );
   };
 
-  const currentRound = currentTournament.rounds[currentTournament.currentRound - 1];
-  const roundName = currentTournament.rounds.length === 1 ? 'Final' :
-    currentTournament.currentRound === currentTournament.rounds.length ? 'Final' :
-    currentTournament.currentRound === currentTournament.rounds.length - 1 ? 'Semi-Finals' :
-    currentTournament.currentRound === currentTournament.rounds.length - 2 ? 'Quarter-Finals' :
-    `Round ${currentTournament.currentRound}`;
+  const currentRound =
+    currentTournament.rounds[currentTournament.currentRound - 1];
+  const roundName =
+    currentTournament.rounds.length === 1
+      ? 'Final'
+      : currentTournament.currentRound === currentTournament.rounds.length
+      ? 'Final'
+      : currentTournament.currentRound === currentTournament.rounds.length - 1
+      ? 'Semi-Finals'
+      : currentTournament.currentRound === currentTournament.rounds.length - 2
+      ? 'Quarter-Finals'
+      : `Round ${currentTournament.currentRound}`;
 
   return (
     <View style={styles.container}>
-      <Surface style={[styles.header, { backgroundColor: theme.colors.primaryContainer }]}>
+      <Surface
+        style={[
+          styles.header,
+          { backgroundColor: theme.colors.primaryContainer },
+        ]}
+      >
         <View style={styles.headerContent}>
           <View style={styles.headerText}>
-            <Text variant="headlineSmall" style={{ color: theme.colors.onPrimaryContainer }}>
+            <Text
+              variant="headlineSmall"
+              style={{ color: theme.colors.onPrimaryContainer }}
+            >
               {currentTournament.name}
             </Text>
-            <Text variant="bodyMedium" style={{ color: theme.colors.onPrimaryContainer }}>
-              {currentTournament.participants.length} Participants • {currentTournament.format}
+            <Text
+              variant="bodyMedium"
+              style={{ color: theme.colors.onPrimaryContainer }}
+            >
+              {currentTournament.participants.length} Participants •{' '}
+              {currentTournament.format}
             </Text>
           </View>
-          
+
           {currentTournament.status === TournamentStatus.REGISTRATION && (
             <IconButton
               icon="close"
@@ -248,9 +295,11 @@ export default function TournamentBracketScreen() {
                 mode={round.status === 'completed' ? 'flat' : 'outlined'}
                 selected={index === currentTournament.currentRound - 1}
                 icon={
-                  round.status === 'completed' ? 'check' :
-                  round.status === 'in_progress' ? 'progress-clock' :
-                  undefined
+                  round.status === 'completed'
+                    ? 'check'
+                    : round.status === 'in_progress'
+                    ? 'progress-clock'
+                    : undefined
                 }
               >
                 R{round.roundNumber}
@@ -264,13 +313,19 @@ export default function TournamentBracketScreen() {
         {currentTournament.status === TournamentStatus.REGISTRATION ? (
           <Card style={styles.registrationCard}>
             <Card.Content>
-              <Text variant="titleLarge" style={{ textAlign: 'center', marginBottom: 16 }}>
+              <Text
+                variant="titleLarge"
+                style={{ textAlign: 'center', marginBottom: 16 }}
+              >
                 Ready to Begin?
               </Text>
-              <Text variant="bodyMedium" style={{ textAlign: 'center', marginBottom: 24 }}>
+              <Text
+                variant="bodyMedium"
+                style={{ textAlign: 'center', marginBottom: 24 }}
+              >
                 The bracket is set! Start the tournament to begin competing.
               </Text>
-              
+
               <Button
                 mode="contained"
                 onPress={handleStartTournament}
@@ -280,7 +335,7 @@ export default function TournamentBracketScreen() {
               >
                 Start Tournament
               </Button>
-              
+
               <Button
                 mode="outlined"
                 onPress={handleCancelTournament}
@@ -293,16 +348,25 @@ export default function TournamentBracketScreen() {
         ) : currentTournament.status === TournamentStatus.COMPLETED ? (
           <Card style={styles.completionCard}>
             <Card.Content>
-              <Text variant="displaySmall" style={{ textAlign: 'center', marginBottom: 8 }}>
+              <Text
+                variant="displaySmall"
+                style={{ textAlign: 'center', marginBottom: 8 }}
+              >
                 🏆
               </Text>
-              <Text variant="titleLarge" style={{ textAlign: 'center', marginBottom: 16 }}>
+              <Text
+                variant="titleLarge"
+                style={{ textAlign: 'center', marginBottom: 16 }}
+              >
                 Tournament Complete!
               </Text>
-              <Text variant="headlineSmall" style={{ textAlign: 'center', marginBottom: 24 }}>
+              <Text
+                variant="headlineSmall"
+                style={{ textAlign: 'center', marginBottom: 24 }}
+              >
                 Champion: {currentTournament.winner?.name}
               </Text>
-              
+
               <Button
                 mode="contained"
                 onPress={handleViewResults}
@@ -314,15 +378,16 @@ export default function TournamentBracketScreen() {
           </Card>
         ) : null}
 
-        {currentTournament.status === TournamentStatus.IN_PROGRESS && currentRound && (
-          <View>
-            <Text variant="titleLarge" style={styles.roundTitle}>
-              {roundName}
-            </Text>
-            
-            {currentRound.matches.map(renderMatch)}
-          </View>
-        )}
+        {currentTournament.status === TournamentStatus.IN_PROGRESS &&
+          currentRound && (
+            <View>
+              <Text variant="titleLarge" style={styles.roundTitle}>
+                {roundName}
+              </Text>
+
+              {currentRound.matches.map(renderMatch)}
+            </View>
+          )}
 
         {/* Show all rounds in accordion */}
         {currentTournament.status === TournamentStatus.IN_PROGRESS && (
@@ -331,13 +396,18 @@ export default function TournamentBracketScreen() {
             <Text variant="titleMedium" style={styles.sectionTitle}>
               Full Bracket
             </Text>
-            
+
             {currentTournament.rounds.map((round, roundIndex) => {
-              const rName = currentTournament.rounds.length === 1 ? 'Final' :
-                roundIndex === currentTournament.rounds.length - 1 ? 'Final' :
-                roundIndex === currentTournament.rounds.length - 2 ? 'Semi-Finals' :
-                roundIndex === currentTournament.rounds.length - 3 ? 'Quarter-Finals' :
-                `Round ${round.roundNumber}`;
+              const rName =
+                currentTournament.rounds.length === 1
+                  ? 'Final'
+                  : roundIndex === currentTournament.rounds.length - 1
+                  ? 'Final'
+                  : roundIndex === currentTournament.rounds.length - 2
+                  ? 'Semi-Finals'
+                  : roundIndex === currentTournament.rounds.length - 3
+                  ? 'Quarter-Finals'
+                  : `Round ${round.roundNumber}`;
 
               return (
                 <View key={round.roundNumber} style={styles.roundSection}>

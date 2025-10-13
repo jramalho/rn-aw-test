@@ -62,8 +62,11 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
         displayName: displayName || undefined,
       });
       // Navigation will be handled by auth state change
-    } catch (err) {
-      Alert.alert('Sign Up Failed', error || 'An error occurred during sign up');
+    } catch {
+      Alert.alert(
+        'Sign Up Failed',
+        error || 'An error occurred during sign up',
+      );
     }
   };
 
@@ -156,7 +159,9 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
           <View style={styles.passwordRequirements}>
             <Text style={styles.requirementsTitle}>Password Requirements:</Text>
             <Text style={styles.requirement}>• At least 8 characters long</Text>
-            <Text style={styles.requirement}>• Contains letters and numbers</Text>
+            <Text style={styles.requirement}>
+              • Contains letters and numbers
+            </Text>
           </View>
 
           {error && (
@@ -177,7 +182,10 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
 
           <View style={styles.loginContainer}>
             <Text style={styles.loginText}>Already have an account? </Text>
-            <TouchableOpacity onPress={handleLoginNavigation} disabled={isLoading}>
+            <TouchableOpacity
+              onPress={handleLoginNavigation}
+              disabled={isLoading}
+            >
               <Text style={styles.loginLink}>Sign In</Text>
             </TouchableOpacity>
           </View>

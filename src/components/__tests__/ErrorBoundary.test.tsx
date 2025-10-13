@@ -30,7 +30,7 @@ describe('ErrorBoundary', () => {
     const { getByText } = render(
       <ErrorBoundary>
         <Text>Test child component</Text>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(getByText('Test child component')).toBeTruthy();
@@ -40,7 +40,7 @@ describe('ErrorBoundary', () => {
     const { getByText } = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(getByText(/Oops! Something went wrong/i)).toBeTruthy();
@@ -49,11 +49,11 @@ describe('ErrorBoundary', () => {
 
   it('calls onError callback when error occurs', () => {
     const onError = jest.fn();
-    
+
     render(
       <ErrorBoundary onError={onError}>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(onError).toHaveBeenCalled();
@@ -65,7 +65,7 @@ describe('ErrorBoundary', () => {
     const { getByText, rerender } = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     // Error UI should be visible
@@ -79,7 +79,7 @@ describe('ErrorBoundary', () => {
     rerender(
       <ErrorBoundary>
         <ThrowError shouldThrow={false} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     // Should render children again
@@ -87,14 +87,14 @@ describe('ErrorBoundary', () => {
   });
 
   it('renders custom fallback when provided', () => {
-    const customFallback = (error: Error, reset: () => void) => (
+    const customFallback = (error: Error, _reset: () => void) => (
       <Text>Custom error: {error.message}</Text>
     );
 
     const { getByText } = render(
       <ErrorBoundary fallback={customFallback}>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(getByText('Custom error: Test error message')).toBeTruthy();
@@ -104,7 +104,7 @@ describe('ErrorBoundary', () => {
     const { getByLabelText } = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     const tryAgainButton = getByLabelText('Try again');
@@ -119,7 +119,7 @@ describe('ErrorBoundary', () => {
     const { getByText } = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(getByText('Debug Info:')).toBeTruthy();

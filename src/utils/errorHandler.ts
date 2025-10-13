@@ -1,6 +1,6 @@
 /**
  * Global Error Handler
- * 
+ *
  * Captures uncaught errors and provides user-friendly error screens
  * Integrates with error tracking services
  */
@@ -14,7 +14,9 @@ export interface ErrorHandler {
 
 class GlobalErrorHandler {
   private handlers: ErrorHandler[] = [];
-  private originalErrorHandler: ((error: Error, isFatal?: boolean) => void) | null = null;
+  private originalErrorHandler:
+    | ((error: Error, isFatal?: boolean) => void)
+    | null = null;
 
   /**
    * Initialize global error handler
@@ -78,7 +80,7 @@ class GlobalErrorHandler {
       if (handler.onError) {
         try {
           handler.onError(error, isFatal);
-        } catch (handlerError) {
+        } catch {
           console.error('Error in error handler:', handlerError);
         }
       }
@@ -98,7 +100,7 @@ class GlobalErrorHandler {
       if (handler.onLog) {
         try {
           handler.onLog(message, level);
-        } catch (error) {
+        } catch {
           console.error('Error in log handler:', error);
         }
       }

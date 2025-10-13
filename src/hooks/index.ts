@@ -12,18 +12,18 @@ export const useKeyboard = () => {
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
-      (event) => {
+      event => {
         setKeyboardVisible(true);
         setKeyboardHeight(event.endCoordinates.height);
-      }
+      },
     );
-    
+
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
         setKeyboardVisible(false);
         setKeyboardHeight(0);
-      }
+      },
     );
 
     return () => {
@@ -39,14 +39,19 @@ export const useKeyboard = () => {
  * Custom hook to track app state changes
  */
 export const useAppState = () => {
-  const [appState, setAppState] = useState<AppStateStatus>(AppState.currentState);
+  const [appState, setAppState] = useState<AppStateStatus>(
+    AppState.currentState,
+  );
 
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       setAppState(nextAppState);
     };
 
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    const subscription = AppState.addEventListener(
+      'change',
+      handleAppStateChange,
+    );
 
     return () => subscription?.remove();
   }, []);
@@ -78,11 +83,11 @@ export const useDebounce = <T>(value: T, delay: number): T => {
  */
 export const usePrevious = <T>(value: T): T | undefined => {
   const ref = useRef<T>();
-  
+
   useEffect(() => {
     ref.current = value;
   }, [value]);
-  
+
   return ref.current;
 };
 
@@ -101,7 +106,7 @@ export const useAsyncOperation = <T, E = Error>() => {
       const result = await asyncFunction();
       setData(result);
       return result;
-    } catch (err) {
+    } catch {
       setError(err as E);
       throw err;
     } finally {
@@ -134,15 +139,15 @@ export const useCountdown = (initialTime: number) => {
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
-    
+
     if (isActive && time > 0) {
       interval = setInterval(() => {
-        setTime(time => time - 1);
+        setTime(prevTime => prevTime - 1);
       }, 1000);
     } else if (time === 0) {
       setIsActive(false);
     }
-    
+
     return () => {
       if (interval) clearInterval(interval);
     };
@@ -158,24 +163,32 @@ export const useAsyncStorage = <T>(key: string, initialValue: T) => {
   const [storedValue, setStoredValue] = useState<T>(initialValue);
   const [loading, setLoading] = useState(true);
 
-  const setValue = useCallback(async (value: T | ((val: T) => T)) => {
-    try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
-      
-      const { default: AsyncStorage } = await import('@react-native-async-storage/async-storage');
-      await AsyncStorage.setItem(key, JSON.stringify(valueToStore));
-    } catch (error) {
-      console.error(`Error setting ${key} in AsyncStorage:`, error);
-    }
-  }, [key, storedValue]);
+  const setValue = useCallback(
+    async (value: T | ((val: T) => T)) => {
+      try {
+        const valueToStore =
+          value instanceof Function ? value(storedValue) : value;
+        setStoredValue(valueToStore);
+
+        const { default: AsyncStorage } = await import(
+          '@react-native-async-storage/async-storage'
+        );
+        await AsyncStorage.setItem(key, JSON.stringify(valueToStore));
+      } catch {
+        console.error(`Error setting ${key} in AsyncStorage:`, error);
+      }
+    },
+    [key, storedValue],
+  );
 
   const removeValue = useCallback(async () => {
     try {
-      const { default: AsyncStorage } = await import('@react-native-async-storage/async-storage');
+      const { default: AsyncStorage } = await import(
+        '@react-native-async-storage/async-storage'
+      );
       await AsyncStorage.removeItem(key);
       setStoredValue(initialValue);
-    } catch (error) {
+    } catch {
       console.error(`Error removing ${key} from AsyncStorage:`, error);
     }
   }, [key, initialValue]);
@@ -183,13 +196,15 @@ export const useAsyncStorage = <T>(key: string, initialValue: T) => {
   useEffect(() => {
     const loadStoredValue = async () => {
       try {
-        const { default: AsyncStorage } = await import('@react-native-async-storage/async-storage');
+        const { default: AsyncStorage } = await import(
+          '@react-native-async-storage/async-storage'
+        );
         const item = await AsyncStorage.getItem(key);
-        
+
         if (item !== null) {
           setStoredValue(JSON.parse(item));
         }
-      } catch (error) {
+      } catch {
         console.error(`Error loading ${key} from AsyncStorage:`, error);
       } finally {
         setLoading(false);

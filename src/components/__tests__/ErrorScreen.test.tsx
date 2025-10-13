@@ -4,7 +4,6 @@
 
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { NavigationContainer } from '@react-navigation/native';
 import { ErrorScreen } from '../ErrorScreen';
 
 // Mock navigation
@@ -29,15 +28,14 @@ describe('ErrorScreen', () => {
     const { getByText } = render(<ErrorScreen />);
 
     expect(getByText('Something went wrong')).toBeTruthy();
-    expect(getByText('An unexpected error occurred. Please try again.')).toBeTruthy();
+    expect(
+      getByText('An unexpected error occurred. Please try again.'),
+    ).toBeTruthy();
   });
 
   it('renders with custom title and message', () => {
     const { getByText } = render(
-      <ErrorScreen
-        title="Custom Error Title"
-        message="Custom error message"
-      />
+      <ErrorScreen title="Custom Error Title" message="Custom error message" />,
     );
 
     expect(getByText('Custom Error Title')).toBeTruthy();
@@ -78,7 +76,7 @@ describe('ErrorScreen', () => {
     testError.stack = 'Test stack trace';
 
     const { getByText } = render(
-      <ErrorScreen error={testError} showDebugInfo={true} />
+      <ErrorScreen error={testError} showDebugInfo={true} />,
     );
 
     expect(getByText('Debug Information')).toBeTruthy();
@@ -89,7 +87,7 @@ describe('ErrorScreen', () => {
   it('hides debug information when showDebugInfo is false', () => {
     const testError = new Error('Test error message');
     const { queryByText } = render(
-      <ErrorScreen error={testError} showDebugInfo={false} />
+      <ErrorScreen error={testError} showDebugInfo={false} />,
     );
 
     expect(queryByText('Debug Information')).toBeNull();

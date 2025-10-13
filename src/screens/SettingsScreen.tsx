@@ -28,7 +28,8 @@ const SettingsScreen: React.FC = () => {
   const { user, logout } = useAuth();
 
   // Local state for other settings
-  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+  const [_notificationsEnabled, _setNotificationsEnabled] =
+    React.useState(true);
   const [analyticsEnabled, setAnalyticsEnabled] = React.useState(false);
   const [performanceMonitoring, setPerformanceMonitoring] =
     React.useState(true);
@@ -53,35 +54,31 @@ const SettingsScreen: React.FC = () => {
     try {
       await pokemonApi.clearCache();
       Alert.alert('Success', 'Cache cleared successfully!');
-    } catch (error) {
+    } catch {
       console.error('Error clearing cache:', error);
       Alert.alert('Error', 'Failed to clear cache');
     }
   };
 
   const handleLogout = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await logout();
+          } catch {
+            console.error('Error signing out:', error);
+            Alert.alert('Error', 'Failed to sign out');
+          }
         },
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await logout();
-            } catch (error) {
-              console.error('Error signing out:', error);
-              Alert.alert('Error', 'Failed to sign out');
-            }
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   return (

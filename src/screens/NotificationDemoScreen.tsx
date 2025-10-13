@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { StyleSheet, ScrollView, Alert } from 'react-native';
 import { Text, Button, Card, useTheme } from 'react-native-paper';
 import { useNotificationNavigation } from '../hooks/useNotificationNavigation';
 import { useNotifications } from '../hooks/useNotifications';
@@ -34,8 +34,11 @@ export const NotificationDemoScreen: React.FC = () => {
         channelId: NotificationChannel.UPDATES,
         priority: NotificationPriority.HIGH,
       });
-      Alert.alert('Success', 'Notification sent! Tap it to navigate to Pikachu');
-    } catch (error) {
+      Alert.alert(
+        'Success',
+        'Notification sent! Tap it to navigate to Pikachu',
+      );
+    } catch {
       Alert.alert('Error', 'Failed to send notification');
     }
   };
@@ -55,7 +58,7 @@ export const NotificationDemoScreen: React.FC = () => {
         priority: NotificationPriority.DEFAULT,
       });
       Alert.alert('Success', 'Notification sent! Tap it to open Team Builder');
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to send notification');
     }
   };
@@ -75,7 +78,7 @@ export const NotificationDemoScreen: React.FC = () => {
         priority: NotificationPriority.DEFAULT,
       });
       Alert.alert('Success', 'Notification sent! Tap it to open settings');
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to send notification');
     }
   };
@@ -102,7 +105,7 @@ export const NotificationDemoScreen: React.FC = () => {
         'Success',
         'Interactive notification sent! Try the action buttons',
       );
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to send notification');
     }
   };
@@ -124,7 +127,7 @@ export const NotificationDemoScreen: React.FC = () => {
         },
       );
       Alert.alert('Success', 'Deep link notification sent!');
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to send notification');
     }
   };
@@ -132,27 +135,30 @@ export const NotificationDemoScreen: React.FC = () => {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={styles.contentContainer}>
+      contentContainerStyle={styles.contentContainer}
+    >
       {/* Permission Status */}
       <Card style={styles.card}>
         <Card.Title title="📱 Notification Navigation Demo" />
         <Card.Content>
           <Text variant="bodyMedium" style={styles.description}>
-            This demo shows how notifications can navigate to specific screens in
-            the app. Tap any notification to see the navigation in action!
+            This demo shows how notifications can navigate to specific screens
+            in the app. Tap any notification to see the navigation in action!
           </Text>
-          
+
           {!permissionStatus.granted && (
             <>
               <Text
                 variant="bodyMedium"
-                style={[styles.warning, { color: theme.colors.error }]}>
+                style={[styles.warning, { color: theme.colors.error }]}
+              >
                 ⚠️ Notification permissions required
               </Text>
               <Button
                 mode="contained"
                 onPress={requestPermissions}
-                style={styles.button}>
+                style={styles.button}
+              >
                 Grant Permissions
               </Button>
             </>
@@ -173,7 +179,8 @@ export const NotificationDemoScreen: React.FC = () => {
             onPress={handleSendPokemonNotification}
             style={styles.button}
             disabled={!permissionStatus.granted}
-            icon="pokemon-go">
+            icon="pokemon-go"
+          >
             Navigate to Pokemon Detail
           </Button>
 
@@ -182,7 +189,8 @@ export const NotificationDemoScreen: React.FC = () => {
             onPress={handleSendTeamNotification}
             style={styles.button}
             disabled={!permissionStatus.granted}
-            icon="sword">
+            icon="sword"
+          >
             Navigate to Team Builder
           </Button>
 
@@ -191,7 +199,8 @@ export const NotificationDemoScreen: React.FC = () => {
             onPress={handleSendSettingsNotification}
             style={styles.button}
             disabled={!permissionStatus.granted}
-            icon="cog">
+            icon="cog"
+          >
             Navigate to Notification Settings
           </Button>
         </Card.Content>
@@ -210,7 +219,8 @@ export const NotificationDemoScreen: React.FC = () => {
             onPress={handleSendInteractiveNotification}
             style={styles.button}
             disabled={!permissionStatus.granted}
-            icon="gesture-tap">
+            icon="gesture-tap"
+          >
             Send Interactive Notification
           </Button>
         </Card.Content>
@@ -229,7 +239,8 @@ export const NotificationDemoScreen: React.FC = () => {
             onPress={handleSendDeepLinkNotification}
             style={styles.button}
             disabled={!permissionStatus.granted}
-            icon="link">
+            icon="link"
+          >
             Send Deep Link Notification
           </Button>
 

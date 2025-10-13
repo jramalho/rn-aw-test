@@ -61,7 +61,7 @@ describe('useAuth', () => {
             password: 'password123',
           },
         });
-      } catch (error) {
+      } catch {
         // Expected to fail as API is not implemented
         expect(error).toBeDefined();
       }

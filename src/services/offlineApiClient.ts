@@ -93,7 +93,7 @@ export async function apiRequest<T = any>(
       fromCache: false,
       queued: false,
     };
-  } catch (error: any) {
+  } catch {
     clearTimeout(timeoutId);
 
     // Handle timeout
@@ -107,7 +107,11 @@ export async function apiRequest<T = any>(
     }
 
     // Queue request if offline and configured to do so
-    if (queueIfOffline && method !== 'GET' && error.message.includes('network')) {
+    if (
+      queueIfOffline &&
+      method !== 'GET' &&
+      error.message.includes('network')
+    ) {
       const queuedRequest: QueuedRequest = {
         url,
         method,
@@ -154,7 +158,7 @@ export async function retryRequest<T = any>(
       }
 
       lastError = result.error;
-    } catch (error) {
+    } catch {
       lastError = error instanceof Error ? error : new Error(String(error));
     }
 

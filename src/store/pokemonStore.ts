@@ -1,7 +1,14 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Pokemon, PokemonSpecies, EvolutionChain, Type, SavedTeam, TeamAnalysis } from '../types';
+import {
+  Pokemon,
+  PokemonSpecies,
+  EvolutionChain,
+  Type,
+  SavedTeam,
+  TeamAnalysis,
+} from '../types';
 import pokemonApi from '../utils/pokemonApi';
 
 interface PokemonState {
@@ -53,7 +60,10 @@ interface PokemonState {
   saveCurrentTeam: (name: string, description?: string) => SavedTeam;
   loadTeam: (teamId: string) => void;
   deleteTeam: (teamId: string) => void;
-  updateTeam: (teamId: string, updates: Partial<Pick<SavedTeam, 'name' | 'description'>>) => void;
+  updateTeam: (
+    teamId: string,
+    updates: Partial<Pick<SavedTeam, 'name' | 'description'>>,
+  ) => void;
   getTeamAnalysis: () => TeamAnalysis | null;
   setSelectedType: (type: string | null) => void;
   loadTypes: () => Promise<void>;
@@ -99,25 +109,27 @@ export const usePokemonStore = create<PokemonState>()(
       // Actions
       loadPokemonList: async (refresh = false) => {
         const { offset, limit, pokemonList, isLoading, selectedType } = get();
-        
+
         if (isLoading) return;
 
         set({ isLoading: true, error: null });
 
         try {
           const newOffset = refresh ? 0 : offset;
-          
+
           if (selectedType) {
             // Load Pokemon by type
             const typeData = await pokemonApi.getType(selectedType);
             const pokemonPromises = typeData.pokemon
               .slice(newOffset, newOffset + limit)
               .map(p => pokemonApi.getPokemon(p.pokemon.name));
-            
+
             const newPokemons = await Promise.all(pokemonPromises);
-            
+
             set({
-              pokemonList: refresh ? newPokemons : [...pokemonList, ...newPokemons],
+              pokemonList: refresh
+                ? newPokemons
+                : [...pokemonList, ...newPokemons],
               offset: newOffset + limit,
               hasMore: newOffset + limit < typeData.pokemon.length,
               isLoading: false,
@@ -125,22 +137,25 @@ export const usePokemonStore = create<PokemonState>()(
           } else {
             // Load regular Pokemon list
             const response = await pokemonApi.getPokemonList(newOffset, limit);
-            const pokemonPromises = response.results.map(p => 
-              pokemonApi.getPokemon(p.name)
+            const pokemonPromises = response.results.map(p =>
+              pokemonApi.getPokemon(p.name),
             );
-            
+
             const newPokemons = await Promise.all(pokemonPromises);
-            
+
             set({
-              pokemonList: refresh ? newPokemons : [...pokemonList, ...newPokemons],
+              pokemonList: refresh
+                ? newPokemons
+                : [...pokemonList, ...newPokemons],
               offset: newOffset + limit,
               hasMore: response.next !== null,
               isLoading: false,
             });
           }
-        } catch (error) {
+        } catch {
           set({
-            error: error instanceof Error ? error.message : 'Failed to load Pokemon',
+            error:
+              error instanceof Error ? error.message : 'Failed to load Pokemon',
             isLoading: false,
           });
         }
@@ -148,7 +163,7 @@ export const usePokemonStore = create<PokemonState>()(
 
       loadMore: async () => {
         const { hasMore, isLoadingMore, isLoading } = get();
-        
+
         if (!hasMore || isLoadingMore || isLoading) return;
 
         set({ isLoadingMore: true });
@@ -161,11 +176,11 @@ export const usePokemonStore = create<PokemonState>()(
       },
 
       searchPokemon: async (query: string) => {
-        set({ 
-          searchQuery: query, 
-          isSearching: true, 
+        set({
+          searchQuery: query,
+          isSearching: true,
           searchError: null,
-          searchResults: [] 
+          searchResults: [],
         });
 
         if (!query.trim()) {
@@ -174,24 +189,27 @@ export const usePokemonStore = create<PokemonState>()(
         }
 
         try {
-          const results = await pokemonApi.searchPokemonAdvanced({ name: query });
-          
+          const results = await pokemonApi.searchPokemonAdvanced({
+            name: query,
+          });
+
           set({
             searchResults: results,
             isSearching: false,
           });
-        } catch (error) {
+        } catch {
           set({
-            searchError: error instanceof Error ? error.message : 'Search failed',
+            searchError:
+              error instanceof Error ? error.message : 'Search failed',
             isSearching: false,
           });
         }
       },
 
       loadPokemonDetail: async (pokemon: Pokemon) => {
-        set({ 
+        set({
           currentPokemon: pokemon,
-          isLoadingDetail: true, 
+          isLoadingDetail: true,
           detailError: null,
           currentSpecies: null,
           currentEvolutionChain: null,
@@ -206,16 +224,21 @@ export const usePokemonStore = create<PokemonState>()(
           if (species.evolution_chain) {
             const evolutionChainId = parseInt(
               species.evolution_chain.url.split('/').slice(-2, -1)[0],
-              10
+              10,
             );
-            const evolutionChain = await pokemonApi.getEvolutionChain(evolutionChainId);
+            const evolutionChain = await pokemonApi.getEvolutionChain(
+              evolutionChainId,
+            );
             set({ currentEvolutionChain: evolutionChain });
           }
 
           set({ isLoadingDetail: false });
-        } catch (error) {
+        } catch {
           set({
-            detailError: error instanceof Error ? error.message : 'Failed to load Pokemon details',
+            detailError:
+              error instanceof Error
+                ? error.message
+                : 'Failed to load Pokemon details',
             isLoadingDetail: false,
           });
         }
@@ -224,7 +247,7 @@ export const usePokemonStore = create<PokemonState>()(
       toggleFavorite: (pokemonId: number) => {
         const { favorites } = get();
         const isFavorite = favorites.includes(pokemonId);
-        
+
         set({
           favorites: isFavorite
             ? favorites.filter(id => id !== pokemonId)
@@ -234,17 +257,17 @@ export const usePokemonStore = create<PokemonState>()(
 
       addToTeam: (pokemon: Pokemon) => {
         const { team } = get();
-        
+
         // Check if team is full (max 6 Pokemon)
         if (team.length >= 6) {
           return false;
         }
-        
+
         // Check if Pokemon is already in team
         if (team.some(p => p.id === pokemon.id)) {
           return false;
         }
-        
+
         set({ team: [...team, pokemon] });
         return true;
       },
@@ -265,24 +288,24 @@ export const usePokemonStore = create<PokemonState>()(
 
       saveCurrentTeam: (name: string, description?: string) => {
         const { team, savedTeams, currentTeamId } = get();
-        
+
         if (team.length === 0) {
           throw new Error('Cannot save an empty team');
         }
 
         const now = Date.now();
-        
+
         // If editing existing team, update it
         if (currentTeamId) {
-          const updatedTeams = savedTeams.map(t => 
-            t.id === currentTeamId 
+          const updatedTeams = savedTeams.map(t =>
+            t.id === currentTeamId
               ? { ...t, name, description, pokemon: team, updatedAt: now }
-              : t
+              : t,
           );
           set({ savedTeams: updatedTeams });
           return updatedTeams.find(t => t.id === currentTeamId)!;
         }
-        
+
         // Otherwise create new team
         const newTeam: SavedTeam = {
           id: `team_${now}_${Math.random().toString(36).substr(2, 9)}`,
@@ -292,24 +315,24 @@ export const usePokemonStore = create<PokemonState>()(
           createdAt: now,
           updatedAt: now,
         };
-        
-        set({ 
+
+        set({
           savedTeams: [...savedTeams, newTeam],
           currentTeamId: newTeam.id,
         });
-        
+
         return newTeam;
       },
 
       loadTeam: (teamId: string) => {
         const { savedTeams } = get();
         const teamToLoad = savedTeams.find(t => t.id === teamId);
-        
+
         if (!teamToLoad) {
           throw new Error('Team not found');
         }
-        
-        set({ 
+
+        set({
           team: [...teamToLoad.pokemon],
           currentTeamId: teamId,
         });
@@ -318,27 +341,28 @@ export const usePokemonStore = create<PokemonState>()(
       deleteTeam: (teamId: string) => {
         const { savedTeams, currentTeamId } = get();
         const updatedTeams = savedTeams.filter(t => t.id !== teamId);
-        
-        set({ 
+
+        set({
           savedTeams: updatedTeams,
           currentTeamId: currentTeamId === teamId ? null : currentTeamId,
         });
       },
 
-      updateTeam: (teamId: string, updates: Partial<Pick<SavedTeam, 'name' | 'description'>>) => {
+      updateTeam: (
+        teamId: string,
+        updates: Partial<Pick<SavedTeam, 'name' | 'description'>>,
+      ) => {
         const { savedTeams } = get();
-        const updatedTeams = savedTeams.map(t => 
-          t.id === teamId 
-            ? { ...t, ...updates, updatedAt: Date.now() }
-            : t
+        const updatedTeams = savedTeams.map(t =>
+          t.id === teamId ? { ...t, ...updates, updatedAt: Date.now() } : t,
         );
-        
+
         set({ savedTeams: updatedTeams });
       },
 
       getTeamAnalysis: (): TeamAnalysis | null => {
         const { team, availableTypes } = get();
-        
+
         if (team.length === 0) return null;
 
         // Calculate type coverage
@@ -359,10 +383,13 @@ export const usePokemonStore = create<PokemonState>()(
           return acc;
         }, {} as Record<string, number>);
 
-        const averageStats = Object.entries(totalStats).reduce((acc, [name, value]) => {
-          acc[name] = Math.round(value / team.length);
-          return acc;
-        }, {} as Record<string, number>);
+        const averageStats = Object.entries(totalStats).reduce(
+          (acc, [name, value]) => {
+            acc[name] = Math.round(value / team.length);
+            return acc;
+          },
+          {} as Record<string, number>,
+        );
 
         // Calculate weaknesses, resistances, and immunities
         const weaknessCount: Record<string, number> = {};
@@ -371,7 +398,7 @@ export const usePokemonStore = create<PokemonState>()(
 
         team.forEach(pokemon => {
           const pokemonTypes = pokemon.types.map(t => t.type.name);
-          
+
           // For each type this Pokemon has
           pokemonTypes.forEach(typeName => {
             const typeData = availableTypes.find(t => t.name === typeName);
@@ -379,17 +406,20 @@ export const usePokemonStore = create<PokemonState>()(
 
             // Track weaknesses (types that deal double damage to this Pokemon)
             typeData.damage_relations.double_damage_from.forEach(weakType => {
-              weaknessCount[weakType.name] = (weaknessCount[weakType.name] || 0) + 1;
+              weaknessCount[weakType.name] =
+                (weaknessCount[weakType.name] || 0) + 1;
             });
 
             // Track resistances (types that deal half damage to this Pokemon)
             typeData.damage_relations.half_damage_from.forEach(resistType => {
-              resistanceCount[resistType.name] = (resistanceCount[resistType.name] || 0) + 1;
+              resistanceCount[resistType.name] =
+                (resistanceCount[resistType.name] || 0) + 1;
             });
 
             // Track immunities (types that deal no damage to this Pokemon)
             typeData.damage_relations.no_damage_from.forEach(immuneType => {
-              immunityCount[immuneType.name] = (immunityCount[immuneType.name] || 0) + 1;
+              immunityCount[immuneType.name] =
+                (immunityCount[immuneType.name] || 0) + 1;
             });
           });
         });
@@ -397,20 +427,26 @@ export const usePokemonStore = create<PokemonState>()(
         return {
           typeCoverage,
           averageStats,
-          weaknesses: Object.keys(weaknessCount).sort((a, b) => weaknessCount[b] - weaknessCount[a]),
-          resistances: Object.keys(resistanceCount).sort((a, b) => resistanceCount[b] - resistanceCount[a]),
-          immunities: Object.keys(immunityCount).sort((a, b) => immunityCount[b] - immunityCount[a]),
+          weaknesses: Object.keys(weaknessCount).sort(
+            (a, b) => weaknessCount[b] - weaknessCount[a],
+          ),
+          resistances: Object.keys(resistanceCount).sort(
+            (a, b) => resistanceCount[b] - resistanceCount[a],
+          ),
+          immunities: Object.keys(immunityCount).sort(
+            (a, b) => immunityCount[b] - immunityCount[a],
+          ),
         };
       },
 
       setSelectedType: (type: string | null) => {
-        set({ 
+        set({
           selectedType: type,
           pokemonList: [],
           offset: 0,
           hasMore: true,
         });
-        
+
         // Reload list with new type filter
         get().loadPokemonList(true);
       },
@@ -421,10 +457,10 @@ export const usePokemonStore = create<PokemonState>()(
           const typePromises = response.results
             .filter(type => !['unknown', 'shadow'].includes(type.name))
             .map(type => pokemonApi.getType(type.name));
-          
+
           const types = await Promise.all(typePromises);
           set({ availableTypes: types });
-        } catch (error) {
+        } catch {
           console.error('Failed to load types:', error);
         }
       },
@@ -438,7 +474,7 @@ export const usePokemonStore = create<PokemonState>()(
         try {
           const suggestions = await pokemonApi.getPokemonSuggestions(query, 8);
           set({ searchSuggestions: suggestions });
-        } catch (error) {
+        } catch {
           console.error('Failed to get suggestions:', error);
           set({ searchSuggestions: [] });
         }
@@ -464,13 +500,13 @@ export const usePokemonStore = create<PokemonState>()(
     {
       name: 'pokemon-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({
+      partialize: state => ({
         favorites: state.favorites,
         team: state.team,
         savedTeams: state.savedTeams,
         currentTeamId: state.currentTeamId,
         selectedType: state.selectedType,
       }),
-    }
-  )
+    },
+  ),
 );

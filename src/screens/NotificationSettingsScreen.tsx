@@ -4,13 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  Platform,
-} from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
 import {
   Text,
   Button,
@@ -29,7 +23,10 @@ import {
 } from '../types/notifications';
 import { RootStackParamList } from '../types';
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'NotificationSettings'>;
+type NavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'NotificationSettings'
+>;
 
 export const NotificationSettingsScreen: React.FC = () => {
   const theme = useTheme();
@@ -90,7 +87,7 @@ export const NotificationSettingsScreen: React.FC = () => {
         },
       });
       Alert.alert('Success', 'Test notification sent!');
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to send test notification');
     }
   };
@@ -118,7 +115,7 @@ export const NotificationSettingsScreen: React.FC = () => {
         },
       });
       Alert.alert('Success', 'Interactive notification sent!');
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to send interactive notification');
     }
   };
@@ -127,7 +124,7 @@ export const NotificationSettingsScreen: React.FC = () => {
     try {
       await cancelAllNotifications();
       Alert.alert('Success', 'All notifications cleared!');
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to clear notifications');
     }
   };
@@ -141,7 +138,7 @@ export const NotificationSettingsScreen: React.FC = () => {
     try {
       await setBadgeCount(count);
       Alert.alert('Success', `Badge count set to ${count}`);
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to set badge count');
     }
   };
@@ -156,7 +153,8 @@ export const NotificationSettingsScreen: React.FC = () => {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={styles.contentContainer}>
+      contentContainerStyle={styles.contentContainer}
+    >
       {/* Permission Status */}
       <Card style={styles.card}>
         <Card.Title title="Notification Permissions" />
@@ -170,7 +168,8 @@ export const NotificationSettingsScreen: React.FC = () => {
                   ? theme.colors.primary
                   : theme.colors.error,
                 fontWeight: 'bold',
-              }}>
+              }}
+            >
               {permissionStatus.granted ? 'Granted' : 'Not Granted'}
             </Text>
           </View>
@@ -178,7 +177,8 @@ export const NotificationSettingsScreen: React.FC = () => {
             <Button
               mode="contained"
               onPress={handleRequestPermissions}
-              style={styles.button}>
+              style={styles.button}
+            >
               Request Permissions
             </Button>
           )}
@@ -186,7 +186,8 @@ export const NotificationSettingsScreen: React.FC = () => {
             <Button
               mode="outlined"
               onPress={openSettings}
-              style={styles.button}>
+              style={styles.button}
+            >
               Open Settings
             </Button>
           )}
@@ -201,20 +202,23 @@ export const NotificationSettingsScreen: React.FC = () => {
             mode="contained"
             onPress={handleTestNotification}
             style={styles.button}
-            disabled={!permissionStatus.granted}>
+            disabled={!permissionStatus.granted}
+          >
             Send Test Notification
           </Button>
           <Button
             mode="contained"
             onPress={handleTestWithActions}
             style={styles.button}
-            disabled={!permissionStatus.granted}>
+            disabled={!permissionStatus.granted}
+          >
             Send Interactive Notification
           </Button>
           <Button
             mode="outlined"
             onPress={handleClearAll}
-            style={styles.button}>
+            style={styles.button}
+          >
             Clear All Notifications
           </Button>
           <Divider style={styles.divider} />
@@ -222,7 +226,8 @@ export const NotificationSettingsScreen: React.FC = () => {
             mode="outlined"
             onPress={() => navigation.navigate('NotificationDemo')}
             style={styles.button}
-            icon="navigation">
+            icon="navigation"
+          >
             Open Navigation Demo
           </Button>
         </Card.Content>
@@ -237,19 +242,22 @@ export const NotificationSettingsScreen: React.FC = () => {
               <Button
                 mode="outlined"
                 onPress={() => handleSetBadge(0)}
-                style={styles.badgeButton}>
+                style={styles.badgeButton}
+              >
                 Clear Badge
               </Button>
               <Button
                 mode="outlined"
                 onPress={() => handleSetBadge(5)}
-                style={styles.badgeButton}>
+                style={styles.badgeButton}
+              >
                 Set to 5
               </Button>
               <Button
                 mode="outlined"
                 onPress={() => handleSetBadge(10)}
-                style={styles.badgeButton}>
+                style={styles.badgeButton}
+              >
                 Set to 10
               </Button>
             </View>
@@ -268,7 +276,9 @@ export const NotificationSettingsScreen: React.FC = () => {
               right={() => (
                 <Switch
                   value={channelSettings[NotificationChannel.DEFAULT]}
-                  onValueChange={() => toggleChannel(NotificationChannel.DEFAULT)}
+                  onValueChange={() =>
+                    toggleChannel(NotificationChannel.DEFAULT)
+                  }
                 />
               )}
             />
@@ -279,7 +289,9 @@ export const NotificationSettingsScreen: React.FC = () => {
               right={() => (
                 <Switch
                   value={channelSettings[NotificationChannel.ALERTS]}
-                  onValueChange={() => toggleChannel(NotificationChannel.ALERTS)}
+                  onValueChange={() =>
+                    toggleChannel(NotificationChannel.ALERTS)
+                  }
                 />
               )}
             />
@@ -290,7 +302,9 @@ export const NotificationSettingsScreen: React.FC = () => {
               right={() => (
                 <Switch
                   value={channelSettings[NotificationChannel.UPDATES]}
-                  onValueChange={() => toggleChannel(NotificationChannel.UPDATES)}
+                  onValueChange={() =>
+                    toggleChannel(NotificationChannel.UPDATES)
+                  }
                 />
               )}
             />

@@ -49,7 +49,7 @@ class NetworkService {
 
       // Restore previous status from storage
       await this.restoreNetworkStatus();
-    } catch (error) {
+    } catch {
       console.error('Error initializing network service:', error);
     }
   }
@@ -107,7 +107,7 @@ class NetworkService {
         NETWORK_STATUS_KEY,
         JSON.stringify(this.currentStatus),
       );
-    } catch (error) {
+    } catch {
       console.error('Error persisting network status:', error);
     }
   }
@@ -129,7 +129,7 @@ class NetworkService {
           this.notifyListeners();
         }
       }
-    } catch (error) {
+    } catch {
       console.error('Error restoring network status:', error);
     }
   }
@@ -141,7 +141,7 @@ class NetworkService {
     this.listeners.forEach(listener => {
       try {
         listener(this.currentStatus);
-      } catch (error) {
+      } catch {
         console.error('Error notifying network listener:', error);
       }
     });
@@ -173,7 +173,10 @@ class NetworkService {
    * Check if device is online
    */
   isOnline(): boolean {
-    return this.currentStatus.isConnected && this.currentStatus.isInternetReachable !== false;
+    return (
+      this.currentStatus.isConnected &&
+      this.currentStatus.isInternetReachable !== false
+    );
   }
 
   /**
@@ -195,7 +198,7 @@ class NetworkService {
         retryCount: 0,
       });
       await this.saveOfflineQueue(queue);
-    } catch (error) {
+    } catch {
       console.error('Error queuing request:', error);
     }
   }
@@ -207,7 +210,7 @@ class NetworkService {
     try {
       const stored = await AsyncStorage.getItem(OFFLINE_QUEUE_KEY);
       return stored ? JSON.parse(stored) : [];
-    } catch (error) {
+    } catch {
       console.error('Error getting offline queue:', error);
       return [];
     }
@@ -219,7 +222,7 @@ class NetworkService {
   private async saveOfflineQueue(queue: QueuedRequest[]): Promise<void> {
     try {
       await AsyncStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
-    } catch (error) {
+    } catch {
       console.error('Error saving offline queue:', error);
     }
   }
@@ -253,8 +256,11 @@ class NetworkService {
           }
 
           console.log(`Successfully processed queued request: ${request.url}`);
-        } catch (error) {
-          console.error(`Failed to process queued request: ${request.url}`, error);
+        } catch {
+          console.error(
+            `Failed to process queued request: ${request.url}`,
+            error,
+          );
 
           // Retry logic
           if ((request.retryCount || 0) < MAX_RETRIES) {
@@ -263,7 +269,9 @@ class NetworkService {
               retryCount: (request.retryCount || 0) + 1,
             });
           } else {
-            console.log(`Dropping request after ${MAX_RETRIES} retries: ${request.url}`);
+            console.log(
+              `Dropping request after ${MAX_RETRIES} retries: ${request.url}`,
+            );
           }
         }
       }
@@ -276,7 +284,7 @@ class NetworkService {
       } else {
         console.log('All queued requests processed successfully');
       }
-    } catch (error) {
+    } catch {
       console.error('Error processing offline queue:', error);
     }
   }
@@ -287,7 +295,7 @@ class NetworkService {
   async clearOfflineQueue(): Promise<void> {
     try {
       await AsyncStorage.removeItem(OFFLINE_QUEUE_KEY);
-    } catch (error) {
+    } catch {
       console.error('Error clearing offline queue:', error);
     }
   }
@@ -295,16 +303,20 @@ class NetworkService {
   /**
    * Get queue statistics
    */
-  async getQueueStats(): Promise<{ count: number; oldestTimestamp: number | null }> {
+  async getQueueStats(): Promise<{
+    count: number;
+    oldestTimestamp: number | null;
+  }> {
     try {
       const queue = await this.getOfflineQueue();
       return {
         count: queue.length,
-        oldestTimestamp: queue.length > 0
-          ? Math.min(...queue.map(r => r.timestamp || Date.now()))
-          : null,
+        oldestTimestamp:
+          queue.length > 0
+            ? Math.min(...queue.map(r => r.timestamp || Date.now()))
+            : null,
       };
-    } catch (error) {
+    } catch {
       console.error('Error getting queue stats:', error);
       return { count: 0, oldestTimestamp: null };
     }

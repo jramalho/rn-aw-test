@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { Linking, Platform } from 'react-native';
+import { Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { parseDeepLink, isValidDeepLink } from '../config/linkingConfig';
 
@@ -39,7 +39,7 @@ export function useDeepLink() {
 
       try {
         const linkData = parseDeepLink(url);
-        
+
         if (!linkData) {
           throw new Error('Unable to parse deep link');
         }
@@ -47,9 +47,9 @@ export function useDeepLink() {
         // Navigate to the screen
         // @ts-ignore - Navigation type inference is complex with dynamic screens
         navigation.navigate(linkData.screen, linkData.params);
-        
+
         setState(prev => ({ ...prev, isHandling: false }));
-      } catch (error) {
+      } catch {
         console.error('Error handling deep link:', error);
         setState(prev => ({
           ...prev,
@@ -58,7 +58,7 @@ export function useDeepLink() {
         }));
       }
     },
-    [navigation]
+    [navigation],
   );
 
   /**
@@ -85,26 +85,29 @@ export function useDeepLink() {
   /**
    * Open a URL (either within app or externally)
    */
-  const openUrl = useCallback(async (url: string) => {
-    try {
-      const canOpen = await Linking.canOpenURL(url);
-      
-      if (!canOpen) {
-        throw new Error('Cannot open URL');
-      }
+  const openUrl = useCallback(
+    async (url: string) => {
+      try {
+        const canOpen = await Linking.canOpenURL(url);
 
-      // If it's our deep link, handle internally
-      if (isValidDeepLink(url)) {
-        await handleDeepLink(url);
-      } else {
-        // Otherwise open externally
-        await Linking.openURL(url);
+        if (!canOpen) {
+          throw new Error('Cannot open URL');
+        }
+
+        // If it's our deep link, handle internally
+        if (isValidDeepLink(url)) {
+          await handleDeepLink(url);
+        } else {
+          // Otherwise open externally
+          await Linking.openURL(url);
+        }
+      } catch {
+        console.error('Error opening URL:', error);
+        throw error;
       }
-    } catch (error) {
-      console.error('Error opening URL:', error);
-      throw error;
-    }
-  }, [handleDeepLink]);
+    },
+    [handleDeepLink],
+  );
 
   /**
    * Get the current deep link URL
@@ -112,7 +115,7 @@ export function useDeepLink() {
   const getInitialUrl = useCallback(async () => {
     try {
       return await Linking.getInitialURL();
-    } catch (error) {
+    } catch {
       console.error('Error getting initial URL:', error);
       return null;
     }

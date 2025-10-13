@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, fireEvent } from '@testing-library/react-native';
 import LoginScreen from '../LoginScreen';
 import SignUpScreen from '../SignUpScreen';
 import { useAuth } from '../../hooks/useAuth';
@@ -47,8 +47,8 @@ describe('LoginScreen', () => {
   });
 
   it('renders correctly', () => {
-    const { getByText, getByPlaceholderText } = render(
-      <LoginScreen navigation={mockNavigation as any} route={{} as any} />
+    const { getByText } = render(
+      <LoginScreen navigation={mockNavigation as any} route={{} as any} />,
     );
 
     expect(getByText('Welcome Back')).toBeTruthy();
@@ -57,7 +57,7 @@ describe('LoginScreen', () => {
 
   it('shows error when submitting empty form', async () => {
     const { getByText } = render(
-      <LoginScreen navigation={mockNavigation as any} route={{} as any} />
+      <LoginScreen navigation={mockNavigation as any} route={{} as any} />,
     );
 
     const signInButton = getByText('Sign In');
@@ -66,14 +66,14 @@ describe('LoginScreen', () => {
     await waitFor(() => {
       expect(Alert.alert).toHaveBeenCalledWith(
         'Error',
-        'Please enter both email and password'
+        'Please enter both email and password',
       );
     });
   });
 
   it('navigates to sign up screen when sign up link is pressed', () => {
     const { getByText } = render(
-      <LoginScreen navigation={mockNavigation as any} route={{} as any} />
+      <LoginScreen navigation={mockNavigation as any} route={{} as any} />,
     );
 
     const signUpLink = getByText('Sign Up');
@@ -109,7 +109,7 @@ describe('SignUpScreen', () => {
 
   it('renders correctly', () => {
     const { getByText } = render(
-      <SignUpScreen navigation={mockNavigation as any} route={{} as any} />
+      <SignUpScreen navigation={mockNavigation as any} route={{} as any} />,
     );
 
     expect(getByText('Create Account')).toBeTruthy();
@@ -118,7 +118,7 @@ describe('SignUpScreen', () => {
 
   it('shows error when passwords do not match', async () => {
     const { getByText, getByLabelText } = render(
-      <SignUpScreen navigation={mockNavigation as any} route={{} as any} />
+      <SignUpScreen navigation={mockNavigation as any} route={{} as any} />,
     );
 
     const emailInput = getByLabelText('Email *');
@@ -132,13 +132,16 @@ describe('SignUpScreen', () => {
     fireEvent.press(signUpButton);
 
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Error', 'Passwords do not match');
+      expect(Alert.alert).toHaveBeenCalledWith(
+        'Error',
+        'Passwords do not match',
+      );
     });
   });
 
   it('navigates to login screen when sign in link is pressed', () => {
     const { getByText } = render(
-      <SignUpScreen navigation={mockNavigation as any} route={{} as any} />
+      <SignUpScreen navigation={mockNavigation as any} route={{} as any} />,
     );
 
     const signInLink = getByText('Sign In');

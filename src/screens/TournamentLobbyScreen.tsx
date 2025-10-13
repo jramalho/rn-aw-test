@@ -4,12 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import {
   Text,
   Button,
@@ -24,23 +19,29 @@ import {
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList, TournamentFormat, SavedTeam } from '../types';
+import { RootStackParamList, TournamentFormat } from '../types';
 import { useTournamentStore } from '../store/tournamentStore';
 import { usePokemonStore } from '../store/pokemonStore';
 
-type TournamentLobbyNavigationProp = NativeStackNavigationProp<RootStackParamList, 'TournamentLobby'>;
+type TournamentLobbyNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'TournamentLobby'
+>;
 
 const PARTICIPANT_COUNTS = [4, 8, 16];
 
 export default function TournamentLobbyScreen() {
   const navigation = useNavigation<TournamentLobbyNavigationProp>();
   const theme = useTheme();
-  
-  const { createTournament, currentTournament, tournamentHistory } = useTournamentStore();
+
+  const { createTournament, currentTournament, tournamentHistory } =
+    useTournamentStore();
   const { savedTeams, pokemonList } = usePokemonStore();
 
   const [tournamentName, setTournamentName] = useState('');
-  const [format, setFormat] = useState<TournamentFormat>(TournamentFormat.SINGLE_ELIMINATION);
+  const [format, setFormat] = useState<TournamentFormat>(
+    TournamentFormat.SINGLE_ELIMINATION,
+  );
   const [participantCount, setParticipantCount] = useState(8);
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
 
@@ -64,7 +65,7 @@ export default function TournamentLobbyScreen() {
     if (pokemonList.length < 20) {
       Alert.alert(
         'Not Enough Pokemon',
-        'Please load more Pokemon in the Pokemon List screen before creating a tournament'
+        'Please load more Pokemon in the Pokemon List screen before creating a tournament',
       );
       return;
     }
@@ -74,12 +75,14 @@ export default function TournamentLobbyScreen() {
       format,
       team.pokemon,
       participantCount,
-      pokemonList
+      pokemonList,
     );
 
     // Navigate to bracket
     if (currentTournament) {
-      navigation.navigate('TournamentBracket', { tournamentId: currentTournament.id });
+      navigation.navigate('TournamentBracket', {
+        tournamentId: currentTournament.id,
+      });
     }
   };
 
@@ -87,11 +90,22 @@ export default function TournamentLobbyScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Surface style={[styles.header, { backgroundColor: theme.colors.primaryContainer }]}>
-        <Text variant="headlineMedium" style={{ color: theme.colors.onPrimaryContainer }}>
+      <Surface
+        style={[
+          styles.header,
+          { backgroundColor: theme.colors.primaryContainer },
+        ]}
+      >
+        <Text
+          variant="headlineMedium"
+          style={{ color: theme.colors.onPrimaryContainer }}
+        >
           Tournament Lobby
         </Text>
-        <Text variant="bodyMedium" style={{ color: theme.colors.onPrimaryContainer, marginTop: 8 }}>
+        <Text
+          variant="bodyMedium"
+          style={{ color: theme.colors.onPrimaryContainer, marginTop: 8 }}
+        >
           Compete against AI trainers in bracket-style tournaments
         </Text>
       </Surface>
@@ -102,19 +116,28 @@ export default function TournamentLobbyScreen() {
         <Card.Content>
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <Text variant="headlineMedium" style={{ color: theme.colors.primary }}>
+              <Text
+                variant="headlineMedium"
+                style={{ color: theme.colors.primary }}
+              >
                 {stats.wins}
               </Text>
               <Text variant="bodySmall">Wins</Text>
             </View>
             <View style={styles.statItem}>
-              <Text variant="headlineMedium" style={{ color: theme.colors.secondary }}>
+              <Text
+                variant="headlineMedium"
+                style={{ color: theme.colors.secondary }}
+              >
                 {stats.totalTournaments}
               </Text>
               <Text variant="bodySmall">Tournaments</Text>
             </View>
             <View style={styles.statItem}>
-              <Text variant="headlineMedium" style={{ color: theme.colors.tertiary }}>
+              <Text
+                variant="headlineMedium"
+                style={{ color: theme.colors.tertiary }}
+              >
                 {stats.winRate}%
               </Text>
               <Text variant="bodySmall">Win Rate</Text>
@@ -163,7 +186,7 @@ export default function TournamentLobbyScreen() {
             ]}
             style={styles.segmentedButtons}
           />
-          
+
           <Text variant="bodySmall" style={styles.helperText}>
             Only Single Elimination is currently available
           </Text>
@@ -188,10 +211,16 @@ export default function TournamentLobbyScreen() {
           <Text variant="titleSmall" style={styles.sectionTitle}>
             Select Your Team
           </Text>
-          
+
           {savedTeams.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text variant="bodyMedium" style={{ textAlign: 'center', color: theme.colors.onSurfaceVariant }}>
+              <Text
+                variant="bodyMedium"
+                style={{
+                  textAlign: 'center',
+                  color: theme.colors.onSurfaceVariant,
+                }}
+              >
                 No saved teams found
               </Text>
               <Button
@@ -207,18 +236,30 @@ export default function TournamentLobbyScreen() {
               <List.Item
                 key={team.id}
                 title={team.name}
-                description={`${team.pokemon.length} Pokemon${team.description ? ` • ${team.description}` : ''}`}
+                description={`${team.pokemon.length} Pokemon${
+                  team.description ? ` • ${team.description}` : ''
+                }`}
                 left={props => (
                   <List.Icon
                     {...props}
-                    icon={selectedTeamId === team.id ? 'checkbox-marked-circle' : 'checkbox-blank-circle-outline'}
-                    color={selectedTeamId === team.id ? theme.colors.primary : theme.colors.onSurfaceVariant}
+                    icon={
+                      selectedTeamId === team.id
+                        ? 'checkbox-marked-circle'
+                        : 'checkbox-blank-circle-outline'
+                    }
+                    color={
+                      selectedTeamId === team.id
+                        ? theme.colors.primary
+                        : theme.colors.onSurfaceVariant
+                    }
                   />
                 )}
                 onPress={() => setSelectedTeamId(team.id)}
                 style={[
                   styles.teamItem,
-                  selectedTeamId === team.id && { backgroundColor: theme.colors.primaryContainer }
+                  selectedTeamId === team.id && {
+                    backgroundColor: theme.colors.primaryContainer,
+                  },
                 ]}
               />
             ))
@@ -232,16 +273,23 @@ export default function TournamentLobbyScreen() {
           mode="contained"
           onPress={handleCreateTournament}
           icon="trophy"
-          disabled={!tournamentName.trim() || !selectedTeamId || pokemonList.length < 20}
+          disabled={
+            !tournamentName.trim() || !selectedTeamId || pokemonList.length < 20
+          }
           style={styles.button}
         >
           Create Tournament
         </Button>
-        
+
         {tournamentHistory.tournaments.length > 0 && (
           <Button
             mode="outlined"
-            onPress={() => Alert.alert('Coming Soon', 'Tournament history view is coming soon!')}
+            onPress={() =>
+              Alert.alert(
+                'Coming Soon',
+                'Tournament history view is coming soon!',
+              )
+            }
             icon="history"
             style={styles.button}
           >

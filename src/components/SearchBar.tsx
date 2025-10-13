@@ -36,7 +36,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const placeholderColor = isDarkMode ? '#888888' : '#666666';
-  const borderColor = isFocused ? '#007AFF' : (isDarkMode ? '#555555' : '#e1e5e9');
+  const borderColor = isFocused
+    ? '#007AFF'
+    : isDarkMode
+    ? '#555555'
+    : '#e1e5e9';
 
   const handleClear = () => {
     onClear();
@@ -50,7 +54,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <View style={[styles.container, backgroundColor]}>
-      <View style={[styles.searchContainer, inputBackgroundColor, { borderColor }]}>
+      <View
+        style={[styles.searchContainer, inputBackgroundColor, { borderColor }]}
+      >
         {/* Search Icon */}
         <View style={styles.searchIcon}>
           <Text style={[styles.iconText, { color: placeholderColor }]}>🔍</Text>
@@ -95,7 +101,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
             accessibilityLabel="Clear search"
             accessibilityHint="Double tap to clear the search field"
           >
-            <Text style={[styles.clearIcon, { color: placeholderColor }]}>✕</Text>
+            <Text style={[styles.clearIcon, { color: placeholderColor }]}>
+              ✕
+            </Text>
           </Pressable>
         )}
 
@@ -128,7 +136,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         >
           <Text style={[styles.quickActionText, textColor]}>⚡ Pikachu</Text>
         </Pressable>
-        
+
         <Pressable
           style={[styles.quickActionButton, inputBackgroundColor]}
           onPress={() => onChangeText('charizard')}
@@ -139,7 +147,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         >
           <Text style={[styles.quickActionText, textColor]}>🔥 Charizard</Text>
         </Pressable>
-        
+
         <Pressable
           style={[styles.quickActionButton, inputBackgroundColor]}
           onPress={() => onChangeText('blastoise')}

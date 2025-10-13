@@ -29,26 +29,38 @@ import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { OfflineIndicator } from './src/components/OfflineIndicator';
 import { linkingConfig } from './src/config/linkingConfig';
 import { useNotifications } from './src/hooks/useNotifications';
-import { useDeepLink } from './src/hooks/useDeepLink';
 import { useNetwork } from './src/hooks/useNetwork';
 
 import { seedDemoUsers } from './src/utils/authApi';
 
-// Seed demo users for testing
-seedDemoUsers();
+// Seed demo users for testing (only once)
+let hasSeededUsers = false;
+if (!hasSeededUsers) {
+  seedDemoUsers();
+  hasSeededUsers = true;
+}
 
 const App: React.FC = () => {
   const systemColorScheme = useColorScheme();
   const { isDarkMode, setSystemTheme } = useThemeStore();
-  
+
   // Initialize notifications
   const { isInitialized: notificationsReady } = useNotifications();
-  
-  // Initialize deep linking
-  const { url: deepLinkUrl } = useDeepLink();
 
   // Initialize network monitoring
   const { isOnline } = useNetwork();
+
+  // Debug: Log why App is re-rendering
+  const renderCount = React.useRef(0);
+  renderCount.current += 1;
+  React.useEffect(() => {
+    console.log(`[App] Render #${renderCount.current}`, {
+      systemColorScheme,
+      isDarkMode,
+      notificationsReady,
+      isOnline,
+    });
+  });
 
   React.useEffect(() => {
     setSystemTheme(systemColorScheme === 'dark');
@@ -59,12 +71,6 @@ const App: React.FC = () => {
       console.log('Notification service initialized successfully');
     }
   }, [notificationsReady]);
-
-  React.useEffect(() => {
-    if (deepLinkUrl) {
-      console.log('Deep link received:', deepLinkUrl);
-    }
-  }, [deepLinkUrl]);
 
   React.useEffect(() => {
     console.log('Network status:', isOnline ? 'Online' : 'Offline');

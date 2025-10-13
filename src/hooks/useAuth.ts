@@ -5,30 +5,40 @@
 
 import { useEffect, useCallback } from 'react';
 import { useAuthStore } from '../store/authStore';
-import { getStoredTokens, getStoredUser, validateTokens } from '../utils/authUtils';
-import type { LoginOptions, SignUpOptions, BiometricAuthOptions } from '../types';
+import {
+  getStoredTokens,
+  getStoredUser,
+  validateTokens,
+} from '../utils/authUtils';
+import type {
+  LoginOptions,
+  SignUpOptions,
+  BiometricAuthOptions,
+} from '../types';
 
 export const useAuth = () => {
-  const {
-    user,
-    tokens,
-    isAuthenticated,
-    isLoading,
-    error,
-    login,
-    signUp,
-    logout,
-    refreshTokens,
-    updateUser,
-    clearError,
-    biometricLogin,
-  } = useAuthStore();
+  // Use optimized selectors to prevent unnecessary re-renders
+  const user = useAuthStore(state => state.user);
+  const tokens = useAuthStore(state => state.tokens);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const isLoading = useAuthStore(state => state.isLoading);
+  const error = useAuthStore(state => state.error);
+  const login = useAuthStore(state => state.login);
+  const signUp = useAuthStore(state => state.signUp);
+  const logout = useAuthStore(state => state.logout);
+  const refreshTokens = useAuthStore(state => state.refreshTokens);
+  const updateUser = useAuthStore(state => state.updateUser);
+  const clearError = useAuthStore(state => state.clearError);
+  const biometricLogin = useAuthStore(state => state.biometricLogin);
 
   /**
    * Initialize auth state from storage on mount
    */
   useEffect(() => {
     const initializeAuth = async () => {
+      // Set loading to true during initialization
+      useAuthStore.setState({ isLoading: true });
+
       try {
         const [storedTokens, storedUser] = await Promise.all([
           getStoredTokens(),
@@ -41,14 +51,31 @@ export const useAuth = () => {
             user: storedUser,
             tokens: storedTokens,
             isAuthenticated: true,
+            isLoading: false,
+            error: null,
           });
         } else {
-          // Clear invalid auth state
-          await logout();
+          // Clear invalid auth state without calling logout (to avoid recursive calls)
+          useAuthStore.setState({
+            user: null,
+            tokens: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: null,
+          });
         }
-      } catch (error) {
-        console.error('Failed to initialize auth:', error);
-        await logout();
+      } catch {
+        console.error('Failed to initialize auth:', initError);
+        useAuthStore.setState({
+          user: null,
+          tokens: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error:
+            initError instanceof Error
+              ? initError.message
+              : 'Failed to initialize auth',
+        });
       }
     };
 
@@ -62,13 +89,13 @@ export const useAuth = () => {
     async (options: LoginOptions) => {
       try {
         await login(options);
-      } catch (error) {
+      } catch (loginError) {
         // Error is already set in store
-        console.error('Login failed:', error);
-        throw error;
+        console.error('Login failed:', loginError);
+        throw loginError;
       }
     },
-    [login]
+    [login],
   );
 
   /**
@@ -78,13 +105,13 @@ export const useAuth = () => {
     async (options: SignUpOptions) => {
       try {
         await signUp(options);
-      } catch (error) {
+      } catch (signUpError) {
         // Error is already set in store
-        console.error('Sign up failed:', error);
-        throw error;
+        console.error('Sign up failed:', signUpError);
+        throw signUpError;
       }
     },
-    [signUp]
+    [signUp],
   );
 
   /**
@@ -93,9 +120,9 @@ export const useAuth = () => {
   const handleLogout = useCallback(async () => {
     try {
       await logout();
-    } catch (error) {
-      console.error('Logout failed:', error);
-      throw error;
+    } catch (logoutError) {
+      console.error('Logout failed:', logoutError);
+      throw logoutError;
     }
   }, [logout]);
 
@@ -105,9 +132,9 @@ export const useAuth = () => {
   const handleRefreshTokens = useCallback(async () => {
     try {
       await refreshTokens();
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      throw error;
+    } catch (refreshError) {
+      console.error('Token refresh failed:', refreshError);
+      throw refreshError;
     }
   }, [refreshTokens]);
 
@@ -118,12 +145,12 @@ export const useAuth = () => {
     async (options?: BiometricAuthOptions) => {
       try {
         await biometricLogin(options);
-      } catch (error) {
-        console.error('Biometric login failed:', error);
-        throw error;
+      } catch (biometricError) {
+        console.error('Biometric login failed:', biometricError);
+        throw biometricError;
       }
     },
-    [biometricLogin]
+    [biometricLogin],
   );
 
   /**

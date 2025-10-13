@@ -21,19 +21,27 @@ const mockPokemon1 = {
   weight: 69,
   base_experience: 64,
   types: [
-    { slot: 1, type: { name: 'grass', url: 'https://pokeapi.co/api/v2/type/12/' } },
-    { slot: 2, type: { name: 'poison', url: 'https://pokeapi.co/api/v2/type/4/' } },
+    {
+      slot: 1,
+      type: { name: 'grass', url: 'https://pokeapi.co/api/v2/type/12/' },
+    },
+    {
+      slot: 2,
+      type: { name: 'poison', url: 'https://pokeapi.co/api/v2/type/4/' },
+    },
   ],
   stats: [
     { base_stat: 45, stat: { name: 'hp' } },
     { base_stat: 49, stat: { name: 'attack' } },
   ],
-  abilities: [
-    { ability: { name: 'overgrow', url: '' } },
-  ],
+  abilities: [{ ability: { name: 'overgrow', url: '' } }],
   sprites: {
     front_default: 'https://example.com/bulbasaur.png',
-    other: { 'official-artwork': { front_default: 'https://example.com/bulbasaur-art.png' } },
+    other: {
+      'official-artwork': {
+        front_default: 'https://example.com/bulbasaur-art.png',
+      },
+    },
   },
 };
 
@@ -44,19 +52,27 @@ const mockPokemon2 = {
   weight: 130,
   base_experience: 142,
   types: [
-    { slot: 1, type: { name: 'grass', url: 'https://pokeapi.co/api/v2/type/12/' } },
-    { slot: 2, type: { name: 'poison', url: 'https://pokeapi.co/api/v2/type/4/' } },
+    {
+      slot: 1,
+      type: { name: 'grass', url: 'https://pokeapi.co/api/v2/type/12/' },
+    },
+    {
+      slot: 2,
+      type: { name: 'poison', url: 'https://pokeapi.co/api/v2/type/4/' },
+    },
   ],
   stats: [
     { base_stat: 60, stat: { name: 'hp' } },
     { base_stat: 62, stat: { name: 'attack' } },
   ],
-  abilities: [
-    { ability: { name: 'overgrow', url: '' } },
-  ],
+  abilities: [{ ability: { name: 'overgrow', url: '' } }],
   sprites: {
     front_default: 'https://example.com/ivysaur.png',
-    other: { 'official-artwork': { front_default: 'https://example.com/ivysaur-art.png' } },
+    other: {
+      'official-artwork': {
+        front_default: 'https://example.com/ivysaur-art.png',
+      },
+    },
   },
 };
 
@@ -76,9 +92,7 @@ const mockSpecies = {
   flavor_text_entries: [
     { flavor_text: 'A strange seed was planted.', language: { name: 'en' } },
   ],
-  genera: [
-    { genus: 'Seed Pokémon', language: { name: 'en' } },
-  ],
+  genera: [{ genus: 'Seed Pokémon', language: { name: 'en' } }],
   evolution_chain: {
     url: 'https://pokeapi.co/api/v2/evolution-chain/1/',
   },
@@ -91,9 +105,7 @@ const mockEvolutionChain = {
     evolves_to: [
       {
         species: { name: 'ivysaur' },
-        evolves_to: [
-          { species: { name: 'venusaur' }, evolves_to: [] },
-        ],
+        evolves_to: [{ species: { name: 'venusaur' }, evolves_to: [] }],
       },
     ],
   },
@@ -103,8 +115,15 @@ const mockType = {
   id: 12,
   name: 'grass',
   pokemon: [
-    { pokemon: { name: 'bulbasaur', url: 'https://pokeapi.co/api/v2/pokemon/1/' } },
-    { pokemon: { name: 'ivysaur', url: 'https://pokeapi.co/api/v2/pokemon/2/' } },
+    {
+      pokemon: {
+        name: 'bulbasaur',
+        url: 'https://pokeapi.co/api/v2/pokemon/1/',
+      },
+    },
+    {
+      pokemon: { name: 'ivysaur', url: 'https://pokeapi.co/api/v2/pokemon/2/' },
+    },
   ],
 };
 
@@ -120,9 +139,9 @@ const mockAllTypes = {
 describe('pokemonStore', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Reset the store state
-    const { result } = renderHook(() => usePokemonStore());
+    renderHook(() => usePokemonStore());
     act(() => {
       usePokemonStore.setState({
         pokemonList: [],
@@ -186,7 +205,9 @@ describe('pokemonStore', () => {
 
   describe('loadPokemonList', () => {
     it('should load Pokemon list successfully', async () => {
-      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(mockPokemonListResponse);
+      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(
+        mockPokemonListResponse,
+      );
       (pokemonApi.getPokemon as jest.Mock)
         .mockResolvedValueOnce(mockPokemon1)
         .mockResolvedValueOnce(mockPokemon2);
@@ -208,7 +229,10 @@ describe('pokemonStore', () => {
 
     it('should set loading state during request', async () => {
       (pokemonApi.getPokemonList as jest.Mock).mockImplementation(
-        () => new Promise(resolve => setTimeout(() => resolve(mockPokemonListResponse), 100))
+        () =>
+          new Promise(resolve =>
+            setTimeout(() => resolve(mockPokemonListResponse), 100),
+          ),
       );
 
       const { result } = renderHook(() => usePokemonStore());
@@ -229,7 +253,9 @@ describe('pokemonStore', () => {
 
     it('should handle API errors gracefully', async () => {
       const errorMessage = 'Network error';
-      (pokemonApi.getPokemonList as jest.Mock).mockRejectedValue(new Error(errorMessage));
+      (pokemonApi.getPokemonList as jest.Mock).mockRejectedValue(
+        new Error(errorMessage),
+      );
 
       const { result } = renderHook(() => usePokemonStore());
 
@@ -243,7 +269,9 @@ describe('pokemonStore', () => {
     });
 
     it('should refresh list when refresh parameter is true', async () => {
-      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(mockPokemonListResponse);
+      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(
+        mockPokemonListResponse,
+      );
       (pokemonApi.getPokemon as jest.Mock)
         .mockResolvedValueOnce(mockPokemon1)
         .mockResolvedValueOnce(mockPokemon2);
@@ -259,7 +287,9 @@ describe('pokemonStore', () => {
       expect(result.current.offset).toBe(20);
 
       // Refresh list
-      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(mockPokemonListResponse);
+      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(
+        mockPokemonListResponse,
+      );
       (pokemonApi.getPokemon as jest.Mock)
         .mockResolvedValueOnce(mockPokemon1)
         .mockResolvedValueOnce(mockPokemon2);
@@ -274,7 +304,10 @@ describe('pokemonStore', () => {
 
     it('should prevent duplicate requests when already loading', async () => {
       (pokemonApi.getPokemonList as jest.Mock).mockImplementation(
-        () => new Promise(resolve => setTimeout(() => resolve(mockPokemonListResponse), 100))
+        () =>
+          new Promise(resolve =>
+            setTimeout(() => resolve(mockPokemonListResponse), 100),
+          ),
       );
 
       const { result } = renderHook(() => usePokemonStore());
@@ -299,7 +332,9 @@ describe('pokemonStore', () => {
         next: null,
       };
 
-      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(lastPageResponse);
+      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(
+        lastPageResponse,
+      );
       (pokemonApi.getPokemon as jest.Mock)
         .mockResolvedValueOnce(mockPokemon1)
         .mockResolvedValueOnce(mockPokemon2);
@@ -317,7 +352,9 @@ describe('pokemonStore', () => {
   describe('loadMore', () => {
     it('should load more Pokemon when available', async () => {
       // Setup initial list
-      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(mockPokemonListResponse);
+      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(
+        mockPokemonListResponse,
+      );
       (pokemonApi.getPokemon as jest.Mock)
         .mockResolvedValueOnce(mockPokemon1)
         .mockResolvedValueOnce(mockPokemon2);
@@ -331,7 +368,9 @@ describe('pokemonStore', () => {
       const initialLength = result.current.pokemonList.length;
 
       // Load more
-      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(mockPokemonListResponse);
+      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(
+        mockPokemonListResponse,
+      );
       (pokemonApi.getPokemon as jest.Mock)
         .mockResolvedValueOnce(mockPokemon1)
         .mockResolvedValueOnce(mockPokemon2);
@@ -375,13 +414,19 @@ describe('pokemonStore', () => {
     it('should set isLoadingMore during request', async () => {
       // Setup initial state
       (pokemonApi.getPokemonList as jest.Mock).mockImplementation(
-        () => new Promise(resolve => setTimeout(() => resolve(mockPokemonListResponse), 100))
+        () =>
+          new Promise(resolve =>
+            setTimeout(() => resolve(mockPokemonListResponse), 100),
+          ),
       );
 
       const { result } = renderHook(() => usePokemonStore());
 
       act(() => {
-        usePokemonStore.setState({ hasMore: true, pokemonList: [mockPokemon1] });
+        usePokemonStore.setState({
+          hasMore: true,
+          pokemonList: [mockPokemon1],
+        });
       });
 
       const loadPromise = act(async () => {
@@ -401,7 +446,9 @@ describe('pokemonStore', () => {
   describe('searchPokemon', () => {
     it('should search Pokemon successfully', async () => {
       const searchResults = [mockPokemon1, mockPokemon2];
-      (pokemonApi.searchPokemonAdvanced as jest.Mock).mockResolvedValue(searchResults);
+      (pokemonApi.searchPokemonAdvanced as jest.Mock).mockResolvedValue(
+        searchResults,
+      );
 
       const { result } = renderHook(() => usePokemonStore());
 
@@ -428,7 +475,9 @@ describe('pokemonStore', () => {
 
     it('should handle search errors', async () => {
       const errorMessage = 'Search failed';
-      (pokemonApi.searchPokemonAdvanced as jest.Mock).mockRejectedValue(new Error(errorMessage));
+      (pokemonApi.searchPokemonAdvanced as jest.Mock).mockRejectedValue(
+        new Error(errorMessage),
+      );
 
       const { result } = renderHook(() => usePokemonStore());
 
@@ -443,7 +492,10 @@ describe('pokemonStore', () => {
 
     it('should set isSearching during search', async () => {
       (pokemonApi.searchPokemonAdvanced as jest.Mock).mockImplementation(
-        () => new Promise(resolve => setTimeout(() => resolve([mockPokemon1]), 100))
+        () =>
+          new Promise(resolve =>
+            setTimeout(() => resolve([mockPokemon1]), 100),
+          ),
       );
 
       const { result } = renderHook(() => usePokemonStore());
@@ -464,8 +516,12 @@ describe('pokemonStore', () => {
 
   describe('loadPokemonDetail', () => {
     it('should load Pokemon details successfully', async () => {
-      (pokemonApi.getPokemonSpecies as jest.Mock).mockResolvedValue(mockSpecies);
-      (pokemonApi.getEvolutionChain as jest.Mock).mockResolvedValue(mockEvolutionChain);
+      (pokemonApi.getPokemonSpecies as jest.Mock).mockResolvedValue(
+        mockSpecies,
+      );
+      (pokemonApi.getEvolutionChain as jest.Mock).mockResolvedValue(
+        mockEvolutionChain,
+      );
 
       const { result } = renderHook(() => usePokemonStore());
 
@@ -486,7 +542,9 @@ describe('pokemonStore', () => {
         evolution_chain: null,
       };
 
-      (pokemonApi.getPokemonSpecies as jest.Mock).mockResolvedValue(speciesWithoutEvolution);
+      (pokemonApi.getPokemonSpecies as jest.Mock).mockResolvedValue(
+        speciesWithoutEvolution,
+      );
 
       const { result } = renderHook(() => usePokemonStore());
 
@@ -501,7 +559,9 @@ describe('pokemonStore', () => {
 
     it('should handle detail loading errors', async () => {
       const errorMessage = 'Failed to load details';
-      (pokemonApi.getPokemonSpecies as jest.Mock).mockRejectedValue(new Error(errorMessage));
+      (pokemonApi.getPokemonSpecies as jest.Mock).mockRejectedValue(
+        new Error(errorMessage),
+      );
 
       const { result } = renderHook(() => usePokemonStore());
 
@@ -515,7 +575,8 @@ describe('pokemonStore', () => {
 
     it('should set isLoadingDetail during request', async () => {
       (pokemonApi.getPokemonSpecies as jest.Mock).mockImplementation(
-        () => new Promise(resolve => setTimeout(() => resolve(mockSpecies), 100))
+        () =>
+          new Promise(resolve => setTimeout(() => resolve(mockSpecies), 100)),
       );
 
       const { result } = renderHook(() => usePokemonStore());
@@ -608,7 +669,9 @@ describe('pokemonStore', () => {
     });
 
     it('should clear filter when type is null', async () => {
-      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(mockPokemonListResponse);
+      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(
+        mockPokemonListResponse,
+      );
       (pokemonApi.getPokemon as jest.Mock)
         .mockResolvedValueOnce(mockPokemon1)
         .mockResolvedValueOnce(mockPokemon2);
@@ -687,11 +750,17 @@ describe('pokemonStore', () => {
 
       // Should only have 3 types (filtered out unknown and shadow)
       expect(result.current.availableTypes).toHaveLength(3);
-      expect(result.current.availableTypes.every(t => !['unknown', 'shadow'].includes(t.name))).toBe(true);
+      expect(
+        result.current.availableTypes.every(
+          t => !['unknown', 'shadow'].includes(t.name),
+        ),
+      ).toBe(true);
     });
 
     it('should handle errors silently', async () => {
-      (pokemonApi.getAllTypes as jest.Mock).mockRejectedValue(new Error('API Error'));
+      (pokemonApi.getAllTypes as jest.Mock).mockRejectedValue(
+        new Error('API Error'),
+      );
 
       const { result } = renderHook(() => usePokemonStore());
 
@@ -706,7 +775,9 @@ describe('pokemonStore', () => {
   describe('getSuggestions', () => {
     it('should get Pokemon suggestions', async () => {
       const suggestions = ['bulbasaur', 'ivysaur', 'venusaur'];
-      (pokemonApi.getPokemonSuggestions as jest.Mock).mockResolvedValue(suggestions);
+      (pokemonApi.getPokemonSuggestions as jest.Mock).mockResolvedValue(
+        suggestions,
+      );
 
       const { result } = renderHook(() => usePokemonStore());
 
@@ -729,7 +800,9 @@ describe('pokemonStore', () => {
     });
 
     it('should handle suggestion errors', async () => {
-      (pokemonApi.getPokemonSuggestions as jest.Mock).mockRejectedValue(new Error('Error'));
+      (pokemonApi.getPokemonSuggestions as jest.Mock).mockRejectedValue(
+        new Error('Error'),
+      );
 
       const { result } = renderHook(() => usePokemonStore());
 
@@ -827,12 +900,12 @@ describe('pokemonStore', () => {
 
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         'pokemon-storage',
-        expect.stringContaining('favorites')
+        expect.stringContaining('favorites'),
       );
     });
 
     it('should only persist favorites and selectedType, not full list', async () => {
-      const { result } = renderHook(() => usePokemonStore());
+      renderHook(() => usePokemonStore());
 
       await act(async () => {
         usePokemonStore.setState({
@@ -846,9 +919,9 @@ describe('pokemonStore', () => {
       const calls = (AsyncStorage.setItem as jest.Mock).mock.calls;
       if (calls.length > 0) {
         const lastCall = calls[calls.length - 1];
-        const [key, value] = lastCall;
+        const [_key, value] = lastCall;
         const parsed = JSON.parse(value);
-        
+
         // Should persist favorites
         expect(parsed.state).toHaveProperty('favorites');
         // Should NOT persist pokemonList
@@ -872,9 +945,10 @@ describe('pokemonStore', () => {
     });
 
     it('should maintain state consistency across operations', async () => {
-      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(mockPokemonListResponse);
-      (pokemonApi.getPokemon as jest.Mock)
-        .mockResolvedValue(mockPokemon1);
+      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(
+        mockPokemonListResponse,
+      );
+      (pokemonApi.getPokemon as jest.Mock).mockResolvedValue(mockPokemon1);
 
       const { result } = renderHook(() => usePokemonStore());
 
@@ -889,8 +963,12 @@ describe('pokemonStore', () => {
     });
 
     it('should handle concurrent requests gracefully', async () => {
-      (pokemonApi.searchPokemonAdvanced as jest.Mock).mockResolvedValue([mockPokemon1]);
-      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(mockPokemonListResponse);
+      (pokemonApi.searchPokemonAdvanced as jest.Mock).mockResolvedValue([
+        mockPokemon1,
+      ]);
+      (pokemonApi.getPokemonList as jest.Mock).mockResolvedValue(
+        mockPokemonListResponse,
+      );
       (pokemonApi.getPokemon as jest.Mock).mockResolvedValue(mockPokemon1);
 
       const { result } = renderHook(() => usePokemonStore());
@@ -1023,12 +1101,17 @@ describe('pokemonStore', () => {
 
         let savedTeam;
         act(() => {
-          savedTeam = result.current.saveCurrentTeam('My Team', 'Test description');
+          savedTeam = result.current.saveCurrentTeam(
+            'My Team',
+            'Test description',
+          );
         });
 
         expect(result.current.savedTeams).toHaveLength(1);
         expect(result.current.savedTeams[0].name).toBe('My Team');
-        expect(result.current.savedTeams[0].description).toBe('Test description');
+        expect(result.current.savedTeams[0].description).toBe(
+          'Test description',
+        );
         expect(result.current.savedTeams[0].pokemon).toHaveLength(2);
         expect(result.current.currentTeamId).toBe(savedTeam.id);
       });
@@ -1046,11 +1129,11 @@ describe('pokemonStore', () => {
       it('should update existing team when currentTeamId is set', () => {
         const { result } = renderHook(() => usePokemonStore());
 
-        let teamId;
+        // let teamId;
         act(() => {
           result.current.addToTeam(mockPokemon1);
-          const saved = result.current.saveCurrentTeam('Original Name');
-          teamId = saved.id;
+          result.current.saveCurrentTeam('Original Name');
+          // teamId = saved.id;
         });
 
         act(() => {
@@ -1060,7 +1143,9 @@ describe('pokemonStore', () => {
 
         expect(result.current.savedTeams).toHaveLength(1);
         expect(result.current.savedTeams[0].name).toBe('Updated Name');
-        expect(result.current.savedTeams[0].description).toBe('New description');
+        expect(result.current.savedTeams[0].description).toBe(
+          'New description',
+        );
         expect(result.current.savedTeams[0].pokemon).toHaveLength(2);
       });
     });
@@ -1074,7 +1159,7 @@ describe('pokemonStore', () => {
           result.current.addToTeam(mockPokemon1);
           result.current.addToTeam(mockPokemon2);
           const saved = result.current.saveCurrentTeam('Team 1');
-          teamId = saved.id;
+          _teamId = saved.id;
           result.current.clearTeam();
         });
 
@@ -1107,7 +1192,7 @@ describe('pokemonStore', () => {
         act(() => {
           result.current.addToTeam(mockPokemon1);
           const saved = result.current.saveCurrentTeam('Team to Delete');
-          teamId = saved.id;
+          _teamId = saved.id;
         });
 
         expect(result.current.savedTeams).toHaveLength(1);
@@ -1126,7 +1211,7 @@ describe('pokemonStore', () => {
         act(() => {
           result.current.addToTeam(mockPokemon1);
           const saved = result.current.saveCurrentTeam('Active Team');
-          teamId = saved.id;
+          _teamId = saved.id;
         });
 
         expect(result.current.currentTeamId).toBe(teamId);
@@ -1146,8 +1231,11 @@ describe('pokemonStore', () => {
         let teamId;
         act(() => {
           result.current.addToTeam(mockPokemon1);
-          const saved = result.current.saveCurrentTeam('Original Name', 'Original description');
-          teamId = saved.id;
+          const saved = result.current.saveCurrentTeam(
+            'Original Name',
+            'Original description',
+          );
+          _teamId = saved.id;
         });
 
         act(() => {
@@ -1157,7 +1245,9 @@ describe('pokemonStore', () => {
           });
         });
 
-        const updatedTeam = result.current.savedTeams.find(t => t.id === teamId);
+        const updatedTeam = result.current.savedTeams.find(
+          t => t.id === teamId,
+        );
         expect(updatedTeam?.name).toBe('Updated Name');
         expect(updatedTeam?.description).toBe('Updated description');
       });

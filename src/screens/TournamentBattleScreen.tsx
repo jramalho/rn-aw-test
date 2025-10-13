@@ -4,13 +4,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  Dimensions,
-} from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Dimensions } from 'react-native';
 import {
   Text,
   Button,
@@ -19,28 +13,32 @@ import {
   Portal,
   Dialog,
   List,
-  IconButton,
   useTheme,
   ActivityIndicator,
   Chip,
 } from 'react-native-paper';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import {
+  useNavigation /* useRoute, RouteProp */,
+} from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList, BattleAction, BattlePokemon } from '../types';
+import { RootStackParamList, BattleAction } from '../types';
 import { useBattleStore } from '../store/battleStore';
 import { useTournamentStore } from '../store/tournamentStore';
 import { generateBattleMoves } from '../utils/battleUtils';
 
-type TournamentBattleRouteProp = RouteProp<RootStackParamList, 'TournamentBattle'>;
-type TournamentBattleNavigationProp = NativeStackNavigationProp<RootStackParamList, 'TournamentBattle'>;
+// type TournamentBattleRouteProp = RouteProp<RootStackParamList, 'TournamentBattle'>; // Unused type
+type TournamentBattleNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'TournamentBattle'
+>;
 
 const { width } = Dimensions.get('window');
 
 export default function TournamentBattleScreen() {
   const navigation = useNavigation<TournamentBattleNavigationProp>();
-  const route = useRoute<TournamentBattleRouteProp>();
+  // const route = useRoute<TournamentBattleRouteProp>();
   const theme = useTheme();
-  const { tournamentId, matchId } = route.params;
+  // const { tournamentId } = route.params; // Currently unused
 
   const {
     currentBattle,
@@ -51,13 +49,10 @@ export default function TournamentBattleScreen() {
     clearCurrentBattle,
   } = useBattleStore();
 
-  const {
-    currentTournament,
-    advanceTournament,
-  } = useTournamentStore();
+  const { currentTournament, advanceTournament } = useTournamentStore();
 
   const [switchDialogVisible, setSwitchDialogVisible] = useState(false);
-  const [selectedMove, setSelectedMove] = useState<number | null>(null);
+  const [_selectedMove, _setSelectedMove] = useState<number | null>(null);
   const [battleLog, setBattleLog] = useState<string[]>([]);
 
   // Find the tournament match
@@ -73,7 +68,7 @@ export default function TournamentBattleScreen() {
 
       startBattle(participant1.team, participant2.team);
     }
-  }, [match, currentBattle]);
+  }, [currentTournament, startBattle, match, currentBattle]);
 
   // Update battle log
   useEffect(() => {
@@ -82,36 +77,39 @@ export default function TournamentBattleScreen() {
       const newMessages = lastTurn.events.map(event => event.message);
       setBattleLog(prev => [...prev, ...newMessages]);
     }
-  }, [currentBattle?.turns.length]);
+  }, [currentBattle]);
 
   // Check if battle ended
   useEffect(() => {
     if (currentBattle && currentBattle.status !== 'ongoing') {
-      const message = currentBattle.status === 'won'
-        ? `Victory! You defeated ${match?.participant2?.name}!`
-        : currentBattle.status === 'lost'
-        ? `Defeat! ${match?.participant2?.name} won!`
-        : 'Battle ended';
+      const message =
+        currentBattle.status === 'won'
+          ? `Victory! You defeated ${match?.participant2?.name}!`
+          : currentBattle.status === 'lost'
+          ? `Defeat! ${match?.participant2?.name} won!`
+          : 'Battle ended';
 
       setTimeout(() => {
-        Alert.alert(
-          'Battle Complete',
-          message,
-          [
-            {
-              text: 'Continue',
-              onPress: () => {
-                // Advance tournament
-                advanceTournament(matchId, currentBattle);
-                clearCurrentBattle();
-                navigation.goBack();
-              },
+        Alert.alert('Battle Complete', message, [
+          {
+            text: 'Continue',
+            onPress: () => {
+              // Advance tournament
+              advanceTournament(matchId, currentBattle);
+              clearCurrentBattle();
+              navigation.goBack();
             },
-          ]
-        );
+          },
+        ]);
       }, 1000);
     }
-  }, [currentBattle?.status]);
+  }, [
+    advanceTournament,
+    clearCurrentBattle,
+    currentBattle,
+    match?.participant2?.name,
+    navigation,
+  ]);
 
   if (!currentTournament || !match) {
     return (
@@ -135,17 +133,25 @@ export default function TournamentBattleScreen() {
     );
   }
 
-  const playerPokemon = currentBattle.playerTeam.pokemon[currentBattle.playerTeam.activePokemonIndex];
-  const opponentPokemon = currentBattle.opponentTeam.pokemon[currentBattle.opponentTeam.activePokemonIndex];
+  const playerPokemon =
+    currentBattle.playerTeam.pokemon[
+      currentBattle.playerTeam.activePokemonIndex
+    ];
+  const opponentPokemon =
+    currentBattle.opponentTeam.pokemon[
+      currentBattle.opponentTeam.activePokemonIndex
+    ];
   const moves = generateBattleMoves(playerPokemon);
 
   const canSwitch = currentBattle.playerTeam.pokemon.some(
-    (p, idx) => idx !== currentBattle.playerTeam.activePokemonIndex && p.status !== 'fainted'
+    (p, idx) =>
+      idx !== currentBattle.playerTeam.activePokemonIndex &&
+      p.status !== 'fainted',
   );
 
   const handleAttack = async (moveIndex: number) => {
     if (isProcessingTurn) return;
-    
+
     const action: BattleAction = {
       type: 'attack',
       moveIndex,
@@ -186,18 +192,28 @@ export default function TournamentBattleScreen() {
             }, 500);
           },
         },
-      ]
+      ],
     );
   };
 
   return (
     <View style={styles.container}>
       {/* Tournament Header */}
-      <View style={[styles.tournamentHeader, { backgroundColor: theme.colors.secondaryContainer }]}>
-        <Text variant="titleSmall" style={{ color: theme.colors.onSecondaryContainer }}>
+      <View
+        style={[
+          styles.tournamentHeader,
+          { backgroundColor: theme.colors.secondaryContainer },
+        ]}
+      >
+        <Text
+          variant="titleSmall"
+          style={{ color: theme.colors.onSecondaryContainer }}
+        >
           {currentTournament.name}
         </Text>
-        <Chip compact icon="trophy">Tournament Match</Chip>
+        <Chip compact icon="trophy">
+          Tournament Match
+        </Chip>
       </View>
 
       {/* Battle UI */}
@@ -214,7 +230,7 @@ export default function TournamentBattleScreen() {
                 Lv. {Math.floor(opponentPokemon.base_experience / 10) || 50}
               </Text>
             </View>
-            
+
             <View style={styles.hpBar}>
               <View style={styles.hpBarHeader}>
                 <Text variant="bodySmall">HP</Text>
@@ -249,7 +265,7 @@ export default function TournamentBattleScreen() {
                 Lv. {Math.floor(playerPokemon.base_experience / 10) || 50}
               </Text>
             </View>
-            
+
             <View style={styles.hpBar}>
               <View style={styles.hpBarHeader}>
                 <Text variant="bodySmall">HP</Text>
@@ -279,7 +295,11 @@ export default function TournamentBattleScreen() {
             <Card.Content>
               <ScrollView style={styles.log} nestedScrollEnabled>
                 {battleLog.slice(-10).map((message, index) => (
-                  <Text key={index} variant="bodySmall" style={styles.logMessage}>
+                  <Text
+                    key={index}
+                    variant="bodySmall"
+                    style={styles.logMessage}
+                  >
                     {message}
                   </Text>
                 ))}
@@ -300,7 +320,9 @@ export default function TournamentBattleScreen() {
                 key={index}
                 mode="contained"
                 onPress={() => handleAttack(index)}
-                disabled={isProcessingTurn || currentBattle.status !== 'ongoing'}
+                disabled={
+                  isProcessingTurn || currentBattle.status !== 'ongoing'
+                }
                 style={styles.moveButton}
                 contentStyle={styles.moveButtonContent}
               >
@@ -318,7 +340,11 @@ export default function TournamentBattleScreen() {
             <Button
               mode="outlined"
               onPress={() => setSwitchDialogVisible(true)}
-              disabled={!canSwitch || isProcessingTurn || currentBattle.status !== 'ongoing'}
+              disabled={
+                !canSwitch ||
+                isProcessingTurn ||
+                currentBattle.status !== 'ongoing'
+              }
               icon="swap-horizontal"
               style={styles.utilityButton}
             >
@@ -347,7 +373,8 @@ export default function TournamentBattleScreen() {
           <Dialog.ScrollArea>
             <ScrollView>
               {currentBattle.playerTeam.pokemon.map((pokemon, index) => {
-                const isActive = index === currentBattle.playerTeam.activePokemonIndex;
+                const isActive =
+                  index === currentBattle.playerTeam.activePokemonIndex;
                 const isFainted = pokemon.status === 'fainted';
 
                 return (
@@ -360,7 +387,13 @@ export default function TournamentBattleScreen() {
                     left={props => (
                       <List.Icon
                         {...props}
-                        icon={isActive ? 'check-circle' : isFainted ? 'close-circle' : 'circle-outline'}
+                        icon={
+                          isActive
+                            ? 'check-circle'
+                            : isFainted
+                            ? 'close-circle'
+                            : 'circle-outline'
+                        }
                       />
                     )}
                   />
@@ -369,7 +402,9 @@ export default function TournamentBattleScreen() {
             </ScrollView>
           </Dialog.ScrollArea>
           <Dialog.Actions>
-            <Button onPress={() => setSwitchDialogVisible(false)}>Cancel</Button>
+            <Button onPress={() => setSwitchDialogVisible(false)}>
+              Cancel
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

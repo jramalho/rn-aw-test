@@ -1,35 +1,21 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  FlatList,
-} from 'react-native';
-import {
-  Text,
-  Card,
-  List,
-  useTheme,
-  IconButton,
-  Divider,
-} from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types';
+import { View, StyleSheet, FlatList } from 'react-native';
+import { Text, Card, useTheme, Divider, IconButton } from 'react-native-paper';
 import { useBattleStore } from '../store/battleStore';
 
-type BattleHistoryScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'BattleHistory'>;
-
 export default function BattleHistoryScreen() {
-  const navigation = useNavigation<BattleHistoryScreenNavigationProp>();
   const theme = useTheme();
-  
+
   const { battleHistory, getBattleStats } = useBattleStore();
   const stats = getBattleStats();
 
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return (
+      date.toLocaleDateString() +
+      ' ' +
+      date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    );
   };
 
   const formatDuration = (start: number, end?: number) => {
@@ -40,10 +26,20 @@ export default function BattleHistoryScreen() {
     return `${minutes}m ${seconds}s`;
   };
 
-  const renderBattleItem = ({ item: battle, index }: { item: typeof battleHistory.battles[0]; index: number }) => {
+  const renderBattleItem = ({
+    item: battle,
+    index,
+  }: {
+    item: (typeof battleHistory.battles)[0];
+    index: number;
+  }) => {
     const playerWon = battle.status === 'won';
     const statusColor = playerWon ? theme.colors.primary : theme.colors.error;
-    const statusIcon = playerWon ? 'trophy' : battle.status === 'forfeit' ? 'flag' : 'close-circle';
+    const statusIcon = playerWon
+      ? 'trophy'
+      : battle.status === 'forfeit'
+      ? 'flag'
+      : 'close-circle';
 
     return (
       <Card style={styles.battleCard} mode="elevated">
@@ -57,10 +53,16 @@ export default function BattleHistoryScreen() {
                 {formatDate(battle.createdAt)}
               </Text>
             </View>
-            <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
+            <View
+              style={[styles.statusBadge, { backgroundColor: statusColor }]}
+            >
               <IconButton icon={statusIcon} iconColor="#fff" size={20} />
               <Text style={styles.statusText}>
-                {battle.status === 'won' ? 'Victory' : battle.status === 'forfeit' ? 'Forfeit' : 'Defeat'}
+                {battle.status === 'won'
+                  ? 'Victory'
+                  : battle.status === 'forfeit'
+                  ? 'Forfeit'
+                  : 'Defeat'}
               </Text>
             </View>
           </View>
@@ -70,14 +72,26 @@ export default function BattleHistoryScreen() {
           <View style={styles.teamsContainer}>
             {/* Player Team */}
             <View style={styles.teamSection}>
-              <Text variant="labelMedium" style={styles.teamLabel}>Your Team</Text>
-              {battle.playerTeam.pokemon.slice(0, 3).map((pokemon, idx) => (
+              <Text variant="labelMedium" style={styles.teamLabel}>
+                Your Team
+              </Text>
+              {battle.playerTeam.pokemon.slice(0, 3).map((pokemon, _idx) => (
                 <View key={pokemon.id} style={styles.pokemonRow}>
                   <Text variant="bodySmall">
-                    {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
+                    {pokemon.name.charAt(0).toUpperCase() +
+                      pokemon.name.slice(1)}
                   </Text>
-                  <Text variant="bodySmall" style={pokemon.status === 'fainted' ? styles.faintedText : undefined}>
-                    {pokemon.status === 'fainted' ? 'Fainted' : `${pokemon.currentHP}/${pokemon.maxHP} HP`}
+                  <Text
+                    variant="bodySmall"
+                    style={
+                      pokemon.status === 'fainted'
+                        ? styles.faintedText
+                        : undefined
+                    }
+                  >
+                    {pokemon.status === 'fainted'
+                      ? 'Fainted'
+                      : `${pokemon.currentHP}/${pokemon.maxHP} HP`}
                   </Text>
                 </View>
               ))}
@@ -90,14 +104,26 @@ export default function BattleHistoryScreen() {
 
             {/* Opponent Team */}
             <View style={styles.teamSection}>
-              <Text variant="labelMedium" style={styles.teamLabel}>Opponent Team</Text>
-              {battle.opponentTeam.pokemon.slice(0, 3).map((pokemon, idx) => (
+              <Text variant="labelMedium" style={styles.teamLabel}>
+                Opponent Team
+              </Text>
+              {battle.opponentTeam.pokemon.slice(0, 3).map((pokemon, _idx) => (
                 <View key={pokemon.id} style={styles.pokemonRow}>
                   <Text variant="bodySmall">
-                    {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
+                    {pokemon.name.charAt(0).toUpperCase() +
+                      pokemon.name.slice(1)}
                   </Text>
-                  <Text variant="bodySmall" style={pokemon.status === 'fainted' ? styles.faintedText : undefined}>
-                    {pokemon.status === 'fainted' ? 'Fainted' : `${pokemon.currentHP}/${pokemon.maxHP} HP`}
+                  <Text
+                    variant="bodySmall"
+                    style={
+                      pokemon.status === 'fainted'
+                        ? styles.faintedText
+                        : undefined
+                    }
+                  >
+                    {pokemon.status === 'fainted'
+                      ? 'Fainted'
+                      : `${pokemon.currentHP}/${pokemon.maxHP} HP`}
                   </Text>
                 </View>
               ))}
@@ -110,9 +136,7 @@ export default function BattleHistoryScreen() {
           </View>
 
           <View style={styles.battleStats}>
-            <Text variant="bodySmall">
-              Turns: {battle.turns.length}
-            </Text>
+            <Text variant="bodySmall">Turns: {battle.turns.length}</Text>
             <Text variant="bodySmall">
               Duration: {formatDuration(battle.createdAt, battle.completedAt)}
             </Text>
@@ -130,22 +154,34 @@ export default function BattleHistoryScreen() {
         <Card.Content>
           <View style={styles.statsGrid}>
             <View style={styles.statItem}>
-              <Text variant="headlineMedium" style={[styles.statValue, { color: theme.colors.primary }]}>
+              <Text
+                variant="headlineMedium"
+                style={[styles.statValue, { color: theme.colors.primary }]}
+              >
                 {stats.wins}
               </Text>
-              <Text variant="bodySmall" style={styles.statLabel}>Wins</Text>
+              <Text variant="bodySmall" style={styles.statLabel}>
+                Wins
+              </Text>
             </View>
             <View style={styles.statItem}>
-              <Text variant="headlineMedium" style={[styles.statValue, { color: theme.colors.error }]}>
+              <Text
+                variant="headlineMedium"
+                style={[styles.statValue, { color: theme.colors.error }]}
+              >
                 {stats.losses}
               </Text>
-              <Text variant="bodySmall" style={styles.statLabel}>Losses</Text>
+              <Text variant="bodySmall" style={styles.statLabel}>
+                Losses
+              </Text>
             </View>
             <View style={styles.statItem}>
               <Text variant="headlineMedium" style={styles.statValue}>
                 {stats.winRate}%
               </Text>
-              <Text variant="bodySmall" style={styles.statLabel}>Win Rate</Text>
+              <Text variant="bodySmall" style={styles.statLabel}>
+                Win Rate
+              </Text>
             </View>
           </View>
         </Card.Content>

@@ -18,4 +18,16 @@ buildscript {
     }
 }
 
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://www.jitpack.io' }
+        // Fix for Notifee dependency resolution
+        maven {
+            url "$rootDir/../node_modules/@notifee/react-native/android/libs"
+        }
+    }
+}
+
 apply plugin: "com.facebook.react.rootproject"

@@ -71,7 +71,7 @@ const getCacheMetadata = async (): Promise<CacheMetadata> => {
     if (metadata) {
       return JSON.parse(metadata);
     }
-  } catch (error) {
+  } catch {
     console.error('Error getting cache metadata:', error);
   }
 
@@ -85,7 +85,7 @@ const getCacheMetadata = async (): Promise<CacheMetadata> => {
 const updateCacheMetadata = async (metadata: CacheMetadata): Promise<void> => {
   try {
     await AsyncStorage.setItem(getCacheMetadataKey(), JSON.stringify(metadata));
-  } catch (error) {
+  } catch {
     console.error('Error updating cache metadata:', error);
   }
 };
@@ -182,7 +182,7 @@ const cleanupOldCache = async (): Promise<void> => {
       itemCount: finalItems.length,
       lastCleanup: now,
     });
-  } catch (error) {
+  } catch {
     console.error('Error during cache cleanup:', error);
   }
 };
@@ -208,7 +208,7 @@ const getFromCache = async <T>(endpoint: string): Promise<T | null> => {
     }
 
     return null;
-  } catch (error) {
+  } catch {
     console.error('Cache get error:', error);
     return null;
   }
@@ -251,7 +251,7 @@ const setCache = async <T>(endpoint: string, data: T): Promise<void> => {
     newMetadata.totalSize += dataSize;
     newMetadata.itemCount += 1;
     await updateCacheMetadata(newMetadata);
-  } catch (error: unknown) {
+  } catch {
     console.error('Cache set error:', error);
     // If storage is full, try to clear some cache and retry
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -274,7 +274,7 @@ const setCache = async <T>(endpoint: string, data: T): Promise<void> => {
           lastAccessed: Date.now(),
         };
         await AsyncStorage.setItem(retryCacheKey, JSON.stringify(cacheItem));
-      } catch (retryError) {
+      } catch {
         console.error('Cache set retry failed:', retryError);
       }
     }
@@ -314,7 +314,7 @@ const apiRequest = async <T>(endpoint: string, useCache = true): Promise<T> => {
     }
 
     return data;
-  } catch (error) {
+  } catch {
     console.error('API request error:', error);
     throw new Error(`Failed to fetch data from ${url}: ${error}`);
   }
@@ -370,7 +370,7 @@ export const pokemonApi = {
       await setCache(endpoint, optimizedPokemon);
 
       return fullPokemon;
-    } catch (error) {
+    } catch {
       console.error('API request error:', error);
       throw new Error(`Failed to fetch Pokemon ${identifier}: ${error}`);
     }
@@ -469,7 +469,7 @@ export const pokemonApi = {
       }
 
       return results;
-    } catch (error) {
+    } catch {
       console.error('Advanced search error:', error);
       return [];
     }
@@ -503,7 +503,7 @@ export const pokemonApi = {
         .map(pokemon => pokemon.name);
 
       return suggestions;
-    } catch (error) {
+    } catch {
       console.error('Error getting suggestions:', error);
       return [];
     }
@@ -517,7 +517,7 @@ export const pokemonApi = {
         key.startsWith('pokemon_api_'),
       );
       await AsyncStorage.multiRemove(pokemonCacheKeys);
-    } catch (error) {
+    } catch {
       console.error('Error clearing cache:', error);
     }
   },
@@ -533,7 +533,7 @@ export const pokemonApi = {
         count: pokemonCacheKeys.length,
         keys: pokemonCacheKeys,
       };
-    } catch (error) {
+    } catch {
       console.error('Error getting cache info:', error);
       return { count: 0, keys: [] };
     }

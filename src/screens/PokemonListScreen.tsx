@@ -9,7 +9,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PokemonCard, SearchBar, TypeFilter, SearchSuggestions } from '../components';
+import {
+  PokemonCard,
+  SearchBar,
+  TypeFilter,
+  SearchSuggestions,
+} from '../components';
 import { usePokemonStore } from '../store/pokemonStore';
 import { Pokemon } from '../types';
 import { useNavigation } from '@react-navigation/native';
@@ -19,7 +24,7 @@ const PokemonListScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const isDarkMode = useColorScheme() === 'dark';
   const navigation = useNavigation();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
@@ -132,17 +137,17 @@ const PokemonListScreen: React.FC = () => {
 
   const renderEmpty = () => {
     if (currentLoading) return null;
-    
+
     return (
       <View style={styles.emptyContainer}>
         <Text style={[styles.emptyText, textStyle]}>
-          {searchQuery.trim() 
-            ? `No Pokémon found for "${searchQuery}"` 
+          {searchQuery.trim()
+            ? `No Pokémon found for "${searchQuery}"`
             : 'No Pokémon available'}
         </Text>
         <Text style={[styles.emptySubtext, textStyle]}>
-          {searchQuery.trim() 
-            ? 'Try a different search term' 
+          {searchQuery.trim()
+            ? 'Try a different search term'
             : 'Pull to refresh'}
         </Text>
       </View>
@@ -151,18 +156,20 @@ const PokemonListScreen: React.FC = () => {
 
   const renderFooter = () => {
     if (!isLoadingMore || searchQuery.trim()) return null;
-    
+
     return (
       <View style={styles.footerLoader}>
         <ActivityIndicator size="small" color="#007AFF" />
-        <Text style={[styles.footerText, textStyle]}>Loading more Pokémon...</Text>
+        <Text style={[styles.footerText, textStyle]}>
+          Loading more Pokémon...
+        </Text>
       </View>
     );
   };
 
   const renderError = () => {
     if (!currentError) return null;
-    
+
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>⚠️ {currentError}</Text>
@@ -180,7 +187,9 @@ const PokemonListScreen: React.FC = () => {
   };
 
   return (
-    <View style={[styles.container, backgroundStyle, { paddingTop: insets.top }]}>
+    <View
+      style={[styles.container, backgroundStyle, { paddingTop: insets.top }]}
+    >
       {/* Header */}
       <View style={styles.header}>
         <Text style={[styles.title, textStyle]}>PokéDex</Text>
@@ -224,7 +233,7 @@ const PokemonListScreen: React.FC = () => {
       <FlatList
         data={displayData}
         renderItem={renderPokemonCard}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.listContent}
         refreshControl={
           <RefreshControl

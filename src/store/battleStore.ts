@@ -4,7 +4,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Battle,
   BattleTeam,
-  BattlePokemon,
   BattleAction,
   BattleEvent,
   BattleTurn,
@@ -49,7 +48,9 @@ export const useBattleStore = create<BattleState>()(
       isProcessingTurn: false,
 
       startBattle: (playerPokemon: Pokemon[], opponentPokemon: Pokemon[]) => {
-        const battleId = `battle_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const battleId = `battle_${Date.now()}_${Math.random()
+          .toString(36)
+          .substr(2, 9)}`;
 
         // Convert to battle pokemon
         const playerTeam: BattleTeam = {
@@ -76,8 +77,12 @@ export const useBattleStore = create<BattleState>()(
 
       executePlayerAction: async (action: BattleAction) => {
         const { currentBattle, isProcessingTurn } = get();
-        
-        if (!currentBattle || isProcessingTurn || currentBattle.status !== 'ongoing') {
+
+        if (
+          !currentBattle ||
+          isProcessingTurn ||
+          currentBattle.status !== 'ongoing'
+        ) {
           return;
         }
 
@@ -85,7 +90,10 @@ export const useBattleStore = create<BattleState>()(
 
         try {
           // Get AI action
-          const aiAction = getAIAction(currentBattle.opponentTeam, currentBattle.playerTeam);
+          const aiAction = getAIAction(
+            currentBattle.opponentTeam,
+            currentBattle.playerTeam,
+          );
           const opponentAction: BattleAction = aiAction.shouldSwitch
             ? { type: 'switch', targetPokemonIndex: aiAction.switchToIndex }
             : { type: 'attack', moveIndex: aiAction.moveIndex };
@@ -96,36 +104,58 @@ export const useBattleStore = create<BattleState>()(
           const updatedOpponentTeam = { ...currentBattle.opponentTeam };
 
           // Handle switches first
-          if (action.type === 'switch' && action.targetPokemonIndex !== undefined) {
+          if (
+            action.type === 'switch' &&
+            action.targetPokemonIndex !== undefined
+          ) {
             updatedPlayerTeam.activePokemonIndex = action.targetPokemonIndex;
             events.push({
               type: 'switch',
               target: 'player',
               pokemonIndex: action.targetPokemonIndex,
-              message: `You sent out ${updatedPlayerTeam.pokemon[action.targetPokemonIndex].name}!`,
+              message: `You sent out ${
+                updatedPlayerTeam.pokemon[action.targetPokemonIndex].name
+              }!`,
             });
           }
 
-          if (opponentAction.type === 'switch' && opponentAction.targetPokemonIndex !== undefined) {
-            updatedOpponentTeam.activePokemonIndex = opponentAction.targetPokemonIndex;
+          if (
+            opponentAction.type === 'switch' &&
+            opponentAction.targetPokemonIndex !== undefined
+          ) {
+            updatedOpponentTeam.activePokemonIndex =
+              opponentAction.targetPokemonIndex;
             events.push({
               type: 'switch',
               target: 'opponent',
               pokemonIndex: opponentAction.targetPokemonIndex,
-              message: `Opponent sent out ${updatedOpponentTeam.pokemon[opponentAction.targetPokemonIndex].name}!`,
+              message: `Opponent sent out ${
+                updatedOpponentTeam.pokemon[opponentAction.targetPokemonIndex]
+                  .name
+              }!`,
             });
           }
 
           // Handle attacks
           if (action.type === 'attack' && action.moveIndex !== undefined) {
-            const playerPokemon = updatedPlayerTeam.pokemon[updatedPlayerTeam.activePokemonIndex];
-            const opponentPokemon = updatedOpponentTeam.pokemon[updatedOpponentTeam.activePokemonIndex];
+            const playerPokemon =
+              updatedPlayerTeam.pokemon[updatedPlayerTeam.activePokemonIndex];
+            const opponentPokemon =
+              updatedOpponentTeam.pokemon[
+                updatedOpponentTeam.activePokemonIndex
+              ];
             const move = generateBattleMoves(playerPokemon)[action.moveIndex];
 
-            const damage = calculateDamage(playerPokemon, opponentPokemon, move);
+            const damage = calculateDamage(
+              playerPokemon,
+              opponentPokemon,
+              move,
+            );
             const newHP = Math.max(0, opponentPokemon.currentHP - damage);
-            
-            updatedOpponentTeam.pokemon[updatedOpponentTeam.activePokemonIndex] = {
+
+            updatedOpponentTeam.pokemon[
+              updatedOpponentTeam.activePokemonIndex
+            ] = {
               ...opponentPokemon,
               currentHP: newHP,
               status: newHP === 0 ? 'fainted' : opponentPokemon.status,
@@ -141,7 +171,7 @@ export const useBattleStore = create<BattleState>()(
 
             const effectiveness = getTypeEffectiveness(
               move.type,
-              opponentPokemon.types.map(t => t.type.name)
+              opponentPokemon.types.map(t => t.type.name),
             );
             const effectivenessMsg = getEffectivenessMessage(effectiveness);
             if (effectivenessMsg) {
@@ -166,15 +196,25 @@ export const useBattleStore = create<BattleState>()(
           if (
             opponentAction.type === 'attack' &&
             opponentAction.moveIndex !== undefined &&
-            updatedOpponentTeam.pokemon[updatedOpponentTeam.activePokemonIndex].status !== 'fainted'
+            updatedOpponentTeam.pokemon[updatedOpponentTeam.activePokemonIndex]
+              .status !== 'fainted'
           ) {
-            const opponentPokemon = updatedOpponentTeam.pokemon[updatedOpponentTeam.activePokemonIndex];
-            const playerPokemon = updatedPlayerTeam.pokemon[updatedPlayerTeam.activePokemonIndex];
-            const move = generateBattleMoves(opponentPokemon)[opponentAction.moveIndex];
+            const opponentPokemon =
+              updatedOpponentTeam.pokemon[
+                updatedOpponentTeam.activePokemonIndex
+              ];
+            const playerPokemon =
+              updatedPlayerTeam.pokemon[updatedPlayerTeam.activePokemonIndex];
+            const move =
+              generateBattleMoves(opponentPokemon)[opponentAction.moveIndex];
 
-            const damage = calculateDamage(opponentPokemon, playerPokemon, move);
+            const damage = calculateDamage(
+              opponentPokemon,
+              playerPokemon,
+              move,
+            );
             const newHP = Math.max(0, playerPokemon.currentHP - damage);
-            
+
             updatedPlayerTeam.pokemon[updatedPlayerTeam.activePokemonIndex] = {
               ...playerPokemon,
               currentHP: newHP,
@@ -191,7 +231,7 @@ export const useBattleStore = create<BattleState>()(
 
             const effectiveness = getTypeEffectiveness(
               move.type,
-              playerPokemon.types.map(t => t.type.name)
+              playerPokemon.types.map(t => t.type.name),
             );
             const effectivenessMsg = getEffectivenessMessage(effectiveness);
             if (effectivenessMsg) {
@@ -222,7 +262,12 @@ export const useBattleStore = create<BattleState>()(
 
           // Check if battle is over
           const winner = isBattleOver(updatedPlayerTeam, updatedOpponentTeam);
-          const battleStatus = winner === 'player' ? 'won' : winner === 'opponent' ? 'lost' : 'ongoing';
+          const battleStatus =
+            winner === 'player'
+              ? 'won'
+              : winner === 'opponent'
+              ? 'lost'
+              : 'ongoing';
 
           const updatedBattle: Battle = {
             ...currentBattle,
@@ -241,8 +286,14 @@ export const useBattleStore = create<BattleState>()(
             set({
               battleHistory: {
                 battles: [...battleHistory.battles, updatedBattle],
-                wins: battleStatus === 'won' ? battleHistory.wins + 1 : battleHistory.wins,
-                losses: battleStatus === 'lost' ? battleHistory.losses + 1 : battleHistory.losses,
+                wins:
+                  battleStatus === 'won'
+                    ? battleHistory.wins + 1
+                    : battleHistory.wins,
+                losses:
+                  battleStatus === 'lost'
+                    ? battleHistory.losses + 1
+                    : battleHistory.losses,
                 totalBattles: battleHistory.totalBattles + 1,
               },
             });
@@ -305,15 +356,22 @@ export const useBattleStore = create<BattleState>()(
         if (!currentBattle) return;
 
         // Only add to history if not already added
-        const alreadyInHistory = battleHistory.battles.some(b => b.id === currentBattle.id);
+        const alreadyInHistory = battleHistory.battles.some(
+          b => b.id === currentBattle.id,
+        );
         if (!alreadyInHistory && currentBattle.status !== 'ongoing') {
           set({
             battleHistory: {
               battles: [...battleHistory.battles, currentBattle],
-              wins: currentBattle.status === 'won' ? battleHistory.wins + 1 : battleHistory.wins,
-              losses: currentBattle.status === 'lost' || currentBattle.status === 'forfeit' 
-                ? battleHistory.losses + 1 
-                : battleHistory.losses,
+              wins:
+                currentBattle.status === 'won'
+                  ? battleHistory.wins + 1
+                  : battleHistory.wins,
+              losses:
+                currentBattle.status === 'lost' ||
+                currentBattle.status === 'forfeit'
+                  ? battleHistory.losses + 1
+                  : battleHistory.losses,
               totalBattles: battleHistory.totalBattles + 1,
             },
           });
@@ -326,9 +384,10 @@ export const useBattleStore = create<BattleState>()(
 
       getBattleStats: () => {
         const { battleHistory } = get();
-        const winRate = battleHistory.totalBattles > 0 
-          ? (battleHistory.wins / battleHistory.totalBattles) * 100 
-          : 0;
+        const winRate =
+          battleHistory.totalBattles > 0
+            ? (battleHistory.wins / battleHistory.totalBattles) * 100
+            : 0;
 
         return {
           wins: battleHistory.wins,
@@ -340,9 +399,9 @@ export const useBattleStore = create<BattleState>()(
     {
       name: 'battle-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({
+      partialize: state => ({
         battleHistory: state.battleHistory,
       }),
-    }
-  )
+    },
+  ),
 );

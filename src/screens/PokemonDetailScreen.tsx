@@ -73,7 +73,7 @@ const PokemonDetailScreen: React.FC = () => {
       try {
         const fullData = await pokemonApi.getPokemon(pokemon.id);
         setFullPokemon(fullData);
-      } catch (err) {
+      } catch {
         console.error('Failed to load full Pokemon data:', err);
       } finally {
         setLoadingFullData(false);

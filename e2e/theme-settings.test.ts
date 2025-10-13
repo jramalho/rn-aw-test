@@ -27,13 +27,13 @@ describe('Theme and Settings', () => {
     it('should toggle between light and dark theme', async () => {
       // Find theme toggle
       await element(by.id('theme-toggle')).tap();
-      
+
       // Wait for theme to change
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       // Verify theme changed (check background color or theme indicator)
       await expect(element(by.id('settings-screen'))).toBeVisible();
-      
+
       // Toggle back
       await element(by.id('theme-toggle')).tap();
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -43,16 +43,16 @@ describe('Theme and Settings', () => {
       // Toggle theme
       await element(by.id('theme-toggle')).tap();
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       // Reload app
       await device.reloadReactNative();
-      
+
       // Navigate back to Settings
       await element(by.text('Settings')).tap();
       await waitFor(element(by.id('settings-screen')))
         .toBeVisible()
         .withTimeout(3000);
-      
+
       // Theme should be persisted
       await expect(element(by.id('settings-screen'))).toBeVisible();
     });
@@ -61,14 +61,14 @@ describe('Theme and Settings', () => {
       // Toggle theme
       await element(by.id('theme-toggle')).tap();
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       // Navigate to different screens and verify theme applies
       await element(by.text('Pokemon')).tap();
       await waitFor(element(by.id('pokemon-list')))
         .toBeVisible()
         .withTimeout(3000);
       await expect(element(by.id('pokemon-list'))).toBeVisible();
-      
+
       await element(by.text('Team')).tap();
       await waitFor(element(by.id('team-builder-screen')))
         .toBeVisible()
@@ -88,7 +88,7 @@ describe('Theme and Settings', () => {
 
     it('should display all settings options', async () => {
       await expect(element(by.id('settings-screen'))).toBeVisible();
-      
+
       // Verify key settings are present
       await expect(element(by.text(/Theme/i))).toBeVisible();
       await expect(element(by.text(/Notification/i))).toBeVisible();
@@ -97,7 +97,7 @@ describe('Theme and Settings', () => {
     it('should toggle notification settings', async () => {
       // Find and toggle notification setting
       await element(by.id('notification-setting-toggle')).tap();
-      
+
       // Verify toggle worked
       await new Promise(resolve => setTimeout(resolve, 500));
       await expect(element(by.id('settings-screen'))).toBeVisible();
@@ -107,16 +107,16 @@ describe('Theme and Settings', () => {
       // Toggle a setting
       await element(by.id('notification-setting-toggle')).tap();
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       // Restart app
       await device.reloadReactNative();
-      
+
       // Navigate back to Settings
       await element(by.text('Settings')).tap();
       await waitFor(element(by.id('settings-screen')))
         .toBeVisible()
         .withTimeout(3000);
-      
+
       // Setting should be persisted
       await expect(element(by.id('settings-screen'))).toBeVisible();
     });
@@ -129,20 +129,20 @@ describe('Theme and Settings', () => {
       await waitFor(element(by.id('settings-screen')))
         .toBeVisible()
         .withTimeout(3000);
-      
+
       try {
         // Look for performance option
         await element(by.text(/Performance/i)).tap();
-        
+
         // Verify performance dashboard
         await waitFor(element(by.id('performance-dashboard-screen')))
           .toBeVisible()
           .withTimeout(3000);
-        
+
         // Check for metrics
         await expect(element(by.id('fps-metric'))).toBeVisible();
         await expect(element(by.id('memory-metric'))).toBeVisible();
-      } catch (e) {
+      } catch {
         // Performance dashboard might not be accessible from Settings
       }
     });
@@ -161,7 +161,7 @@ describe('Theme and Settings', () => {
       // Look for version info
       try {
         await expect(element(by.text(/Version/i))).toBeVisible();
-      } catch (e) {
+      } catch {
         // Version might not be displayed
       }
     });
@@ -170,7 +170,7 @@ describe('Theme and Settings', () => {
       // Look for New Architecture indicator
       try {
         await expect(element(by.text(/New Architecture/i))).toBeVisible();
-      } catch (e) {
+      } catch {
         // Might not be displayed
       }
     });

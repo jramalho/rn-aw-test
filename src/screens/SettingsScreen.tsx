@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useThemeStore } from '../store/themeStore';
 import { useAuth } from '../hooks/useAuth';
+import { useBiometric } from '../hooks/useBiometric';
 import { Button } from '../components';
 import { pokemonApi } from '../utils/pokemonApi';
 import { useNavigation } from '@react-navigation/native';
@@ -26,6 +27,7 @@ const SettingsScreen: React.FC = () => {
   const systemColorScheme = useColorScheme();
   const { isDarkMode, systemTheme, toggleTheme, setTheme } = useThemeStore();
   const { user, logout } = useAuth();
+  const { isAvailable, isEnabled, biometryType, enable, disable } = useBiometric();
 
   // Local state for other settings
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
@@ -82,6 +84,44 @@ const SettingsScreen: React.FC = () => {
         },
       ]
     );
+  };
+
+  const handleBiometricToggle = async (value: boolean) => {
+    if (value) {
+      // Enable biometric
+      const result = await enable();
+      if (!result.success) {
+        Alert.alert(
+          'Failed to Enable',
+          result.error || 'Could not enable biometric authentication'
+        );
+      } else {
+        Alert.alert(
+          'Success',
+          `${biometryType} authentication has been enabled`
+        );
+      }
+    } else {
+      // Disable biometric
+      Alert.alert(
+        'Disable Biometric Authentication',
+        `Are you sure you want to disable ${biometryType}?`,
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Disable',
+            style: 'destructive',
+            onPress: async () => {
+              await disable();
+              Alert.alert('Success', 'Biometric authentication has been disabled');
+            },
+          },
+        ]
+      );
+    }
   };
 
   return (
@@ -141,6 +181,32 @@ const SettingsScreen: React.FC = () => {
             </Pressable>
           </View>
         </View>
+
+        {/* Security Section */}
+        {isAvailable && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, textStyle]}>Security</Text>
+
+            <View
+              style={[
+                styles.settingCard,
+                { backgroundColor: isDarkMode ? '#2a2a2a' : '#f8f9fa' },
+              ]}
+            >
+              <SettingItem
+                title={`${biometryType} Authentication`}
+                description={
+                  isEnabled
+                    ? `Sign in quickly with ${biometryType}`
+                    : `Enable ${biometryType} for faster sign in`
+                }
+                value={isEnabled}
+                onValueChange={handleBiometricToggle}
+                isDarkMode={isDarkMode}
+              />
+            </View>
+          </View>
+        )}
 
         {/* App Settings Section */}
         <View style={styles.section}>

@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
+  Pressable,
   Platform,
   StatusBar,
 } from 'react-native';
@@ -125,24 +125,29 @@ const PerformanceDashboardScreen: React.FC = () => {
           </View>
           
           <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={[
+            <Pressable
+              style={({ pressed }) => [
                 styles.button,
                 isMonitoring ? styles.buttonDanger : styles.buttonPrimary,
+                pressed && styles.buttonPressed,
               ]}
               onPress={isMonitoring ? stopMonitoring : startMonitoring}
             >
               <Text style={styles.buttonText}>
                 {isMonitoring ? '⏸ Pause' : '▶️ Start'}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
             
-            <TouchableOpacity
-              style={[styles.button, styles.buttonSecondary]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                styles.buttonSecondary,
+                pressed && styles.buttonPressed,
+              ]}
               onPress={resetStats}
             >
               <Text style={styles.buttonText}>🔄 Reset</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
 
@@ -344,6 +349,10 @@ const styles = StyleSheet.create({
   },
   buttonSecondary: {
     backgroundColor: '#6b7280',
+  },
+  buttonPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
   },
   buttonText: {
     color: '#ffffff',

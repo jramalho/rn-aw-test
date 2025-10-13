@@ -6,10 +6,11 @@ import {
   Platform,
   ScrollView,
   Text,
-  TouchableOpacity,
+  Pressable,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
-import { TextInput, Button, ActivityIndicator, IconButton } from 'react-native-paper';
+import { TextInput, Button } from '../components';
 import { useAuth } from '../hooks/useAuth';
 import { useBiometric } from '../hooks/useBiometric';
 import { AuthProvider } from '../types/auth';
@@ -95,37 +96,31 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             label="Email"
             value={email}
             onChangeText={setEmail}
-            mode="outlined"
             autoCapitalize="none"
             keyboardType="email-address"
             textContentType="emailAddress"
             autoComplete="email"
-            style={styles.input}
-            error={!!error}
-            disabled={isLoading}
+            editable={!isLoading}
+            error={error}
           />
 
           <TextInput
             label="Password"
             value={password}
             onChangeText={setPassword}
-            mode="outlined"
             secureTextEntry={!showPassword}
             textContentType="password"
             autoComplete="password"
-            style={styles.input}
-            error={!!error}
-            disabled={isLoading}
-            right={
-              <TextInput.Icon
-                icon={showPassword ? 'eye-off' : 'eye'}
-                onPress={() => setShowPassword(!showPassword)}
-              />
+            editable={!isLoading}
+            error={error}
+            rightIcon={
+              <Text style={{ fontSize: 20 }}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
             }
+            onRightIconPress={() => setShowPassword(!showPassword)}
           />
 
           <View style={styles.optionsRow}>
-            <TouchableOpacity
+            <Pressable
               style={styles.checkboxRow}
               onPress={() => setRememberMe(!rememberMe)}
               disabled={isLoading}
@@ -134,11 +129,11 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
                 {rememberMe && <Text style={styles.checkmark}>✓</Text>}
               </View>
               <Text style={styles.checkboxLabel}>Remember me</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity onPress={handleForgotPassword} disabled={isLoading}>
+            <Pressable onPress={handleForgotPassword} disabled={isLoading}>
               <Text style={styles.forgotPassword}>Forgot Password?</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {error && (
@@ -148,14 +143,11 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           )}
 
           <Button
-            mode="contained"
+            title={isLoading ? 'Signing In...' : 'Sign In'}
             onPress={handleLogin}
-            style={styles.loginButton}
             disabled={isLoading}
             loading={isLoading}
-          >
-            {isLoading ? 'Signing In...' : 'Sign In'}
-          </Button>
+          />
 
           {isAvailable && isEnabled && (
             <View style={styles.biometricContainer}>
@@ -166,22 +158,19 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
               </View>
               
               <Button
-                mode="outlined"
+                title={`Sign in with ${biometryType}`}
                 onPress={handleBiometricLogin}
-                style={styles.biometricButton}
                 disabled={isLoading}
-                icon={biometryType === 'Face ID' ? 'face-recognition' : 'fingerprint'}
-              >
-                Sign in with {biometryType}
-              </Button>
+                variant="outline"
+              />
             </View>
           )}
 
           <View style={styles.signUpContainer}>
             <Text style={styles.signUpText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={handleSignUpNavigation} disabled={isLoading}>
+            <Pressable onPress={handleSignUpNavigation} disabled={isLoading}>
               <Text style={styles.signUpLink}>Sign Up</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </ScrollView>
@@ -219,10 +208,6 @@ const styles = StyleSheet.create({
   },
   form: {
     width: '100%',
-  },
-  input: {
-    marginBottom: 16,
-    backgroundColor: '#fff',
   },
   optionsRow: {
     flexDirection: 'row',
@@ -271,11 +256,6 @@ const styles = StyleSheet.create({
     color: '#c00',
     fontSize: 14,
   },
-  loginButton: {
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
   biometricContainer: {
     marginBottom: 16,
   },
@@ -294,10 +274,6 @@ const styles = StyleSheet.create({
     color: '#666',
     fontSize: 14,
     fontWeight: '500',
-  },
-  biometricButton: {
-    borderRadius: 8,
-    borderColor: '#007AFF',
   },
   signUpContainer: {
     flexDirection: 'row',

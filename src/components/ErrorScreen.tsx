@@ -9,7 +9,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   ScrollView,
   useColorScheme,
 } from 'react-native';
@@ -73,18 +73,26 @@ export const ErrorScreen: React.FC<ErrorScreenProps> = ({
 
       <View style={styles.actionsContainer}>
         {onRetry && (
-          <TouchableOpacity
-            style={[styles.button, styles.primaryButton]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.button,
+              styles.primaryButton,
+              pressed && styles.buttonPressed,
+            ]}
             onPress={onRetry}
             accessibilityRole="button"
             accessibilityLabel="Retry"
           >
             <Text style={styles.primaryButtonText}>Try Again</Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
 
-        <TouchableOpacity
-          style={[styles.button, styles.secondaryButton]}
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            styles.secondaryButton,
+            pressed && styles.buttonPressed,
+          ]}
           onPress={handleGoHome}
           accessibilityRole="button"
           accessibilityLabel="Go to home screen"
@@ -92,7 +100,7 @@ export const ErrorScreen: React.FC<ErrorScreenProps> = ({
           <Text style={[styles.secondaryButtonText, isDark && styles.darkText]}>
             Go Home
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </ScrollView>
   );
@@ -171,6 +179,10 @@ const createStyles = (isDark: boolean) =>
       borderRadius: 12,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    buttonPressed: {
+      opacity: 0.8,
+      transform: [{ scale: 0.98 }],
     },
     primaryButton: {
       backgroundColor: '#007AFF',

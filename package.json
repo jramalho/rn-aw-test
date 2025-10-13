@@ -28,7 +28,15 @@
     "type-check": "tsc --noEmit",
     "bundle:android": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output bundle-analysis/index.android.bundle --assets-dest bundle-analysis/",
     "bundle:ios": "react-native bundle --platform ios --dev false --entry-file index.js --bundle-output bundle-analysis/index.ios.bundle --assets-dest bundle-analysis/",
-    "analyze-bundle": "./scripts/analyze-bundle.sh"
+    "analyze-bundle": "./scripts/analyze-bundle.sh",
+    "deploy:ios:build": "cd ios && bundle exec fastlane build",
+    "deploy:ios:beta": "cd ios && bundle exec fastlane beta",
+    "deploy:ios:release": "cd ios && bundle exec fastlane release",
+    "deploy:android:build": "cd android && bundle exec fastlane build",
+    "deploy:android:bundle": "cd android && bundle exec fastlane bundle",
+    "deploy:android:internal": "cd android && bundle exec fastlane internal",
+    "deploy:android:beta": "cd android && bundle exec fastlane beta",
+    "deploy:android:release": "cd android && bundle exec fastlane release"
   },
   "dependencies": {
     "@notifee/react-native": "^9.1.8",
@@ -41,6 +49,7 @@
     "@react-navigation/stack": "^7.0.14",
     "react": "19.1.1",
     "react-native": "0.82.0",
+    "react-native-biometrics": "^3.0.1",
     "react-native-gesture-handler": "^2.20.2",
     "react-native-paper": "^5.12.5",
     "react-native-reanimated": "4.1.3",

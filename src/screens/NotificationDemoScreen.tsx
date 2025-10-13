@@ -5,7 +5,8 @@
 
 import React from 'react';
 import { StyleSheet, ScrollView, Alert } from 'react-native';
-import { Text, Button, Card, useTheme } from 'react-native-paper';
+import { Text, Button, Card } from '../components';
+import { useTheme } from '../hooks';
 import { useNotificationNavigation } from '../hooks/useNotificationNavigation';
 import { useNotifications } from '../hooks/useNotifications';
 import {
@@ -155,12 +156,11 @@ export const NotificationDemoScreen: React.FC = () => {
                 ⚠️ Notification permissions required
               </Text>
               <Button
+                title="Grant Permissions"
                 mode="contained"
                 onPress={requestPermissions}
                 style={styles.button}
-              >
-                Grant Permissions
-              </Button>
+              />
             </>
           )}
         </Card.Content>
@@ -175,34 +175,31 @@ export const NotificationDemoScreen: React.FC = () => {
           </Text>
 
           <Button
+            title="Navigate to Pokemon Detail"
             mode="contained"
             onPress={handleSendPokemonNotification}
             style={styles.button}
             disabled={!permissionStatus.granted}
             icon="pokemon-go"
-          >
-            Navigate to Pokemon Detail
-          </Button>
+          />
 
           <Button
+            title="Navigate to Team Builder"
             mode="contained"
             onPress={handleSendTeamNotification}
             style={styles.button}
             disabled={!permissionStatus.granted}
             icon="sword"
-          >
-            Navigate to Team Builder
-          </Button>
+          />
 
           <Button
+            title="Navigate to Notification Settings"
             mode="contained"
             onPress={handleSendSettingsNotification}
             style={styles.button}
             disabled={!permissionStatus.granted}
             icon="cog"
-          >
-            Navigate to Notification Settings
-          </Button>
+          />
         </Card.Content>
       </Card>
 
@@ -215,14 +212,13 @@ export const NotificationDemoScreen: React.FC = () => {
           </Text>
 
           <Button
+            title="Send Interactive Notification"
             mode="contained"
             onPress={handleSendInteractiveNotification}
             style={styles.button}
             disabled={!permissionStatus.granted}
             icon="gesture-tap"
-          >
-            Send Interactive Notification
-          </Button>
+          />
         </Card.Content>
       </Card>
 
@@ -235,14 +231,13 @@ export const NotificationDemoScreen: React.FC = () => {
           </Text>
 
           <Button
+            title="Send Deep Link Notification"
             mode="contained"
             onPress={handleSendDeepLinkNotification}
             style={styles.button}
             disabled={!permissionStatus.granted}
             icon="link"
-          >
-            Send Deep Link Notification
-          </Button>
+          />
 
           <Text variant="bodySmall" style={styles.info}>
             Deep links use the format: rnawtest://screen/params

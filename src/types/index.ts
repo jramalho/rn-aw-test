@@ -11,6 +11,7 @@ export type RootStackParamList = {
   Battle: { teamId: string; opponentTrainer?: OpponentTrainer };
   BattleHistory: undefined;
   PerformanceDashboard: undefined;
+  DeviceInfo: undefined;
   Search: undefined;
   Login: undefined;
   SignUp: undefined;
@@ -366,7 +367,7 @@ export interface PokemonDetailState {
   error: string | null;
 }
 
-// Theme Types  
+// Theme Types
 export interface Theme {
   colors: {
     primary: string;
@@ -444,7 +445,14 @@ export interface TeamAnalysis {
 export interface BattlePokemon extends Pokemon {
   currentHP: number;
   maxHP: number;
-  status: 'normal' | 'fainted' | 'poisoned' | 'paralyzed' | 'burned' | 'frozen' | 'asleep';
+  status:
+    | 'normal'
+    | 'fainted'
+    | 'poisoned'
+    | 'paralyzed'
+    | 'burned'
+    | 'frozen'
+    | 'asleep';
   statusTurns: number;
 }
 
@@ -503,7 +511,13 @@ export interface BattleHistory {
 }
 
 // Opponent Trainer Types
-export type TeamStrategy = 'random' | 'type-focused' | 'balanced' | 'offensive' | 'defensive' | 'legendary';
+export type TeamStrategy =
+  | 'random'
+  | 'type-focused'
+  | 'balanced'
+  | 'offensive'
+  | 'defensive'
+  | 'legendary';
 export type DifficultyLevel = 'easy' | 'medium' | 'hard' | 'expert';
 
 export interface OpponentTrainer {

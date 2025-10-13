@@ -1,0 +1,153 @@
+# Android Fastlane Configuration for RN AW Test
+# This file contains the fastlane.tools configuration
+
+default_platform(:android)
+
+platform :android do
+  desc "Build APK for local testing"
+  lane :build do
+    gradle(
+      task: "assemble",
+      build_type: "Release",
+      project_dir: "android/"
+    )
+  end
+
+  desc "Build App Bundle (AAB) for Play Store"
+  lane :bundle do
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "android/"
+    )
+  end
+
+  desc "Deploy to Internal Testing track"
+  lane :internal do
+    # Build AAB
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "android/"
+    )
+    
+    # Upload to Play Store Internal Testing
+    upload_to_play_store(
+      track: "internal",
+      aab: "android/app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Deploy to Beta track"
+  lane :beta do
+    # Increment version code
+    increment_version_code(
+      gradle_file_path: "android/app/build.gradle"
+    )
+    
+    # Build AAB
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "android/"
+    )
+    
+    # Upload to Play Store Beta
+    upload_to_play_store(
+      track: "beta",
+      aab: "android/app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+    
+    # Commit version bump
+    git_commit(
+      path: ["android/app/build.gradle"],
+      message: "Bump Android version code [skip ci]"
+    )
+    
+    # Push to repository
+    push_to_git_remote
+  end
+
+  desc "Deploy to Production track"
+  lane :release do
+    # Increment version code
+    increment_version_code(
+      gradle_file_path: "android/app/build.gradle"
+    )
+    
+    # Build AAB
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "android/"
+    )
+    
+    # Upload to Play Store Production
+    upload_to_play_store(
+      track: "production",
+      aab: "android/app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      rollout: "0.1" # Start with 10% rollout
+    )
+    
+    # Commit version bump
+    git_commit(
+      path: ["android/app/build.gradle"],
+      message: "Release Android version [skip ci]"
+    )
+    
+    # Create git tag
+    version_name = get_version_name(
+      gradle_file_path: "android/app/build.gradle"
+    )
+    add_git_tag(
+      tag: "android-v#{version_name}"
+    )
+    
+    # Push to repository
+    push_to_git_remote(tags: true)
+  end
+
+  desc "Generate screenshots for Play Store"
+  lane :screenshots do
+    # Screenshots can be generated using screengrab
+    # screengrab
+    UI.message("Screenshot generation not configured yet")
+  end
+
+  desc "Run unit tests"
+  lane :test do
+    gradle(
+      task: "test",
+      build_type: "Release",
+      project_dir: "android/"
+    )
+  end
+
+  desc "Increment version code"
+  lane :increment_version_code do
+    increment_version_code(
+      gradle_file_path: "android/app/build.gradle"
+    )
+    
+    git_commit(
+      path: ["android/app/build.gradle"],
+      message: "Bump Android version code [skip ci]"
+    )
+    
+    push_to_git_remote
+  end
+
+  # Error handling
+  error do |lane, exception|
+    UI.error("Error in lane #{lane}: #{exception.message}")
+  end
+end

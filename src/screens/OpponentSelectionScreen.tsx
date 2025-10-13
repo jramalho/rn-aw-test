@@ -1,23 +1,20 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
-import {
-  Text,
-  Card,
-  useTheme,
-  Chip,
-} from 'react-native-paper';
+import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { Text, Card, Chip } from '../components';
+import { useTheme } from '../hooks';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { OPPONENT_TRAINERS, OpponentTrainer } from '../utils/battleUtils';
 
-type OpponentSelectionScreenRouteProp = RouteProp<RootStackParamList, 'OpponentSelection'>;
-type OpponentSelectionScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'OpponentSelection'>;
+type OpponentSelectionScreenRouteProp = RouteProp<
+  RootStackParamList,
+  'OpponentSelection'
+>;
+type OpponentSelectionScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'OpponentSelection'
+>;
 
 export default function OpponentSelectionScreen() {
   const navigation = useNavigation<OpponentSelectionScreenNavigationProp>();
@@ -74,9 +71,12 @@ export default function OpponentSelectionScreen() {
         </Text>
       </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+      >
         {OPPONENT_TRAINERS.map((trainer, index) => (
-          <TouchableOpacity
+          <Pressable
             key={index}
             onPress={() => handleTrainerSelect(trainer)}
             activeOpacity={0.7}
@@ -112,7 +112,9 @@ export default function OpponentSelectionScreen() {
                       Strategy:
                     </Text>
                     <Text variant="bodySmall" style={styles.detailValue}>
-                      {trainer.strategy.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      {trainer.strategy
+                        .replace('-', ' ')
+                        .replace(/\b\w/g, l => l.toUpperCase())}
                     </Text>
                   </View>
 
@@ -121,7 +123,14 @@ export default function OpponentSelectionScreen() {
                       Difficulty:
                     </Text>
                     <Chip
-                      style={[styles.difficultyChip, { backgroundColor: getDifficultyColor(trainer.difficulty) }]}
+                      style={[
+                        styles.difficultyChip,
+                        {
+                          backgroundColor: getDifficultyColor(
+                            trainer.difficulty,
+                          ),
+                        },
+                      ]}
                       textStyle={styles.difficultyText}
                     >
                       {trainer.difficulty.toUpperCase()}
@@ -130,17 +139,19 @@ export default function OpponentSelectionScreen() {
                 </View>
               </Card.Content>
             </Card>
-          </TouchableOpacity>
+          </Pressable>
         ))}
 
-        <TouchableOpacity
-          onPress={() => handleTrainerSelect({
-            name: 'Random Trainer',
-            title: 'Wild Trainer',
-            strategy: 'random',
-            difficulty: 'medium',
-            teamSize: 6,
-          })}
+        <Pressable
+          onPress={() =>
+            handleTrainerSelect({
+              name: 'Random Trainer',
+              title: 'Wild Trainer',
+              strategy: 'random',
+              difficulty: 'medium',
+              teamSize: 6,
+            })
+          }
           activeOpacity={0.7}
         >
           <Card style={[styles.trainerCard, styles.randomCard]} mode="elevated">
@@ -161,7 +172,7 @@ export default function OpponentSelectionScreen() {
               </Text>
             </Card.Content>
           </Card>
-        </TouchableOpacity>
+        </Pressable>
       </ScrollView>
     </View>
   );

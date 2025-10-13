@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
+  Pressable,
   Platform,
   StatusBar,
 } from 'react-native';
@@ -32,11 +32,23 @@ const PerformanceDashboardScreen: React.FC = () => {
     return `${Math.round(ms * 100) / 100}ms`;
   };
 
-  const getPerformanceColor = (value: number, threshold: number, inverse = false): string => {
+  const getPerformanceColor = (
+    value: number,
+    threshold: number,
+    inverse = false,
+  ): string => {
     if (inverse) {
-      return value > threshold ? '#22c55e' : value > threshold * 0.7 ? '#eab308' : '#ef4444';
+      return value > threshold
+        ? '#22c55e'
+        : value > threshold * 0.7
+        ? '#eab308'
+        : '#ef4444';
     }
-    return value < threshold ? '#22c55e' : value < threshold * 1.5 ? '#eab308' : '#ef4444';
+    return value < threshold
+      ? '#22c55e'
+      : value < threshold * 1.5
+      ? '#eab308'
+      : '#ef4444';
   };
 
   const MetricCard = ({
@@ -95,16 +107,17 @@ const PerformanceDashboardScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#007AFF" />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Performance Dashboard</Text>
-        <Text style={styles.headerSubtitle}>
-          New Architecture Monitoring
-        </Text>
+        <Text style={styles.headerSubtitle}>New Architecture Monitoring</Text>
       </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+      >
         {/* Status Section */}
         <View style={styles.statusSection}>
           <View style={styles.statusRow}>
@@ -123,26 +136,31 @@ const PerformanceDashboardScreen: React.FC = () => {
               {stats.measurements} samples
             </Text>
           </View>
-          
+
           <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={[
+            <Pressable
+              style={({ pressed }) => [
                 styles.button,
                 isMonitoring ? styles.buttonDanger : styles.buttonPrimary,
+                pressed && styles.buttonPressed,
               ]}
               onPress={isMonitoring ? stopMonitoring : startMonitoring}
             >
               <Text style={styles.buttonText}>
                 {isMonitoring ? '⏸ Pause' : '▶️ Start'}
               </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={[styles.button, styles.buttonSecondary]}
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                styles.buttonSecondary,
+                pressed && styles.buttonPressed,
+              ]}
               onPress={resetStats}
             >
               <Text style={styles.buttonText}>🔄 Reset</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
 
@@ -178,7 +196,7 @@ const PerformanceDashboardScreen: React.FC = () => {
           average={stats.average.fps}
           peak={stats.peak.fps}
           unit="FPS"
-          formatter={(v) => Math.round(v).toString()}
+          formatter={v => Math.round(v).toString()}
           threshold={50}
           inverse={true}
         />
@@ -344,6 +362,10 @@ const styles = StyleSheet.create({
   },
   buttonSecondary: {
     backgroundColor: '#6b7280',
+  },
+  buttonPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
   },
   buttonText: {
     color: '#ffffff',

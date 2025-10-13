@@ -6,11 +6,12 @@ import {
   Platform,
   ScrollView,
   Text,
-  TouchableOpacity,
+  Pressable,
   Alert,
 } from 'react-native';
-import { TextInput, Button } from 'react-native-paper';
+import { TextInput, Button } from '../components';
 import { useAuth } from '../hooks/useAuth';
+import { useBiometric } from '../hooks/useBiometric';
 import { AuthProvider } from '../types/auth';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types';
@@ -24,6 +25,7 @@ const LoginScreen: React.FC<Props> = React.memo(({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const { login, isLoading, error, clearError } = useAuth();
+  const { isAvailable, isEnabled, biometryType, authenticate } = useBiometric();
 
   // Performance monitoring - only log when auth state changes
   React.useEffect(() => {
@@ -53,6 +55,29 @@ const LoginScreen: React.FC<Props> = React.memo(({ navigation }) => {
     }
   }, [email, password, rememberMe, login, error]);
 
+  const handleBiometricLogin = async () => {
+    try {
+      const result = await authenticate(`Authenticate with ${biometryType}`);
+
+      if (result.success) {
+        // In a real app, you would validate the biometric auth with your backend
+        // and then log the user in. For now, we'll use the demo login.
+        await login({
+          provider: AuthProvider.BIOMETRIC,
+          credentials: { email: 'demo@example.com', password: 'Demo123!' },
+          rememberMe: true,
+        });
+      } else {
+        Alert.alert(
+          'Authentication Failed',
+          result.error || 'Biometric authentication failed',
+        );
+      }
+    } catch {
+      Alert.alert('Error', 'Failed to authenticate with biometrics');
+    }
+  };
+
   const handleSignUpNavigation = React.useCallback(() => {
     clearError();
     navigation.navigate('SignUp');
@@ -62,9 +87,9 @@ const LoginScreen: React.FC<Props> = React.memo(({ navigation }) => {
     Alert.alert('Forgot Password', 'Password reset functionality coming soon!');
   }, []);
 
-  const toggleShowPassword = React.useCallback(() => {
-    setShowPassword(prev => !prev);
-  }, []);
+  // const toggleShowPassword = React.useCallback(() => {
+  //   setShowPassword(prev => !prev);
+  // }, []);
 
   const toggleRememberMe = React.useCallback(() => {
     setRememberMe(prev => !prev);
@@ -91,37 +116,31 @@ const LoginScreen: React.FC<Props> = React.memo(({ navigation }) => {
             label="Email"
             value={email}
             onChangeText={setEmail}
-            mode="outlined"
             autoCapitalize="none"
             keyboardType="email-address"
             textContentType="emailAddress"
             autoComplete="email"
-            style={styles.input}
-            error={!!error}
-            disabled={isLoading}
+            editable={!isLoading}
+            error={error}
           />
 
           <TextInput
             label="Password"
             value={password}
             onChangeText={setPassword}
-            mode="outlined"
             secureTextEntry={!showPassword}
             textContentType="password"
             autoComplete="password"
-            style={styles.input}
-            error={!!error}
-            disabled={isLoading}
-            right={
-              <TextInput.Icon
-                icon={showPassword ? 'eye-off' : 'eye'}
-                onPress={toggleShowPassword}
-              />
+            editable={!isLoading}
+            error={error}
+            rightIcon={
+              <Text style={{ fontSize: 20 }}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
             }
+            onRightIconPress={() => setShowPassword(!showPassword)}
           />
 
           <View style={styles.optionsRow}>
-            <TouchableOpacity
+            <Pressable
               style={styles.checkboxRow}
               onPress={toggleRememberMe}
               disabled={isLoading}
@@ -132,14 +151,11 @@ const LoginScreen: React.FC<Props> = React.memo(({ navigation }) => {
                 {rememberMe && <Text style={styles.checkmark}>✓</Text>}
               </View>
               <Text style={styles.checkboxLabel}>Remember me</Text>
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              onPress={handleForgotPassword}
-              disabled={isLoading}
-            >
+            <Pressable onPress={handleForgotPassword} disabled={isLoading}>
               <Text style={styles.forgotPassword}>Forgot Password?</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {error && (
@@ -149,23 +165,34 @@ const LoginScreen: React.FC<Props> = React.memo(({ navigation }) => {
           )}
 
           <Button
-            mode="contained"
+            title={isLoading ? 'Signing In...' : 'Sign In'}
             onPress={handleLogin}
-            style={styles.loginButton}
             disabled={isLoading}
             loading={isLoading}
-          >
-            {isLoading ? 'Signing In...' : 'Sign In'}
-          </Button>
+          />
+
+          {isAvailable && isEnabled && (
+            <View style={styles.biometricContainer}>
+              <View style={styles.divider}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>OR</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              <Button
+                title={`Sign in with ${biometryType}`}
+                onPress={handleBiometricLogin}
+                disabled={isLoading}
+                variant="outline"
+              />
+            </View>
+          )}
 
           <View style={styles.signUpContainer}>
             <Text style={styles.signUpText}>Don't have an account? </Text>
-            <TouchableOpacity
-              onPress={handleSignUpNavigation}
-              disabled={isLoading}
-            >
+            <Pressable onPress={handleSignUpNavigation} disabled={isLoading}>
               <Text style={styles.signUpLink}>Sign Up</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </ScrollView>
@@ -203,10 +230,6 @@ const styles = StyleSheet.create({
   },
   form: {
     width: '100%',
-  },
-  input: {
-    marginBottom: 16,
-    backgroundColor: '#fff',
   },
   optionsRow: {
     flexDirection: 'row',
@@ -255,10 +278,24 @@ const styles = StyleSheet.create({
     color: '#c00',
     fontSize: 14,
   },
-  loginButton: {
-    paddingVertical: 8,
-    borderRadius: 8,
+  biometricContainer: {
     marginBottom: 16,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#ccc',
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    color: '#666',
+    fontSize: 14,
+    fontWeight: '500',
   },
   signUpContainer: {
     flexDirection: 'row',

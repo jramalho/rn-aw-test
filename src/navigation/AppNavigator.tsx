@@ -9,6 +9,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import PokemonListScreen from '../screens/PokemonListScreen';
 import PokemonDetailScreen from '../screens/PokemonDetailScreen';
 import PerformanceDashboardScreen from '../screens/PerformanceDashboardScreen';
+import DeviceInfoScreen from '../screens/DeviceInfoScreen';
 import TeamBuilderScreen from '../screens/TeamBuilderScreen';
 import OpponentSelectionScreen from '../screens/OpponentSelectionScreen';
 import BattleScreen from '../screens/BattleScreen';
@@ -274,6 +275,14 @@ export const AppNavigator: React.FC = () => {
             component={NotificationDemoScreen}
             options={{
               title: 'Notification Navigation Demo',
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen
+            name="DeviceInfo"
+            component={DeviceInfoScreen}
+            options={{
+              title: 'Device Information',
               headerShown: true,
             }}
           />

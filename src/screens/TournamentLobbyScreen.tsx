@@ -13,10 +13,10 @@ import {
   TextInput,
   List,
   Chip,
-  useTheme,
   Surface,
   Divider,
-} from 'react-native-paper';
+} from '../components';
+import { useTheme } from '../hooks';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, TournamentFormat } from '../types';

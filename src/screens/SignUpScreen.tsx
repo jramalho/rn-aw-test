@@ -6,10 +6,11 @@ import {
   Platform,
   ScrollView,
   Text,
-  TouchableOpacity,
+  Pressable,
   Alert,
 } from 'react-native';
-import { TextInput, Button } from 'react-native-paper';
+import TextInput from '../components/TextInput';
+import Button from '../components/Button';
 import { useAuth } from '../hooks/useAuth';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types';
@@ -96,11 +97,9 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
             label="Display Name (Optional)"
             value={displayName}
             onChangeText={setDisplayName}
-            mode="outlined"
             autoCapitalize="words"
             textContentType="name"
             autoComplete="name"
-            style={styles.input}
             disabled={isLoading}
           />
 
@@ -108,12 +107,10 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
             label="Email *"
             value={email}
             onChangeText={setEmail}
-            mode="outlined"
             autoCapitalize="none"
             keyboardType="email-address"
             textContentType="emailAddress"
             autoComplete="email"
-            style={styles.input}
             error={!!error}
             disabled={isLoading}
           />
@@ -122,37 +119,33 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
             label="Password *"
             value={password}
             onChangeText={setPassword}
-            mode="outlined"
             secureTextEntry={!showPassword}
             textContentType="newPassword"
             autoComplete="password-new"
-            style={styles.input}
             error={!!error}
             disabled={isLoading}
-            right={
-              <TextInput.Icon
-                icon={showPassword ? 'eye-off' : 'eye'}
-                onPress={() => setShowPassword(!showPassword)}
-              />
+            rightIcon={
+              <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '🔒'}</Text>
             }
+            onRightIconPress={() => setShowPassword(!showPassword)}
           />
 
           <TextInput
             label="Confirm Password *"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
-            mode="outlined"
             secureTextEntry={!showConfirmPassword}
             textContentType="newPassword"
             autoComplete="password-new"
-            style={styles.input}
             error={!!error}
             disabled={isLoading}
-            right={
-              <TextInput.Icon
-                icon={showConfirmPassword ? 'eye-off' : 'eye'}
-                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-              />
+            rightIcon={
+              <Text style={styles.eyeIcon}>
+                {showConfirmPassword ? '👁️' : '🔒'}
+              </Text>
+            }
+            onRightIconPress={() =>
+              setShowConfirmPassword(!showConfirmPassword)
             }
           />
 
@@ -171,23 +164,19 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
           )}
 
           <Button
-            mode="contained"
+            title={isLoading ? 'Creating Account...' : 'Sign Up'}
             onPress={handleSignUp}
-            style={styles.signUpButton}
             disabled={isLoading}
             loading={isLoading}
-          >
-            {isLoading ? 'Creating Account...' : 'Sign Up'}
-          </Button>
+            variant="primary"
+            size="large"
+          />
 
           <View style={styles.loginContainer}>
             <Text style={styles.loginText}>Already have an account? </Text>
-            <TouchableOpacity
-              onPress={handleLoginNavigation}
-              disabled={isLoading}
-            >
+            <Pressable onPress={handleLoginNavigation} disabled={isLoading}>
               <Text style={styles.loginLink}>Sign In</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </ScrollView>
@@ -226,9 +215,8 @@ const styles = StyleSheet.create({
   form: {
     width: '100%',
   },
-  input: {
-    marginBottom: 16,
-    backgroundColor: '#fff',
+  eyeIcon: {
+    fontSize: 20,
   },
   passwordRequirements: {
     backgroundColor: '#f0f8ff',
@@ -257,15 +245,11 @@ const styles = StyleSheet.create({
     color: '#c00',
     fontSize: 14,
   },
-  signUpButton: {
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
   loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 16,
   },
   loginText: {
     fontSize: 14,

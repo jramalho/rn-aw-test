@@ -4,7 +4,14 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Dimensions } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Dimensions,
+  ActivityIndicator,
+} from 'react-native';
 import {
   Text,
   Button,
@@ -13,13 +20,10 @@ import {
   Portal,
   Dialog,
   List,
-  useTheme,
-  ActivityIndicator,
   Chip,
-} from 'react-native-paper';
-import {
-  useNavigation /* useRoute, RouteProp */,
-} from '@react-navigation/native';
+} from '../components';
+import { useTheme } from '../hooks';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, BattleAction } from '../types';
 import { useBattleStore } from '../store/battleStore';

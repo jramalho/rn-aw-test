@@ -9,6 +9,7 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  ActivityIndicator,
   // Dimensions, // Unused import
 } from 'react-native';
 import {
@@ -16,12 +17,11 @@ import {
   Button,
   Card,
   Surface,
-  useTheme,
-  ActivityIndicator,
   Chip,
   IconButton,
   Divider,
-} from 'react-native-paper';
+} from '../components';
+import { useTheme } from '../hooks';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {

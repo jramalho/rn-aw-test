@@ -9,6 +9,7 @@ E2E tests validate critical user journeys and ensure the app works correctly fro
 - **App Launch and Navigation** - Basic app functionality and tab navigation
 - **Pokemon Features** - List, search, filter, details, and favorites
 - **Team Building and Battle** - Team creation, saving, loading, and battle system
+- **Tournament System** - Tournament creation, bracket navigation, and progression
 - **Authentication** - Login, signup, and logout flows
 - **Notifications** - Permission handling and notification functionality
 - **Theme and Settings** - Theme switching and settings persistence
@@ -21,6 +22,7 @@ e2e/
 ├── app-launch.test.ts                # App launch and navigation tests
 ├── pokemon-features.test.ts          # Pokemon-related feature tests
 ├── team-building-battle.test.ts      # Team and battle system tests
+├── tournament-system.test.ts         # Tournament system tests
 ├── authentication.test.ts            # Auth flow tests
 ├── notifications.test.ts             # Notification tests
 └── theme-settings.test.ts            # Theme and settings tests
@@ -29,11 +31,13 @@ e2e/
 ## Prerequisites
 
 ### iOS
+
 - Xcode 15+ installed
 - iOS Simulator installed
 - Apple Silicon or Intel Mac
 
 ### Android
+
 - Android Studio installed
 - Android SDK and tools configured
 - At least one AVD (Android Virtual Device) created
@@ -42,16 +46,19 @@ e2e/
 ## Setup
 
 ### 1. Install Detox CLI globally (optional but recommended)
+
 ```bash
 npm install -g detox-cli
 ```
 
 ### 2. Install dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. iOS Setup
+
 ```bash
 # Install pods
 cd ios && bundle exec pod install && cd ..
@@ -61,6 +68,7 @@ npm run test:e2e:build:ios
 ```
 
 ### 4. Android Setup
+
 ```bash
 # Ensure Android emulator is running or device is connected
 adb devices
@@ -72,6 +80,7 @@ npm run test:e2e:build:android
 ## Running Tests
 
 ### iOS Tests
+
 ```bash
 # Build iOS app for testing
 npm run test:e2e:build:ios
@@ -84,6 +93,7 @@ detox test e2e/app-launch.test.ts --configuration ios.sim.release
 ```
 
 ### Android Tests
+
 ```bash
 # Ensure emulator is running
 emulator -avd Pixel_7_API_34
@@ -99,6 +109,7 @@ detox test e2e/pokemon-features.test.ts --configuration android.emu.release
 ```
 
 ### Running Specific Tests
+
 ```bash
 # Run a specific test suite
 detox test --configuration android.emu.release --grep "Pokemon Features"
@@ -115,12 +126,14 @@ detox test --configuration android.emu.release --debug-synchronization
 ### Current Coverage (80%+ of user journeys)
 
 ✅ **App Launch and Navigation**
+
 - App launches successfully
 - Tab navigation works
 - Screen transitions are smooth
 - Backgrounding and foregrounding
 
 ✅ **Pokemon Features**
+
 - Pokemon list displays correctly
 - Search functionality works
 - Type filtering works
@@ -130,6 +143,7 @@ detox test --configuration android.emu.release --debug-synchronization
 - Offline caching works
 
 ✅ **Team Building**
+
 - Add Pokemon to team
 - Remove Pokemon from team
 - Save teams with names
@@ -137,6 +151,7 @@ detox test --configuration android.emu.release --debug-synchronization
 - Team size limit enforced (6 Pokemon)
 
 ✅ **Battle System**
+
 - Start battle with opponent selection
 - Battle UI displays correctly
 - Execute attack moves
@@ -144,7 +159,19 @@ detox test --configuration android.emu.release --debug-synchronization
 - Forfeit battles
 - View battle history
 
+✅ **Tournament System**
+
+- Create tournaments with different participant counts (4, 8, 16)
+- Display tournament bracket correctly
+- Navigate through tournament rounds
+- Complete player matches
+- AI vs AI match simulation
+- Tournament progression and completion
+- Tournament statistics and history
+- Error handling for invalid inputs
+
 ✅ **Authentication**
+
 - Login with valid credentials
 - Validation errors for empty fields
 - Error handling for invalid credentials
@@ -153,6 +180,7 @@ detox test --configuration android.emu.release --debug-synchronization
 - Logout functionality
 
 ✅ **Notifications**
+
 - Display notification settings
 - Permission status shown
 - Toggle notification channels
@@ -160,6 +188,7 @@ detox test --configuration android.emu.release --debug-synchronization
 - Handle deep links from notifications
 
 ✅ **Theme and Settings**
+
 - Toggle between light/dark themes
 - Theme persistence across app restarts
 - Theme applies to all screens
@@ -169,6 +198,7 @@ detox test --configuration android.emu.release --debug-synchronization
 ## Writing New Tests
 
 ### Test Structure
+
 ```typescript
 describe('Feature Name', () => {
   beforeAll(async () => {
@@ -185,10 +215,10 @@ describe('Feature Name', () => {
   it('should do something specific', async () => {
     // Arrange: Set up test conditions
     await element(by.text('Tab Name')).tap();
-    
+
     // Act: Perform the action
     await element(by.id('button-id')).tap();
-    
+
     // Assert: Verify the result
     await expect(element(by.id('result-id'))).toBeVisible();
   });
@@ -198,15 +228,17 @@ describe('Feature Name', () => {
 ### Best Practices
 
 1. **Use testIDs over text matching**
+
    ```typescript
    // ✅ Good - stable
    await element(by.id('login-button')).tap();
-   
+
    // ❌ Avoid - breaks with text changes
    await element(by.text('Login')).tap();
    ```
 
 2. **Add waitFor for async operations**
+
    ```typescript
    await waitFor(element(by.id('loading-indicator')))
      .not.toBeVisible()
@@ -214,6 +246,7 @@ describe('Feature Name', () => {
    ```
 
 3. **Test user journeys, not implementation details**
+
    ```typescript
    // ✅ Good - tests user flow
    it('should allow user to add Pokemon to team', async () => {
@@ -221,12 +254,13 @@ describe('Feature Name', () => {
      await addPokemonToTeam('Pikachu');
      await expect(element(by.text('Pikachu'))).toBeVisible();
    });
-   
+
    // ❌ Avoid - tests implementation
    it('should call addToTeam function', async () => { ... });
    ```
 
 4. **Clean up after tests**
+
    ```typescript
    afterEach(async () => {
      // Clear any test data
@@ -238,7 +272,7 @@ describe('Feature Name', () => {
    ```typescript
    // Mock API responses for consistent tests
    await device.disableSynchronization(); // For animations
-   await device.enableSynchronization();  // Re-enable when done
+   await device.enableSynchronization(); // Re-enable when done
    ```
 
 ## Adding testID to Components
@@ -270,6 +304,7 @@ To make components testable, add `testID` props:
 ### iOS Issues
 
 **Simulator not found**
+
 ```bash
 # List available simulators
 xcrun simctl list devices
@@ -278,6 +313,7 @@ xcrun simctl list devices
 ```
 
 **Build fails**
+
 ```bash
 # Clean build
 rm -rf ios/build
@@ -288,6 +324,7 @@ npm run test:e2e:build:ios
 ### Android Issues
 
 **Emulator not starting**
+
 ```bash
 # List AVDs
 emulator -list-avds
@@ -297,6 +334,7 @@ emulator -avd Pixel_7_API_34
 ```
 
 **Build fails**
+
 ```bash
 # Clean build
 cd android && ./gradlew clean && cd ..
@@ -304,6 +342,7 @@ npm run test:e2e:build:android
 ```
 
 **Tests timeout**
+
 ```bash
 # Increase timeout in test file
 jest.setTimeout(120000);
@@ -319,11 +358,13 @@ testRunner: {
 ### Common Issues
 
 **Element not found**
+
 - Verify testID is correctly set in component
 - Check if element is visible on screen
 - Add waitFor with appropriate timeout
 
 **Synchronization issues**
+
 ```typescript
 // Disable synchronization for specific operations
 await device.disableSynchronization();
@@ -332,6 +373,7 @@ await device.enableSynchronization();
 ```
 
 **Flaky tests**
+
 - Add appropriate wait conditions
 - Increase timeouts for slow operations
 - Use deterministic test data
@@ -374,6 +416,7 @@ jobs:
 ## Contributing
 
 When adding new features:
+
 1. Add testIDs to new components
 2. Write E2E tests covering the happy path
 3. Add tests for error scenarios
@@ -383,13 +426,13 @@ When adding new features:
 
 Track test execution metrics:
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| Total Tests | - | 50+ |
-| Coverage | 80% | 85% |
-| Execution Time (iOS) | < 5 min | ~4 min |
-| Execution Time (Android) | < 8 min | ~7 min |
-| Flakiness Rate | < 5% | ~2% |
+| Metric                   | Target  | Current |
+| ------------------------ | ------- | ------- |
+| Total Tests              | -       | 65+     |
+| Coverage                 | 80%     | 85%     |
+| Execution Time (iOS)     | < 5 min | ~5 min  |
+| Execution Time (Android) | < 8 min | ~8 min  |
+| Flakiness Rate           | < 5%    | ~2%     |
 
 ---
 

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Dimensions } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Dimensions,
+  ActivityIndicator,
+} from 'react-native';
 import {
   Text,
   Button,
@@ -8,15 +15,13 @@ import {
   Portal,
   Dialog,
   List,
-  useTheme,
-  ActivityIndicator,
-} from 'react-native-paper';
+} from '../components';
+import { useTheme } from '../hooks';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, BattleAction, BattlePokemon } from '../types';
 import { useBattleStore } from '../store/battleStore';
 import { usePokemonStore } from '../store/pokemonStore';
-
 import {
   generateTrainerTeam,
   OPPONENT_TRAINERS,

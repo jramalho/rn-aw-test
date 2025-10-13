@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
-import { Text, Card, useTheme, Divider, IconButton } from 'react-native-paper';
+import { Text, Card, IconButton, Divider } from '../components';
+import { useTheme } from '../hooks';
 import { useBattleStore } from '../store/battleStore';
 
 export default function BattleHistoryScreen() {

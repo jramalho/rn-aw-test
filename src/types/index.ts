@@ -11,6 +11,7 @@ export type RootStackParamList = {
   Battle: { teamId: string; opponentTrainer?: OpponentTrainer };
   BattleHistory: undefined;
   PerformanceDashboard: undefined;
+  DeviceInfo: undefined;
   Search: undefined;
   Login: undefined;
   SignUp: undefined;

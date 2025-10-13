@@ -140,4 +140,7 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+    
+    // AndroidX Biometric for biometric authentication detection
+    implementation "androidx.biometric:biometric:1.2.0-alpha05"
 }

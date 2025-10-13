@@ -10,18 +10,8 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import {
-  Text,
-  Button,
-  Card,
-  SegmentedButtons,
-  TextInput,
-  List,
-  Chip,
-  useTheme,
-  Surface,
-  Divider,
-} from 'react-native-paper';
+import { Text, Button, Card, SegmentedButtons, TextInput, List, Chip, Surface, Divider,  } from '../components';
+import { useTheme } from '../hooks';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, TournamentFormat, SavedTeam } from '../types';

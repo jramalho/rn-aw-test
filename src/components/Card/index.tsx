@@ -1,66 +1,51 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  ViewStyle,
-  TextStyle,
-  useColorScheme,
-} from 'react-native';
+import { View, ViewStyle, useColorScheme } from 'react-native';
 import { styles } from './styles';
+import Text from '../Text';
 
 interface CardProps {
   children?: React.ReactNode;
   style?: ViewStyle;
-  title?: string;
-  titleStyle?: TextStyle;
 }
 
 interface CardTitleProps {
-  children: React.ReactNode;
-  style?: TextStyle;
+  title?: string;
+  children?: React.ReactNode;
+  style?: ViewStyle;
 }
 
 interface CardContentProps {
-  children: React.ReactNode;
-  style?: TextStyle;
+  children?: React.ReactNode;
+  style?: ViewStyle;
 }
 
 const Card: React.FC<CardProps> & {
   Title: React.FC<CardTitleProps>;
   Content: React.FC<CardContentProps>;
-} = ({ children, style, title, titleStyle }) => {
+} = ({ children, style }) => {
   const isDarkMode = useColorScheme() === 'dark';
   const backgroundColor = isDarkMode ? '#1c1c1e' : '#ffffff';
 
   return (
     <View style={[styles.card, { backgroundColor }, style]}>
-      {title && (
-        <Text style={[styles.title, { color: isDarkMode ? '#ffffff' : '#000000' }, titleStyle]}>
-          {title}
-        </Text>
-      )}
       {children}
     </View>
   );
 };
 
-const CardTitle: React.FC<CardTitleProps> = ({ children, style }) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  
+const CardTitle: React.FC<CardTitleProps> = ({ title, children, style }) => {
   return (
-    <Text style={[styles.title, { color: isDarkMode ? '#ffffff' : '#000000' }, style]}>
-      {children}
-    </Text>
+    <View style={[styles.titleContainer, style]}>
+      <Text variant="titleLarge">{title || children}</Text>
+    </View>
   );
 };
 
 const CardContent: React.FC<CardContentProps> = ({ children, style }) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  
   return (
-    <Text style={[styles.content, { color: isDarkMode ? '#ffffff' : '#000000' }, style]}>
+    <View style={[styles.contentContainer, style]}>
       {children}
-    </Text>
+    </View>
   );
 };
 

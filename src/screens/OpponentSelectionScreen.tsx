@@ -5,12 +5,8 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
-import {
-  Text,
-  Card,
-  useTheme,
-  Chip,
-} from 'react-native-paper';
+import { Text, Card, Chip,  } from '../components';
+import { useTheme } from '../hooks';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';

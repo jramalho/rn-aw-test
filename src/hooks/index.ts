@@ -222,3 +222,6 @@ export { useNetwork } from './useNetwork';
 
 // Export biometric hook
 export { useBiometric } from './useBiometric';
+
+// Export theme hook
+export { useTheme } from './useTheme';

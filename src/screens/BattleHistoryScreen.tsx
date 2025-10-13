@@ -5,14 +5,8 @@ import {
   ScrollView,
   FlatList,
 } from 'react-native';
-import {
-  Text,
-  Card,
-  List,
-  useTheme,
-  IconButton,
-  Divider,
-} from 'react-native-paper';
+import { Text, Card, List, IconButton, Divider,  } from '../components';
+import { useTheme } from '../hooks';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';

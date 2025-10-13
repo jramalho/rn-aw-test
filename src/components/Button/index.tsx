@@ -5,29 +5,43 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
+  View,
 } from 'react-native';
 import type { ButtonProps } from '../../types';
 import { styles } from './styles';
 
-const Button: React.FC<ButtonProps> = ({
+// Extended button props to support Paper-like features
+interface ExtendedButtonProps extends ButtonProps {
+  mode?: 'text' | 'outlined' | 'contained' | 'elevated' | 'contained-tonal';
+  icon?: string; // For compatibility, but we won't render icons
+}
+
+const Button: React.FC<ExtendedButtonProps> = ({
   title,
   onPress,
   variant = 'primary',
   size = 'medium',
   disabled = false,
   loading = false,
+  mode = 'contained',
+  icon,
 }) => {
+  // Map Paper mode to our variant system
+  const effectiveVariant = mode === 'contained' ? variant : 
+                          mode === 'outlined' ? 'outline' : 
+                          variant;
+
   const buttonStyle: ViewStyle[] = [
     styles.base,
     styles[size],
-    styles[variant],
+    styles[effectiveVariant],
     (disabled || loading) && styles.disabled,
   ];
 
   const textStyle: TextStyle[] = [
     styles.text,
     styles[`${size}Text` as keyof typeof styles] as TextStyle,
-    styles[`${variant}Text` as keyof typeof styles] as TextStyle,
+    styles[`${effectiveVariant}Text` as keyof typeof styles] as TextStyle,
     (disabled || loading) && styles.disabledText,
   ];
 
@@ -46,7 +60,7 @@ const Button: React.FC<ButtonProps> = ({
       {loading ? (
         <ActivityIndicator 
           size="small" 
-          color={variant === 'primary' ? '#ffffff' : '#007AFF'} 
+          color={effectiveVariant === 'primary' ? '#ffffff' : '#007AFF'} 
         />
       ) : (
         <Text style={textStyle}>{title}</Text>

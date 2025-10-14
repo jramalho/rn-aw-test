@@ -21,7 +21,7 @@ This document describes the bundle size optimizations implemented in the RN AW T
 - **React Inline Elements**: Optimizes React element creation
 - **React Constant Elements**: Hoists constant elements to reduce re-creation
 - **Console Transform**: Removes console statements in production
-- **React Native Paper**: Tree-shaking for Material Design components
+- **Module Resolver**: Path aliases for cleaner imports and better tree-shaking
 
 **Impact**: 5-10% reduction in JS bundle size
 

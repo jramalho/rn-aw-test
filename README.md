@@ -23,7 +23,7 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 | ⚛️ **React 19.1.1**       | ✅ Complete | Concurrent features, Suspense, automatic batching            |
 | 📘 **TypeScript**         | ✅ Complete | Strict mode with enhanced type safety                        |
 | 🧭 **Navigation**         | ✅ Complete | React Navigation v7 with type safety                         |
-| 🎨 **UI Components**      | ✅ Complete | Material Design 3, dark/light theme                          |
+| 🎨 **UI Components**      | ✅ Complete | Custom components built with React Native core, dark/light theme |
 | 📱 **Responsive Design**  | ✅ Complete | iOS/Android with safe area handling                          |
 | ⚡ **State Management**   | ✅ Complete | Zustand with persistence                                     |
 | 🎮 **Pokemon App**        | ✅ Complete | Full PokéAPI integration with search & details               |
@@ -70,7 +70,7 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 
 - **React 19.1.1** - Latest with Concurrent Features and Suspense
 - **TypeScript 5.8.3** - Strict mode with enhanced type safety
-- **Material Design 3** - Modern UI components via React Native Paper
+- **Custom UI Components** - Modern components built with React Native core
 - **Zustand** - Lightweight state management with persistence
 - **React Navigation 7** - Type-safe navigation system
 - **React Native Reanimated 3** - Smooth, performant animations

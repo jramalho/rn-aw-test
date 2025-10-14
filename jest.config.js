@@ -7,7 +7,7 @@ module.exports = {
     '<rootDir>/ios/',
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|react-native-.*|@react-navigation|react-native-paper|react-native-vector-icons|react-native-reanimated|@react-native-async-storage)/)',
+    'node_modules/(?!(react-native|@react-native|react-native-.*|@react-navigation|react-native-vector-icons|react-native-reanimated|@react-native-async-storage)/)',
   ],
   moduleNameMapping: {
     '^@/(.*)$': '<rootDir>/src/$1',

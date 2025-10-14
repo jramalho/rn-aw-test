@@ -33,6 +33,7 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 | 🏆 **Tournament System**  | ✅ Complete | Bracket-based tournaments with AI opponents (4/8/16 players) |
 | 🔧 **Custom TurboModule** | ✅ Complete | DeviceInfo module with battery, storage, and system info     |
 | 🔐 **Biometric Auth**     | ✅ Complete | Face ID, Touch ID, and Fingerprint authentication            |
+| 🎭 **Enhanced Animations** | ✅ Complete | Reanimated 3 with smooth micro-interactions and transitions  |
 | ♿ **Accessibility**      | ✅ Enhanced | WCAG 2.1 AA compliance with screen reader support            |
 | 🧪 **Testing Setup**      | ✅ Complete | Unit tests (80%+), E2E tests with Detox (6 test suites)      |
 | 🚀 **CI/CD Pipeline**     | ✅ Complete | GitHub Actions for builds and tests                          |
@@ -43,6 +44,7 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 - **Installation**: See [INSTALLATION.md](./INSTALLATION.md) for setup guide
 - **Contributing**: Check [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines
 - **Accessibility**: Read [docs/ACCESSIBILITY.md](./docs/ACCESSIBILITY.md) for accessibility features
+- **Animations**: See [docs/ANIMATIONS.md](./docs/ANIMATIONS.md) for Reanimated 3 animations and micro-interactions
 - **Bundle Optimization**: See [docs/BUNDLE_SIZE_OPTIMIZATION.md](./docs/BUNDLE_SIZE_OPTIMIZATION.md) for size reduction strategies
 - **Push Notifications**: See [docs/PUSH_NOTIFICATIONS.md](./docs/PUSH_NOTIFICATIONS.md) for notification features
 - **Deep Linking**: Read [docs/DEEP_LINKING.md](./docs/DEEP_LINKING.md) for deep link patterns

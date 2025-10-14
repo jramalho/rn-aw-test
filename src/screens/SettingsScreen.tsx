@@ -257,6 +257,25 @@ const SettingsScreen: React.FC = () => {
 
             <View style={styles.separator} />
 
+            <Pressable
+              style={styles.settingPressable}
+              onPress={() => navigation.navigate('AnimationsDemo')}
+            >
+              <View style={styles.settingContent}>
+                <Text style={[styles.settingTitle, textStyle]}>
+                  🎭 Animations Demo
+                </Text>
+                <Text style={[styles.settingDescription, textStyle]}>
+                  Explore Reanimated 3 animations
+                </Text>
+              </View>
+              <Text style={[styles.actionText, { color: '#007AFF' }]}>
+                View
+              </Text>
+            </Pressable>
+
+            <View style={styles.separator} />
+
             <SettingItem
               title="Analytics"
               description="Help improve the app with usage data"

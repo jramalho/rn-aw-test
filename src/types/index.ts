@@ -20,6 +20,7 @@ export type RootStackParamList = {
   TournamentLobby: undefined;
   TournamentBracket: { tournamentId: string };
   TournamentBattle: { tournamentId: string; matchId: string };
+  AnimationsDemo: undefined;
 };
 
 // Pokemon API Types

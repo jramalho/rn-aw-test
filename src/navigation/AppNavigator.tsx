@@ -21,6 +21,7 @@ import { NotificationDemoScreen } from '../screens/NotificationDemoScreen';
 import TournamentLobbyScreen from '../screens/TournamentLobbyScreen';
 import TournamentBracketScreen from '../screens/TournamentBracketScreen';
 import TournamentBattleScreen from '../screens/TournamentBattleScreen';
+import AnimationsDemoScreen from '../screens/AnimationsDemoScreen';
 
 // Import types
 import type { RootStackParamList } from '../types';
@@ -307,6 +308,14 @@ export const AppNavigator: React.FC = () => {
             component={TournamentBattleScreen}
             options={{
               title: 'Tournament Battle',
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen
+            name="AnimationsDemo"
+            component={AnimationsDemoScreen}
+            options={{
+              title: 'Animations Demo',
               headerShown: true,
             }}
           />

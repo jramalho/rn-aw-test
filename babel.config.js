@@ -18,8 +18,8 @@ module.exports = {
         },
       },
     ],
-    // Worklets plugin must be last
-    'react-native-worklets/plugin',
+    // Reanimated plugin must be listed last
+    'react-native-reanimated/plugin',
   ],
   env: {
     production: {

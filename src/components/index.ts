@@ -16,3 +16,7 @@ export { default as Dialog } from './Dialog';
 export { default as List } from './List';
 export { default as IconButton } from './IconButton';
 export { default as Portal } from './Portal';
+
+// Animated components
+export { default as AnimatedButton } from './AnimatedButton';
+export { default as AnimatedCard } from './AnimatedCard';

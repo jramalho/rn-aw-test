@@ -55,7 +55,7 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false,
             error: null,
           });
-        } catch {
+        } catch (error) {
           const authError: AuthError = {
             code: 'LOGIN_FAILED',
             message: error instanceof Error ? error.message : 'Login failed',
@@ -78,7 +78,7 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false,
             error: null,
           });
-        } catch {
+        } catch (error) {
           const authError: AuthError = {
             code: 'SIGNUP_FAILED',
             message: error instanceof Error ? error.message : 'Sign up failed',
@@ -104,7 +104,7 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false,
             error: null,
           });
-        } catch {
+        } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Logout failed',
             isLoading: false,
@@ -128,7 +128,7 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false,
             error: null,
           });
-        } catch {
+        } catch (error) {
           const authError: AuthError = {
             code: 'TOKEN_REFRESH_FAILED',
             message:
@@ -171,7 +171,7 @@ export const useAuthStore = create<AuthStore>()(
           throw new Error(
             'Biometric login not implemented yet. Library integration pending.',
           );
-        } catch {
+        } catch (error) {
           const authError: AuthError = {
             code: 'BIOMETRIC_AUTH_FAILED',
             message:

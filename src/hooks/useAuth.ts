@@ -64,7 +64,7 @@ export const useAuth = () => {
             error: null,
           });
         }
-      } catch {
+      } catch (initError) {
         console.error('Failed to initialize auth:', initError);
         useAuthStore.setState({
           user: null,

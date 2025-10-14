@@ -61,7 +61,7 @@ export const storeTokens = async (tokens: AuthTokens): Promise<void> => {
       STORAGE_KEYS.AUTH_TOKENS,
       JSON.stringify(tokens),
     );
-  } catch {
+  } catch (error) {
     throw new Error(
       `Failed to store tokens: ${
         error instanceof Error ? error.message : 'Unknown error'
@@ -82,7 +82,7 @@ export const getStoredTokens = async (): Promise<AuthTokens | null> => {
 
     const tokens = JSON.parse(tokensJson) as AuthTokens;
     return validateTokens(tokens) ? tokens : null;
-  } catch {
+  } catch (error) {
     console.error('Failed to retrieve tokens:', error);
     return null;
   }
@@ -94,7 +94,7 @@ export const getStoredTokens = async (): Promise<AuthTokens | null> => {
 export const storeUser = async (user: User): Promise<void> => {
   try {
     await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
-  } catch {
+  } catch (error) {
     throw new Error(
       `Failed to store user data: ${
         error instanceof Error ? error.message : 'Unknown error'
@@ -110,7 +110,7 @@ export const getStoredUser = async (): Promise<User | null> => {
   try {
     const userJson = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
     return userJson ? (JSON.parse(userJson) as User) : null;
-  } catch {
+  } catch (error) {
     console.error('Failed to retrieve user data:', error);
     return null;
   }
@@ -125,7 +125,7 @@ export const clearAuthStorage = async (): Promise<void> => {
       STORAGE_KEYS.AUTH_TOKENS,
       STORAGE_KEYS.USER_DATA,
     ]);
-  } catch {
+  } catch (error) {
     throw new Error(
       `Failed to clear auth storage: ${
         error instanceof Error ? error.message : 'Unknown error'
@@ -141,7 +141,7 @@ export const isBiometricEnabled = async (): Promise<boolean> => {
   try {
     const enabled = await AsyncStorage.getItem(STORAGE_KEYS.BIOMETRIC_ENABLED);
     return enabled === 'true';
-  } catch {
+  } catch (error) {
     console.error('Failed to check biometric status:', error);
     return false;
   }
@@ -156,7 +156,7 @@ export const setBiometricEnabled = async (enabled: boolean): Promise<void> => {
       STORAGE_KEYS.BIOMETRIC_ENABLED,
       enabled ? 'true' : 'false',
     );
-  } catch {
+  } catch (error) {
     throw new Error(
       `Failed to set biometric status: ${
         error instanceof Error ? error.message : 'Unknown error'

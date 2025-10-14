@@ -89,7 +89,13 @@ const SignUpScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.header}>
           <Text style={styles.logo}>🎮</Text>
           <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Join PokéDex community today</Text>
+          <Text style={styles.subtitle}>
+            Sign up is not available in demo mode
+          </Text>
+          <Text style={styles.infoText}>
+            This app uses DummyJSON API which provides test accounts only.
+            Please use the Login screen with one of the available demo accounts.
+          </Text>
         </View>
 
         <View style={styles.form}>
@@ -211,6 +217,14 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#666',
+    marginBottom: 8,
+  },
+  infoText: {
+    fontSize: 14,
+    color: '#007AFF',
+    textAlign: 'center',
+    marginTop: 8,
+    paddingHorizontal: 20,
   },
   form: {
     width: '100%',

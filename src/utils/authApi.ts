@@ -1,179 +1,179 @@
 /**
  * Authentication API Service
- * Mock implementation for demonstration purposes
- * In production, this would connect to a real backend API
+ * Integration with DummyJSON API for demonstration purposes
+ * Uses real API endpoints from https://dummyjson.com/docs/auth
  */
 
 import type { User, AuthTokens, AuthCredentials, SignUpOptions } from '../types/auth';
 
-// Simulate network delay
-const NETWORK_DELAY = 1000;
+const DUMMYJSON_API_BASE = 'https://dummyjson.com';
 
-// Mock user database (in production, this would be on the backend)
-const mockUsers = new Map<string, { password: string; user: User }>();
-
-// Helper to simulate API delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-// Helper to generate mock tokens
-const generateTokens = (): AuthTokens => {
-  const now = Date.now();
-  return {
-    accessToken: `mock_access_token_${Math.random().toString(36).substring(7)}`,
-    refreshToken: `mock_refresh_token_${Math.random().toString(36).substring(7)}`,
-    expiresAt: now + 3600000, // 1 hour from now
-  };
-};
-
-// Helper to generate mock user
-const generateUser = (email: string, displayName?: string): User => {
+// Helper to convert DummyJSON user response to our User type
+const convertDummyJsonUser = (dummyUser: any): User => {
   const now = new Date().toISOString();
   return {
-    id: `user_${Math.random().toString(36).substring(7)}`,
-    email,
-    displayName: displayName || email.split('@')[0],
-    emailVerified: false, // Would be verified via email in production
+    id: String(dummyUser.id),
+    email: dummyUser.email,
+    displayName: `${dummyUser.firstName} ${dummyUser.lastName}`,
+    photoURL: dummyUser.image,
+    emailVerified: true,
     createdAt: now,
     lastLoginAt: now,
   };
 };
 
+// Helper to convert DummyJSON auth response to our AuthTokens type
+const convertDummyJsonTokens = (response: any): AuthTokens => {
+  // DummyJSON tokens expire in 60 minutes by default
+  const expiresInMs = 60 * 60 * 1000; // 60 minutes
+  return {
+    accessToken: response.accessToken,
+    refreshToken: response.refreshToken,
+    expiresAt: Date.now() + expiresInMs,
+  };
+};
+
 export const authApi = {
   /**
-   * Login with email and password
+   * Login with username and password using DummyJSON API
+   * Note: DummyJSON uses username instead of email for authentication
+   * Available test users: emilys/emilyspass, michaelw/michaelwpass, etc.
    */
   login: async (credentials: AuthCredentials): Promise<{ user: User; tokens: AuthTokens }> => {
-    await delay(NETWORK_DELAY);
-
     const { email, password } = credentials;
 
-    // Check if user exists
-    const userData = mockUsers.get(email.toLowerCase());
-    if (!userData) {
-      throw new Error('Invalid email or password');
+    try {
+      const response = await fetch(`${DUMMYJSON_API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: email, // Using email field as username for compatibility
+          password,
+          expiresInMins: 60,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Invalid username or password');
+      }
+
+      const data = await response.json();
+
+      // Convert DummyJSON response to our format
+      const user = convertDummyJsonUser(data);
+      const tokens = convertDummyJsonTokens(data);
+
+      return { user, tokens };
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Login failed');
     }
-
-    // Verify password
-    if (userData.password !== password) {
-      throw new Error('Invalid email or password');
-    }
-
-    // Update last login
-    const user = {
-      ...userData.user,
-      lastLoginAt: new Date().toISOString(),
-    };
-
-    // Generate tokens
-    const tokens = generateTokens();
-
-    // Update stored user
-    mockUsers.set(email.toLowerCase(), { ...userData, user });
-
-    return { user, tokens };
   },
 
   /**
-   * Sign up with email and password
+   * Sign up - Note: DummyJSON doesn't support user registration
+   * This is a mock implementation that throws an error with instructions
    */
   signUp: async (options: SignUpOptions): Promise<{ user: User; tokens: AuthTokens }> => {
-    await delay(NETWORK_DELAY);
-
-    const { email, password, displayName } = options;
-
-    // Check if user already exists
-    if (mockUsers.has(email.toLowerCase())) {
-      throw new Error('An account with this email already exists');
-    }
-
-    // Validate password strength (basic validation)
-    if (password.length < 8) {
-      throw new Error('Password must be at least 8 characters long');
-    }
-
-    // Create new user
-    const user = generateUser(email, displayName);
-
-    // Generate tokens
-    const tokens = generateTokens();
-
-    // Store user
-    mockUsers.set(email.toLowerCase(), { password, user });
-
-    return { user, tokens };
+    throw new Error(
+      'Sign up is not available with DummyJSON API. Please use one of the existing test accounts: emilys/emilyspass, michaelw/michaelwpass, sophiab/sophiabpass, etc.',
+    );
   },
 
   /**
-   * Refresh authentication tokens
+   * Refresh authentication tokens using DummyJSON API
    */
   refreshTokens: async (refreshToken: string): Promise<AuthTokens> => {
-    await delay(NETWORK_DELAY);
+    try {
+      const response = await fetch(`${DUMMYJSON_API_BASE}/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          refreshToken,
+          expiresInMins: 60,
+        }),
+      });
 
-    // In production, validate the refresh token on the backend
-    if (!refreshToken || !refreshToken.startsWith('mock_refresh_token_')) {
-      throw new Error('Invalid refresh token');
+      if (!response.ok) {
+        throw new Error('Invalid refresh token');
+      }
+
+      const data = await response.json();
+      return convertDummyJsonTokens(data);
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Token refresh failed');
     }
-
-    // Generate new tokens
-    return generateTokens();
   },
 
   /**
-   * Logout (invalidate tokens on backend)
+   * Logout - DummyJSON doesn't have a logout endpoint
+   * Tokens are stateless JWTs, so logout is handled client-side
    */
   logout: async (): Promise<void> => {
-    await delay(500);
-    // In production, this would invalidate tokens on the backend
+    // No server-side logout needed for DummyJSON
+    // Tokens will naturally expire
   },
 
   /**
-   * Reset password
+   * Get current authenticated user using access token
+   */
+  getCurrentUser: async (accessToken: string): Promise<User> => {
+    try {
+      const response = await fetch(`${DUMMYJSON_API_BASE}/auth/me`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+
+      const data = await response.json();
+      return convertDummyJsonUser(data);
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Failed to get user');
+    }
+  },
+
+  /**
+   * Reset password - Not supported by DummyJSON
    */
   resetPassword: async (email: string): Promise<void> => {
-    await delay(NETWORK_DELAY);
-
-    // Check if user exists
-    if (!mockUsers.has(email.toLowerCase())) {
-      // In production, don't reveal if email exists for security
-      // But for demo purposes, we'll throw an error
-      throw new Error('No account found with this email');
-    }
-
-    // In production, this would send a password reset email
-    console.log(`Password reset email sent to: ${email}`);
+    throw new Error('Password reset is not available with DummyJSON API');
   },
 
   /**
-   * Verify email
+   * Verify email - Not supported by DummyJSON
    */
   verifyEmail: async (token: string): Promise<void> => {
-    await delay(NETWORK_DELAY);
-
-    // In production, validate the verification token
-    if (!token) {
-      throw new Error('Invalid verification token');
-    }
-
-    // Update user's email verification status
-    console.log('Email verified successfully');
+    throw new Error('Email verification is not available with DummyJSON API');
   },
 };
 
 /**
  * Helper function to seed demo users for testing
+ * DummyJSON provides these test accounts:
+ * - emilys / emilyspass
+ * - michaelw / michaelwpass
+ * - sophiab / sophiabpass
+ * - jamesd / jamesdpass
+ * - emmaj / emmajpass
+ * - oliviaw / oliviawpass
+ * - alexanderj / alexanderjpass
+ * - avat / avatpass
+ * And many more at https://dummyjson.com/users
  */
 export const seedDemoUsers = () => {
-  const demoUser = {
-    email: 'demo@example.com',
-    password: 'demo12345',
-    displayName: 'Demo User',
-  };
-
-  const user = generateUser(demoUser.email, demoUser.displayName);
-  mockUsers.set(demoUser.email.toLowerCase(), {
-    password: demoUser.password,
-    user,
-  });
-
-  console.log('Demo user seeded:', demoUser.email, '/', demoUser.password);
+  console.log('DummyJSON API Integration Active');
+  console.log('Test Accounts Available:');
+  console.log('  - emilys / emilyspass');
+  console.log('  - michaelw / michaelwpass');
+  console.log('  - sophiab / sophiabpass');
+  console.log('  - jamesd / jamesdpass');
+  console.log('See https://dummyjson.com/users for more accounts');
 };

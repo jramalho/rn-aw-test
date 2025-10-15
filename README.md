@@ -35,6 +35,7 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 | 🔐 **Biometric Auth**     | ✅ Complete | Face ID, Touch ID, and Fingerprint authentication            |
 | 🎭 **Enhanced Animations** | ✅ Complete | Reanimated 3 with smooth micro-interactions and transitions  |
 | ♿ **Accessibility**      | ✅ Enhanced | WCAG 2.1 AA compliance with screen reader support            |
+| 📖 **Storybook**         | ✅ Complete | Interactive component playground with on-device addons       |
 | 🧪 **Testing Setup**      | ✅ Complete | Unit tests (80%+), E2E tests with Detox (6 test suites)      |
 | 🚀 **CI/CD Pipeline**     | ✅ Complete | GitHub Actions for builds and tests                          |
 | 📚 **Documentation**      | ✅ Complete | Comprehensive guides and API docs                            |
@@ -43,6 +44,7 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 
 - **Installation**: See [INSTALLATION.md](./INSTALLATION.md) for setup guide
 - **Contributing**: Check [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines
+- **Storybook**: Read [docs/STORYBOOK.md](./docs/STORYBOOK.md) for component playground and development
 - **Accessibility**: Read [docs/ACCESSIBILITY.md](./docs/ACCESSIBILITY.md) for accessibility features
 - **Animations**: See [docs/ANIMATIONS.md](./docs/ANIMATIONS.md) for Reanimated 3 animations and micro-interactions
 - **Bundle Optimization**: See [docs/BUNDLE_SIZE_OPTIMIZATION.md](./docs/BUNDLE_SIZE_OPTIMIZATION.md) for size reduction strategies

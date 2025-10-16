@@ -17,27 +17,27 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 
 ### 📋 Implementation Status
 
-| Feature                   | Status      | Description                                                  |
-| ------------------------- | ----------- | ------------------------------------------------------------ |
-| 🏗️ **New Architecture**   | ✅ Complete | 100% Fabric + TurboModules implementation                    |
-| ⚛️ **React 19.1.1**       | ✅ Complete | Concurrent features, Suspense, automatic batching            |
-| 📘 **TypeScript**         | ✅ Complete | Strict mode with enhanced type safety                        |
-| 🧭 **Navigation**         | ✅ Complete | React Navigation v7 with type safety                         |
-| 🎨 **UI Components**      | ✅ Complete | Custom components built with React Native core, dark/light theme |
-| 📱 **Responsive Design**  | ✅ Complete | iOS/Android with safe area handling                          |
-| ⚡ **State Management**   | ✅ Complete | Zustand with persistence                                     |
-| 🎮 **Pokemon App**        | ✅ Complete | Full PokéAPI integration with search & details               |
-| 🔔 **Push Notifications** | ✅ Complete | Notifee with channels, permissions, navigation integration   |
-| 🔗 **Deep Linking**       | ✅ Complete | Custom URL scheme + universal/app links                      |
-| 🌐 **Offline Support**    | ✅ Complete | Network monitoring, request queuing, intelligent caching     |
-| 🏆 **Tournament System**  | ✅ Complete | Bracket-based tournaments with AI opponents (4/8/16 players) |
-| 🔧 **Custom TurboModule** | ✅ Complete | DeviceInfo module with battery, storage, and system info     |
-| 🔐 **Biometric Auth**     | ✅ Complete | Face ID, Touch ID, and Fingerprint authentication            |
-| 🎭 **Enhanced Animations** | ✅ Complete | Reanimated 3 with smooth micro-interactions and transitions  |
-| ♿ **Accessibility**      | ✅ Enhanced | WCAG 2.1 AA compliance with screen reader support            |
-| 🧪 **Testing Setup**      | ✅ Complete | Unit tests (80%+), E2E tests with Detox (6 test suites)      |
-| 🚀 **CI/CD Pipeline**     | ✅ Complete | GitHub Actions for builds and tests                          |
-| 📚 **Documentation**      | ✅ Complete | Comprehensive guides and API docs                            |
+| Feature                    | Status      | Description                                                                          |
+| -------------------------- | ----------- | ------------------------------------------------------------------------------------ |
+| 🏗️ **New Architecture**    | ✅ Complete | 100% Fabric + TurboModules implementation                                            |
+| ⚛️ **React 19.1.1**        | ✅ Complete | Concurrent features, Suspense, automatic batching                                    |
+| 📘 **TypeScript**          | ✅ Complete | Strict mode with enhanced type safety                                                |
+| 🧭 **Navigation**          | ✅ Complete | React Navigation v7 with type safety                                                 |
+| 🎨 **UI Components**       | ✅ Complete | Custom components built with React Native core, dark/light theme                     |
+| 📱 **Responsive Design**   | ✅ Complete | iOS/Android with safe area handling                                                  |
+| ⚡ **State Management**    | ✅ Complete | Zustand with persistence                                                             |
+| 🎮 **Pokemon App**         | ✅ Complete | Full PokéAPI integration with search & details                                       |
+| 🔔 **Push Notifications**  | ✅ Complete | Notifee with channels, permissions, navigation integration                           |
+| 🔗 **Deep Linking**        | ✅ Complete | Custom URL scheme + universal/app links                                              |
+| 🌐 **Offline Support**     | ✅ Complete | Network monitoring, request queuing, intelligent caching                             |
+| 🏆 **Tournament System**   | ✅ Complete | Bracket-based tournaments with AI opponents (4/8/16 players)                         |
+| 🔧 **Custom TurboModule**  | ✅ Complete | DeviceInfo module with battery, storage, and system info                             |
+| 🔐 **Biometric Auth**      | ✅ Complete | Face ID, Touch ID, and Fingerprint authentication                                    |
+| 🎭 **Enhanced Animations** | ✅ Complete | Reanimated 3 with smooth micro-interactions and transitions                          |
+| ♿ **Accessibility**       | ✅ Enhanced | WCAG 2.1 AA compliance with screen reader support                                    |
+| 🧪 **Testing Setup**       | ✅ Complete | Unit tests (80%+), E2E tests with Detox (6 test suites), BrowserStack device testing |
+| 🚀 **CI/CD Pipeline**      | ✅ Complete | GitHub Actions for builds and tests, GitHub Agentic Workflows with BrowserStack      |
+| 📚 **Documentation**       | ✅ Complete | Comprehensive guides and API docs                                                    |
 
 ### 🛠️ Ready for Development
 
@@ -301,6 +301,60 @@ yarn test:e2e:test:android
 ```
 
 For more details on E2E testing, see [e2e/README.md](./e2e/README.md).
+
+### 📱 BrowserStack Device Testing
+
+Automated testing on real devices using [BrowserStack](https://www.browserstack.com/) with GitHub Agentic Workflows:
+
+**Features:**
+
+- **Real Device Testing** - iOS and Android devices in the cloud
+- **Automatic Execution** - Runs on push/PR automatically
+- **Smart Reporting** - Intelligent comments and issue creation
+- **Multiple Configurations** - Choose devices and test suites
+- **Video Recording** - Watch test execution recordings
+
+**Quick Start:**
+
+1. Configure BrowserStack credentials in GitHub Secrets:
+
+   ```
+   BROWSERSTACK_USERNAME=your_username
+   BROWSERSTACK_ACCESS_KEY=your_access_key
+   ```
+
+2. Manual execution:
+
+   - Go to **Actions** → **"BrowserStack Mobile App Testing"**
+   - Choose platform (iOS/Android/both), devices, and test suite
+   - Click **"Run workflow"**
+
+3. Local testing:
+   ```bash
+   export BROWSERSTACK_USERNAME="your_username"
+   export BROWSERSTACK_ACCESS_KEY="your_key"
+   npm run test:browserstack:local android smoke "Samsung Galaxy S23"
+   ```
+
+**Available Scripts:**
+
+```bash
+# BrowserStack testing
+npm run test:browserstack:android    # Run Android tests on BrowserStack
+npm run test:browserstack:ios        # Run iOS tests on BrowserStack
+npm run test:browserstack:local      # Local BrowserStack test script
+
+# Upload apps to BrowserStack
+npm run browserstack:upload:android  # Upload Android APK
+npm run browserstack:upload:ios      # Upload iOS IPA
+```
+
+**Supported Devices:**
+
+- **iOS**: iPhone 15, 14, 13, iPad Air, iPad Pro
+- **Android**: Pixel 8/7/6, Galaxy S24/S23/S22, OnePlus 11
+
+For complete setup and usage guide, see [docs/BROWSERSTACK_INTEGRATION.md](./docs/BROWSERSTACK_INTEGRATION.md).
 
 ## 🛠️ Development Tools
 

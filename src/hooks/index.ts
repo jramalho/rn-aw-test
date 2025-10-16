@@ -240,3 +240,9 @@ export { useBiometric } from './useBiometric';
 
 // Export theme hook
 export { useTheme } from './useTheme';
+
+// Export analytics hook
+export { useAnalytics } from './useAnalytics';
+
+// Export animations hook
+export { useAnimations } from './useAnimations';

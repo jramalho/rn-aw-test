@@ -43,13 +43,13 @@ class NetworkService {
       this.updateStatus(state);
 
       // Subscribe to network state updates
-      this.subscription = NetInfo.addEventListener(state => {
-        this.updateStatus(state);
+      this.subscription = NetInfo.addEventListener(netState => {
+        this.updateStatus(netState);
       });
 
       // Restore previous status from storage
       await this.restoreNetworkStatus();
-    } catch {
+    } catch (error) {
       console.error('Error initializing network service:', error);
     }
   }
@@ -107,7 +107,7 @@ class NetworkService {
         NETWORK_STATUS_KEY,
         JSON.stringify(this.currentStatus),
       );
-    } catch {
+    } catch (error) {
       console.error('Error persisting network status:', error);
     }
   }
@@ -129,7 +129,7 @@ class NetworkService {
           this.notifyListeners();
         }
       }
-    } catch {
+    } catch (error) {
       console.error('Error restoring network status:', error);
     }
   }
@@ -141,7 +141,7 @@ class NetworkService {
     this.listeners.forEach(listener => {
       try {
         listener(this.currentStatus);
-      } catch {
+      } catch (error) {
         console.error('Error notifying network listener:', error);
       }
     });
@@ -198,7 +198,7 @@ class NetworkService {
         retryCount: 0,
       });
       await this.saveOfflineQueue(queue);
-    } catch {
+    } catch (error) {
       console.error('Error queuing request:', error);
     }
   }
@@ -210,7 +210,7 @@ class NetworkService {
     try {
       const stored = await AsyncStorage.getItem(OFFLINE_QUEUE_KEY);
       return stored ? JSON.parse(stored) : [];
-    } catch {
+    } catch (error) {
       console.error('Error getting offline queue:', error);
       return [];
     }
@@ -222,7 +222,7 @@ class NetworkService {
   private async saveOfflineQueue(queue: QueuedRequest[]): Promise<void> {
     try {
       await AsyncStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
-    } catch {
+    } catch (error) {
       console.error('Error saving offline queue:', error);
     }
   }
@@ -256,7 +256,7 @@ class NetworkService {
           }
 
           console.log(`Successfully processed queued request: ${request.url}`);
-        } catch {
+        } catch (error) {
           console.error(
             `Failed to process queued request: ${request.url}`,
             error,
@@ -284,7 +284,7 @@ class NetworkService {
       } else {
         console.log('All queued requests processed successfully');
       }
-    } catch {
+    } catch (error) {
       console.error('Error processing offline queue:', error);
     }
   }
@@ -295,7 +295,7 @@ class NetworkService {
   async clearOfflineQueue(): Promise<void> {
     try {
       await AsyncStorage.removeItem(OFFLINE_QUEUE_KEY);
-    } catch {
+    } catch (error) {
       console.error('Error clearing offline queue:', error);
     }
   }
@@ -316,7 +316,7 @@ class NetworkService {
             ? Math.min(...queue.map(r => r.timestamp || Date.now()))
             : null,
       };
-    } catch {
+    } catch (error) {
       console.error('Error getting queue stats:', error);
       return { count: 0, oldestTimestamp: null };
     }

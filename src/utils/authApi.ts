@@ -4,7 +4,12 @@
  * Uses real API endpoints from https://dummyjson.com/docs/auth
  */
 
-import type { User, AuthTokens, AuthCredentials, SignUpOptions } from '../types/auth';
+import type {
+  User,
+  AuthTokens,
+  AuthCredentials,
+  SignUpOptions,
+} from '../types/auth';
 
 const DUMMYJSON_API_BASE = 'https://dummyjson.com';
 
@@ -24,8 +29,8 @@ const convertDummyJsonUser = (dummyUser: any): User => {
 
 // Helper to convert DummyJSON auth response to our AuthTokens type
 const convertDummyJsonTokens = (response: any): AuthTokens => {
-  // DummyJSON tokens expire in 60 minutes by default
-  const expiresInMs = 60 * 60 * 1000; // 60 minutes
+  // DummyJSON tokens expire in 60 minutes by default, but we'll set a longer time for development
+  const expiresInMs = 24 * 60 * 60 * 1000; // 24 hours for development
   return {
     accessToken: response.accessToken,
     refreshToken: response.refreshToken,
@@ -39,7 +44,9 @@ export const authApi = {
    * Note: DummyJSON uses username instead of email for authentication
    * Available test users: emilys/emilyspass, michaelw/michaelwpass, etc.
    */
-  login: async (credentials: AuthCredentials): Promise<{ user: User; tokens: AuthTokens }> => {
+  login: async (
+    credentials: AuthCredentials,
+  ): Promise<{ user: User; tokens: AuthTokens }> => {
     const { email, password } = credentials;
 
     try {
@@ -75,7 +82,9 @@ export const authApi = {
    * Sign up - Note: DummyJSON doesn't support user registration
    * This is a mock implementation that throws an error with instructions
    */
-  signUp: async (options: SignUpOptions): Promise<{ user: User; tokens: AuthTokens }> => {
+  signUp: async (
+    _options: SignUpOptions,
+  ): Promise<{ user: User; tokens: AuthTokens }> => {
     throw new Error(
       'Sign up is not available with DummyJSON API. Please use one of the existing test accounts: emilys/emilyspass, michaelw/michaelwpass, sophiab/sophiabpass, etc.',
     );
@@ -104,7 +113,9 @@ export const authApi = {
       const data = await response.json();
       return convertDummyJsonTokens(data);
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Token refresh failed');
+      throw new Error(
+        error instanceof Error ? error.message : 'Token refresh failed',
+      );
     }
   },
 
@@ -136,21 +147,23 @@ export const authApi = {
       const data = await response.json();
       return convertDummyJsonUser(data);
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : 'Failed to get user');
+      throw new Error(
+        error instanceof Error ? error.message : 'Failed to get user',
+      );
     }
   },
 
   /**
    * Reset password - Not supported by DummyJSON
    */
-  resetPassword: async (email: string): Promise<void> => {
+  resetPassword: async (_email: string): Promise<void> => {
     throw new Error('Password reset is not available with DummyJSON API');
   },
 
   /**
    * Verify email - Not supported by DummyJSON
    */
-  verifyEmail: async (token: string): Promise<void> => {
+  verifyEmail: async (_token: string): Promise<void> => {
     throw new Error('Email verification is not available with DummyJSON API');
   },
 };

@@ -34,14 +34,14 @@ export const useAuthStore = create<AuthStore>()(
       user: null,
       tokens: null,
       isAuthenticated: false,
-      isLoading: true, // Start with loading true to prevent flash
+      isLoading: false, // Changed to false since persistence will handle restoration
       error: null,
 
       // Login action
       login: async (_options: LoginOptions) => {
         set({ isLoading: true, error: null });
         try {
-          const { credentials } = options;
+          const { credentials } = _options;
           if (!credentials) {
             throw new Error('Email and password are required');
           }
@@ -69,7 +69,7 @@ export const useAuthStore = create<AuthStore>()(
       signUp: async (_options: SignUpOptions) => {
         set({ isLoading: true, error: null });
         try {
-          const { user, tokens } = await authApi.signUp(options);
+          const { user, tokens } = await authApi.signUp(_options);
 
           set({
             user,
@@ -192,6 +192,40 @@ export const useAuthStore = create<AuthStore>()(
         tokens: state.tokens,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => state => {
+        if (state && state.tokens && state.user) {
+          // Validate restored tokens
+          import('../utils/authUtils').then(({ validateTokens }) => {
+            if (!validateTokens(state.tokens)) {
+              console.log(
+                '🔒 Restored tokens are invalid, clearing auth state',
+              );
+              // Clear invalid auth state
+              useAuthStore.setState({
+                user: null,
+                tokens: null,
+                isAuthenticated: false,
+                error: null,
+              });
+            } else {
+              console.log(
+                '✅ Restored tokens are valid, user remains authenticated',
+              );
+              // Ensure authenticated state is set correctly
+              useAuthStore.setState({
+                isAuthenticated: true,
+                error: null,
+              });
+            }
+          });
+        } else {
+          console.log('🔒 No auth data to restore');
+          useAuthStore.setState({
+            isAuthenticated: false,
+            error: null,
+          });
+        }
+      },
     },
   ),
 );

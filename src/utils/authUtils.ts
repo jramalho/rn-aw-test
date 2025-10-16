@@ -18,8 +18,8 @@ const STORAGE_KEYS = {
  */
 export const isTokenExpired = (expiresAt: number): boolean => {
   const now = Date.now();
-  // Add 5-minute buffer to refresh before actual expiration
-  const bufferMs = 5 * 60 * 1000;
+  // Add smaller buffer to refresh before actual expiration (30 seconds instead of 5 minutes)
+  const bufferMs = 30 * 1000; // 30 seconds
   return now >= expiresAt - bufferMs;
 };
 

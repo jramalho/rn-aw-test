@@ -3,13 +3,9 @@
  * Provides easy access to authentication state and actions
  */
 
-import { useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useAuthStore } from '../store/authStore';
-import {
-  getStoredTokens,
-  getStoredUser,
-  validateTokens,
-} from '../utils/authUtils';
+import { validateTokens } from '../utils/authUtils';
 import type {
   LoginOptions,
   SignUpOptions,
@@ -30,57 +26,7 @@ export const useAuth = () => {
   const updateUser = useAuthStore(state => state.updateUser);
   const clearError = useAuthStore(state => state.clearError);
   const biometricLogin = useAuthStore(state => state.biometricLogin);
-
-  /**
-   * Initialize auth state from storage on mount
-   */
-  useEffect(() => {
-    const initializeAuth = async () => {
-      // Set loading to true during initialization
-      useAuthStore.setState({ isLoading: true });
-
-      try {
-        const [storedTokens, storedUser] = await Promise.all([
-          getStoredTokens(),
-          getStoredUser(),
-        ]);
-
-        if (storedTokens && storedUser && validateTokens(storedTokens)) {
-          // Restore auth state if tokens are valid
-          useAuthStore.setState({
-            user: storedUser,
-            tokens: storedTokens,
-            isAuthenticated: true,
-            isLoading: false,
-            error: null,
-          });
-        } else {
-          // Clear invalid auth state without calling logout (to avoid recursive calls)
-          useAuthStore.setState({
-            user: null,
-            tokens: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null,
-          });
-        }
-      } catch (initError) {
-        console.error('Failed to initialize auth:', initError);
-        useAuthStore.setState({
-          user: null,
-          tokens: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error:
-            initError instanceof Error
-              ? initError.message
-              : 'Failed to initialize auth',
-        });
-      }
-    };
-
-    initializeAuth();
-  }, []);
+  // No initialization needed - Zustand persistence handles it automatically
 
   /**
    * Handle login with error handling

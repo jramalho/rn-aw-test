@@ -46,6 +46,7 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 - **Accessibility**: Read [docs/ACCESSIBILITY.md](./docs/ACCESSIBILITY.md) for accessibility features
 - **Animations**: See [docs/ANIMATIONS.md](./docs/ANIMATIONS.md) for Reanimated 3 animations and micro-interactions
 - **Bundle Optimization**: See [docs/BUNDLE_SIZE_OPTIMIZATION.md](./docs/BUNDLE_SIZE_OPTIMIZATION.md) for size reduction strategies
+- **Performance Analytics**: See [docs/PERFORMANCE_ANALYTICS.md](./docs/PERFORMANCE_ANALYTICS.md) for monitoring and tracking
 - **Push Notifications**: See [docs/PUSH_NOTIFICATIONS.md](./docs/PUSH_NOTIFICATIONS.md) for notification features
 - **Deep Linking**: Read [docs/DEEP_LINKING.md](./docs/DEEP_LINKING.md) for deep link patterns
 - **Notification Navigation**: Check [docs/NOTIFICATION_NAVIGATION_INTEGRATION.md](./docs/NOTIFICATION_NAVIGATION_INTEGRATION.md) for integration details
@@ -146,6 +147,21 @@ Offline-first architecture for seamless user experience:
 - **System Capabilities** - Biometric auth detection, locale, timezone
 - **JSI Communication** - Direct JavaScript-to-Native communication
 - **Performance Benefits** - 30-50% faster than legacy modules
+
+### 📊 Performance Analytics
+
+Complete performance monitoring and analytics system:
+
+- **App Startup Tracking** - Measure time from launch to interactive state
+- **Screen Navigation Timing** - Track time spent on each screen and transitions
+- **API Call Monitoring** - Record API response times and success/failure rates
+- **Error Tracking** - Capture JavaScript errors and component crashes
+- **User Interaction Logging** - Track button clicks, form submissions, and custom events
+- **Session Management** - Maintain analytics sessions across app restarts
+- **Data Persistence** - Store analytics data locally with AsyncStorage
+- **Export Functionality** - Share analytics reports as JSON
+- **Visual Dashboard** - Real-time session metrics and insights
+- **Zero Dependencies** - Lightweight, self-contained analytics solution
 
 ### 🚀 Performance Optimizations
 

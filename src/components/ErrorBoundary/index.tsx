@@ -3,10 +3,12 @@
  *
  * Catches JavaScript errors in child component tree and displays fallback UI
  * Implements React error boundary lifecycle methods
+ * Integrates with performance analytics to track errors
  */
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { View, Text, Pressable } from 'react-native';
+import { performanceAnalytics } from '../../services/analytics/performanceAnalytics';
 import { styles } from './styles';
 
 interface Props {
@@ -41,6 +43,16 @@ export class ErrorBoundary extends Component<Props, State> {
     if (__DEV__) {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
+
+    // Track error in analytics
+    performanceAnalytics.trackError({
+      error: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      metadata: {
+        errorInfo: errorInfo.digest,
+      },
+    });
 
     // Call optional error handler
     if (this.props.onError) {

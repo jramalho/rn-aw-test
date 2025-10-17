@@ -19,6 +19,8 @@ import {
   Text,
   Divider,
 } from '../components';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { SwipeableListItem } from '../components/SwipeableListItem';
 import {
   useFadeIn,
   useScaleIn,
@@ -211,6 +213,104 @@ const AnimationsDemoScreen: React.FC = () => {
           </Card.Content>
         </Card>
 
+        {/* Loading Spinners Section */}
+        <Card style={styles.section}>
+          <Card.Title title="Loading Animations" />
+          <Card.Content>
+            <Text variant="bodyMedium" style={styles.description}>
+              Multiple loading animation types with Reanimated 3
+            </Text>
+            <View style={styles.loadingGrid}>
+              <View style={styles.loadingItem}>
+                <LoadingSpinner type="circular" size={40} color="#007AFF" />
+                <Text variant="bodySmall" style={styles.loadingLabel}>
+                  Circular
+                </Text>
+              </View>
+              <View style={styles.loadingItem}>
+                <LoadingSpinner type="pulse" size={40} color="#34C759" />
+                <Text variant="bodySmall" style={styles.loadingLabel}>
+                  Pulse
+                </Text>
+              </View>
+              <View style={styles.loadingItem}>
+                <LoadingSpinner type="bounce" size={40} color="#FF9500" />
+                <Text variant="bodySmall" style={styles.loadingLabel}>
+                  Bounce
+                </Text>
+              </View>
+              <View style={styles.loadingItem}>
+                <LoadingSpinner type="dots" size={40} color="#FF3B30" />
+                <Text variant="bodySmall" style={styles.loadingLabel}>
+                  Dots
+                </Text>
+              </View>
+            </View>
+          </Card.Content>
+        </Card>
+
+        {/* Swipeable List Items Section */}
+        <Card style={styles.section}>
+          <Card.Title title="Swipeable List Items" />
+          <Card.Content>
+            <Text variant="bodyMedium" style={styles.description}>
+              Swipe left to reveal actions
+            </Text>
+            
+            <SwipeableListItem
+              rightActions={[
+                {
+                  text: 'Delete',
+                  color: '#FF3B30',
+                  icon: '🗑️',
+                  onPress: () => console.log('Delete pressed'),
+                },
+                {
+                  text: 'Edit',
+                  color: '#007AFF',
+                  icon: '✏️',
+                  onPress: () => console.log('Edit pressed'),
+                },
+              ]}
+              style={styles.swipeableItem}
+            >
+              <View style={styles.swipeableContent}>
+                <Text variant="bodyLarge">🎮 Swipe me left</Text>
+                <Text variant="bodySmall" style={styles.swipeHint}>
+                  Try swiping to see actions
+                </Text>
+              </View>
+            </SwipeableListItem>
+
+            <SwipeableListItem
+              leftActions={[
+                {
+                  text: 'Archive',
+                  color: '#34C759',
+                  icon: '📦',
+                  onPress: () => console.log('Archive pressed'),
+                },
+              ]}
+              rightActions={[
+                {
+                  text: 'Star',
+                  color: '#FFD60A',
+                  icon: '⭐',
+                  onPress: () => console.log('Star pressed'),
+                },
+              ]}
+              style={styles.swipeableItem}
+            >
+              <View style={styles.swipeableContent}>
+                <Text variant="bodyLarge">⚡ Swipe both ways</Text>
+                <Text variant="bodySmall" style={styles.swipeHint}>
+                  Left: Archive | Right: Star
+                </Text>
+              </View>
+            </SwipeableListItem>
+          </Card.Content>
+        </Card>
+
         {/* Bottom spacing */}
         <View style={styles.bottomSpacing} />
       </ScrollView>
@@ -287,6 +387,34 @@ const styles = StyleSheet.create({
   },
   listItemDelay: {
     opacity: 0.5,
+  },
+  loadingGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    paddingVertical: 20,
+  },
+  loadingItem: {
+    alignItems: 'center',
+    marginBottom: 24,
+    width: '45%',
+  },
+  loadingLabel: {
+    marginTop: 12,
+    opacity: 0.7,
+  },
+  swipeableItem: {
+    marginBottom: 12,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  swipeableContent: {
+    padding: 16,
+    backgroundColor: '#ffffff',
+  },
+  swipeHint: {
+    marginTop: 4,
+    opacity: 0.6,
   },
   bottomSpacing: {
     height: 40,

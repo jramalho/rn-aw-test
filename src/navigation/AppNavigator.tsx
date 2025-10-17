@@ -1,7 +1,8 @@
 import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Platform, StyleSheet } from 'react-native';
+import { enhancedScreenOptions, getDefaultTransition } from '../utils/screenTransitions';
 
 // Import screens
 import ProfileScreen from '../screens/ProfileScreen';
@@ -188,6 +189,7 @@ export const AppNavigator: React.FC = () => {
 
   const screenOptions = React.useMemo(
     () => ({
+      ...enhancedScreenOptions.stack,
       headerStyle: {
         backgroundColor: '#007AFF',
       },

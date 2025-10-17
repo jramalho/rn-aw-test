@@ -62,6 +62,20 @@ tools:
     - 'node:*'
     - 'unzip:*'
     - 'wget:*'
+    - 'echo'
+    - 'ls'
+    - 'pwd'
+    - 'cat'
+    - 'head'
+    - 'tail'
+    - 'grep'
+    - 'wc'
+    - 'find'
+    - 'mkdir'
+    - 'cp'
+    - 'mv'
+    - 'rm'
+    - 'date'
   web-fetch:
   edit:
 
@@ -82,10 +96,12 @@ Executa testes E2E automatizados no BrowserStack para o app React Native em disp
 
 ### Parâmetros de Entrada:
 
-- **Platform**: ${{ github.event.inputs.platform || 'both' }}
-- **iOS Device**: ${{ github.event.inputs.device_ios || 'iPhone 15' }}
-- **Android Device**: ${{ github.event.inputs.device_android || 'Google Pixel 8' }}
-- **Test Suite**: ${{ github.event.inputs.test_suite || 'all' }}
+Determine os parâmetros de entrada automaticamente com base no contexto do trigger:
+
+- **Platform**: Padrão 'both' (iOS e Android), pode ser especificado via workflow_dispatch
+- **iOS Device**: Padrão 'iPhone 15', pode ser especificado via workflow_dispatch
+- **Android Device**: Padrão 'Google Pixel 8', pode ser especificado via workflow_dispatch
+- **Test Suite**: Padrão 'all', pode ser especificado via workflow_dispatch
 
 ### Etapas de Execução:
 
@@ -116,10 +132,11 @@ npm ci
 npx detox --version
 
 # Configurar variáveis para BrowserStack
-export PLATFORM="${{ github.event.inputs.platform || 'both' }}"
-export IOS_DEVICE="${{ github.event.inputs.device_ios || 'iPhone 15' }}"
-export ANDROID_DEVICE="${{ github.event.inputs.device_android || 'Google Pixel 8' }}"
-export TEST_SUITE="${{ github.event.inputs.test_suite || 'all' }}"
+# Configurar parâmetros de entrada (detectados automaticamente pelo contexto)
+export PLATFORM="${PLATFORM:-both}"
+export IOS_DEVICE="${IOS_DEVICE:-iPhone 15}"
+export ANDROID_DEVICE="${ANDROID_DEVICE:-Google Pixel 8}"
+export TEST_SUITE="${TEST_SUITE:-all}"
 ```
 
 #### 3. Build das Aplicações
@@ -311,7 +328,7 @@ Execute os testes no BrowserStack:
 # Configurar variáveis de ambiente para BrowserStack
 export BROWSERSTACK_USERNAME="$BROWSERSTACK_USERNAME"
 export BROWSERSTACK_ACCESS_KEY="$BROWSERSTACK_ACCESS_KEY"
-export BROWSERSTACK_BUILD_NAME="RN-AW-Test-${{ github.run_number }}"
+export BROWSERSTACK_BUILD_NAME="RN-AW-Test-$(date +%Y%m%d-%H%M%S)"
 export BROWSERSTACK_PROJECT_NAME="React Native AW Test"
 
 # Função para executar testes em uma plataforma
@@ -395,10 +412,11 @@ TEST_REPORT="## 📱 BrowserStack Test Results
 ### BrowserStack Session
 🔗 [View Test Sessions](https://app-automate.browserstack.com/dashboard/v2/builds/$BROWSERSTACK_SESSIONS)
 
-### Commit Information
-- **SHA**: ${{ github.sha }}
-- **Branch**: ${{ github.ref_name }}
-- **Author**: ${{ github.actor }}"
+## 📊 Resultados dos Testes
+
+- **SHA**: $(git rev-parse HEAD)
+- **Branch**: $(git rev-parse --abbrev-ref HEAD)
+- **Author**: $(git log -1 --pretty=format:'%an')""
 
 if [ "$TESTS_PASSED" = "false" ]; then
   TEST_REPORT="$TEST_REPORT
@@ -416,9 +434,10 @@ Publique os resultados baseado no contexto:
 
 ```bash
 # Decidir como reportar baseado no contexto
-if [ "${{ github.event_name }}" = "pull_request" ]; then
+# Determinar se é um pull request verificando se existe GITHUB_HEAD_REF
+if [ -n "$GITHUB_HEAD_REF" ]; then
   # Comentar no PR
-  echo "💬 Adding comment to PR #${{ github.event.pull_request.number }}"
+  echo "💬 Adding comment to pull request"
 
   cat test-results.md
 
@@ -426,7 +445,7 @@ elif [ "$TESTS_PASSED" = "false" ]; then
   # Criar issue para falhas em push/workflow_dispatch
   echo "🐛 Creating issue for test failures"
 
-  ISSUE_TITLE="Test Failures on BrowserStack - ${{ github.ref_name }} (${{ github.run_number }})"
+  ISSUE_TITLE="Test Failures on BrowserStack - $(git rev-parse --abbrev-ref HEAD) ($(date +%Y%m%d-%H%M%S))"
   ISSUE_BODY="$(cat test-results.md)
 
 ### How to Reproduce
@@ -439,7 +458,7 @@ elif [ "$TESTS_PASSED" = "false" ]; then
 - [ ] Fix identified issues
 - [ ] Re-run tests to verify fixes
 
-/cc @${{ github.actor }}"
+/cc @$(git log -1 --pretty=format:'%an')"
 
   # Note: O safe-outputs irá criar o issue automaticamente
   echo "Issue will be created automatically with title: $ISSUE_TITLE"

@@ -96,7 +96,8 @@ Executa testes E2E automatizados no BrowserStack para o app React Native em disp
 
 ### Parâmetros de Entrada:
 
-Determine os parâmetros de entrada automaticamente com base no contexto do trigger:
+````bash
+# Determine os parâmetros de entrada automaticamente com base no contexto do trigger:
 
 - **Platform**: Padrão 'both' (iOS e Android), pode ser especificado via workflow_dispatch
 - **iOS Device**: Padrão 'iPhone 15', pode ser especificado via workflow_dispatch
@@ -118,7 +119,7 @@ if [ -z "$BROWSERSTACK_USERNAME" ] || [ -z "$BROWSERSTACK_ACCESS_KEY" ]; then
 fi
 
 echo "✅ Credenciais do BrowserStack verificadas"
-```
+````
 
 #### 2. Preparação do Ambiente
 
@@ -207,7 +208,14 @@ upload_to_browserstack() {
     -F "file=@$app_path" \
     -F "custom_id=rn-aw-test-$platform-$(date +%s)")
 
-  app_url=$(echo $response | jq -r '.app_url')
+  # Verificar se a resposta é um JSON válido
+  if echo "$response" | jq . >/dev/null 2>&1; then
+    app_url=$(echo $response | jq -r '.app_url')
+  else
+    echo "❌ Invalid JSON response from BrowserStack upload API"
+    echo "Response: $response"
+    exit 1
+  fi
 
   if [ "$app_url" != "null" ] && [ -n "$app_url" ]; then
     echo "✅ $platform app uploaded: $app_url"
@@ -287,7 +295,8 @@ export DETOX_CONFIGURATION_PATH=".detoxrc.browserstack.js"
 
 #### 6. Seleção de Testes
 
-Determine quais testes executar baseado no parâmetro test_suite:
+````bash
+# Determine quais testes executar baseado no parâmetro test_suite:
 
 ```bash
 # Determinar arquivos de teste baseado na suite
@@ -318,11 +327,12 @@ get_test_files() {
 
 TEST_FILES=$(get_test_files "$TEST_SUITE")
 echo "🧪 Test files to run: $TEST_FILES"
-```
+````
 
 #### 7. Execução dos Testes
 
-Execute os testes no BrowserStack:
+````bash
+# Execute os testes no BrowserStack:
 
 ```bash
 # Configurar variáveis de ambiente para BrowserStack
@@ -371,11 +381,12 @@ if [ "$PLATFORM" = "android" ] || [ "$PLATFORM" = "both" ]; then
     echo "❌ Android tests failed"
   fi
 fi
-```
+````
 
 #### 8. Coleta de Resultados e Relatórios
 
-Colete os resultados e gere relatórios:
+````bash
+# Colete os resultados e gere relatórios:
 
 ```bash
 # Coletar resultados dos testes
@@ -387,12 +398,24 @@ FAILED_TESTS=$(grep -r "FAIL\|Error" e2e/artifacts/ 2>/dev/null | wc -l || echo 
 PASSED_TESTS=$((TOTAL_TESTS - FAILED_TESTS))
 
 # Coletar links das sessões BrowserStack
-BROWSERSTACK_SESSIONS=$(curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
-  "https://api.browserstack.com/app-automate/builds.json" | \
-  jq -r --arg build "$BROWSERSTACK_BUILD_NAME" \
-  '.[] | select(.name == $build) | .hashed_id')
+BROWSERSTACK_RESPONSE=$(curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+  "https://api.browserstack.com/app-automate/builds.json")
 
-echo "📱 BrowserStack Build: https://app-automate.browserstack.com/dashboard/v2/builds/$BROWSERSTACK_SESSIONS"
+# Verificar se a resposta é um JSON válido
+if echo "$BROWSERSTACK_RESPONSE" | jq . >/dev/null 2>&1; then
+  BROWSERSTACK_SESSIONS=$(echo "$BROWSERSTACK_RESPONSE" | \
+    jq -r --arg build "$BROWSERSTACK_BUILD_NAME" \
+    '.[] | select(.name == $build) | .hashed_id')
+
+  if [ -n "$BROWSERSTACK_SESSIONS" ] && [ "$BROWSERSTACK_SESSIONS" != "null" ]; then
+    echo "📱 BrowserStack Build: https://app-automate.browserstack.com/dashboard/v2/builds/$BROWSERSTACK_SESSIONS"
+  else
+    echo "⚠️ BrowserStack build not found or no sessions available"
+  fi
+else
+  echo "⚠️ Invalid JSON response from BrowserStack API"
+  echo "Response: $BROWSERSTACK_RESPONSE"
+fi
 
 # Preparar relatório
 TEST_REPORT="## 📱 BrowserStack Test Results
@@ -426,7 +449,7 @@ $(find e2e/artifacts -name "*.log" -exec echo "#### {}" \; -exec head -10 {} \; 
 fi
 
 echo "$TEST_REPORT" > test-results.md
-```
+````
 
 #### 9. Publicação dos Resultados
 

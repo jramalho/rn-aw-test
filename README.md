@@ -45,6 +45,7 @@ A modern React Native project showcasing the **New Architecture** (Fabric + Turb
 - **Contributing**: Check [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines
 - **Accessibility**: Read [docs/ACCESSIBILITY.md](./docs/ACCESSIBILITY.md) for accessibility features
 - **Animations**: See [docs/ANIMATIONS.md](./docs/ANIMATIONS.md) for Reanimated 3 animations and micro-interactions
+- **Enhanced Animations**: Read [docs/ENHANCED_ANIMATIONS.md](./docs/ENHANCED_ANIMATIONS.md) for advanced gestures and screen transitions
 - **Bundle Optimization**: See [docs/BUNDLE_SIZE_OPTIMIZATION.md](./docs/BUNDLE_SIZE_OPTIMIZATION.md) for size reduction strategies
 - **Push Notifications**: See [docs/PUSH_NOTIFICATIONS.md](./docs/PUSH_NOTIFICATIONS.md) for notification features
 - **Deep Linking**: Read [docs/DEEP_LINKING.md](./docs/DEEP_LINKING.md) for deep link patterns
